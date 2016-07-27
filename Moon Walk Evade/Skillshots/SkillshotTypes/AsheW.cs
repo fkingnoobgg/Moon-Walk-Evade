@@ -4,12 +4,12 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.Evading;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Evading;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Skillshots.SkillshotTypes
+namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
     public class AsheW : EvadeSkillshot
     {

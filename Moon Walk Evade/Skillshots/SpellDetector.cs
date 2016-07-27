@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
-using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Utils;
 
-namespace MoonWalkEvade.Skillshots
+namespace Moon_Walk_Evade.Skillshots
 {
     public class SpellDetector
     {

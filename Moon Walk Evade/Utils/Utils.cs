@@ -7,7 +7,7 @@ using EloBuddy.SDK.Rendering;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Utils
+namespace Moon_Walk_Evade.Utils
 {
     internal static class Utils
     {

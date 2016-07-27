@@ -4,11 +4,11 @@ using System.Text.RegularExpressions;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Skillshots.SkillshotTypes
+namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
     class VeigarE : EvadeSkillshot
     {

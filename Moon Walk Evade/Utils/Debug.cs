@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
-using MoonWalkEvade.Skillshots;
-using MoonWalkEvade.Skillshots.SkillshotTypes;
+using Moon_Walk_Evade.Skillshots;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 using SharpDX;
 
-namespace MoonWalkEvade.Utils
+namespace Moon_Walk_Evade.Utils
 {
     static class Debug
     {

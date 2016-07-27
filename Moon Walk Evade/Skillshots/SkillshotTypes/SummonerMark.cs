@@ -2,11 +2,11 @@
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Skillshots.SkillshotTypes
+namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
     public class SummonerMark : EvadeSkillshot
     {

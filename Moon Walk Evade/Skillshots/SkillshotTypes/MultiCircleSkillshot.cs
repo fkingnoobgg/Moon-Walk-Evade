@@ -7,7 +7,7 @@ using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Skillshots.SkillshotTypes
+namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
     class MultiCircleSkillshot : EvadeSkillshot
     {

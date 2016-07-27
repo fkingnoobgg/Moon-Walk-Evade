@@ -63,7 +63,6 @@
     <Compile Include="Evading\AutoPathing.cs" />
     <Compile Include="Evading\Collision.cs" />
     <Compile Include="Evading\MoonWalkEvade.cs" />
-    <Compile Include="Evading\PathFinding.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Skillshots\EvadeSkillshot.cs" />

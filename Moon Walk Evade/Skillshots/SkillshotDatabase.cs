@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using EloBuddy;
-using MoonWalkEvade.Skillshots.SkillshotTypes;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 
-namespace MoonWalkEvade.Skillshots
+namespace Moon_Walk_Evade.Skillshots
 {
     internal static class SkillshotDatabase
     {

@@ -4,11 +4,11 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.Skillshots.SkillshotTypes;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 
-namespace MoonWalkEvade.Evading
+namespace Moon_Walk_Evade.Evading
 {
     internal static class Collision
     {

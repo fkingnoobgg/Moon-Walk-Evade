@@ -3,10 +3,10 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 
-namespace MoonWalkEvade.EvadeSpells
+namespace Moon_Walk_Evade.EvadeSpells
 {
     public static class EvadeSpellManager
     {

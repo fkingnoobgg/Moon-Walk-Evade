@@ -1,9 +1,9 @@
 ﻿using EloBuddy.SDK.Events;
-using MoonWalkEvade.Skillshots;
-using MoonWalkEvade.Utils;
-using Collision = MoonWalkEvade.Evading.Collision;
+using Moon_Walk_Evade.Skillshots;
+using Moon_Walk_Evade.Utils;
+using Collision = Moon_Walk_Evade.Evading.Collision;
 
-namespace MoonWalkEvade
+namespace Moon_Walk_Evade
 {
     internal static class Program
     {

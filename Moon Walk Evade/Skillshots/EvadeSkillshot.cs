@@ -2,7 +2,7 @@
 using EloBuddy.SDK;
 using SharpDX;
 
-namespace MoonWalkEvade.Skillshots
+namespace Moon_Walk_Evade.Skillshots
 {
     public abstract class EvadeSkillshot
     {

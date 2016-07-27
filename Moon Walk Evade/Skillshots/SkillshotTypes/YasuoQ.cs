@@ -1,7 +1,7 @@
 ﻿using EloBuddy;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.Utils;
 
-namespace MoonWalkEvade.Skillshots.SkillshotTypes
+namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
     public class YasuoQ : LinearSkillshot
     {

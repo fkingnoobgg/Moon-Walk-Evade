@@ -1,6 +1,6 @@
 ﻿using EloBuddy;
 
-namespace MoonWalkEvade.EvadeSpells
+namespace Moon_Walk_Evade.EvadeSpells
 {
     public delegate bool UseSpellFunc(EvadeSpellData evadeSpell, bool process = true);
 

@@ -4,10 +4,10 @@ using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
-using MoonWalkEvade.EvadeSpells;
-using MoonWalkEvade.Skillshots;
+using Moon_Walk_Evade.EvadeSpells;
+using Moon_Walk_Evade.Skillshots;
 
-namespace MoonWalkEvade
+namespace Moon_Walk_Evade
 {
     internal static class MenuExtension
     {

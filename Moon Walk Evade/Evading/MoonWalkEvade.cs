@@ -7,13 +7,14 @@ using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
-using MoonWalkEvade.EvadeSpells;
-using MoonWalkEvade.Skillshots;
-using MoonWalkEvade.Utils;
+using Moon_Walk_Evade.EvadeSpells;
+using Moon_Walk_Evade.Skillshots;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MoonWalkEvade.Evading
+namespace Moon_Walk_Evade.Evading
 {
     public class MoonWalkEvade
     {
@@ -53,7 +54,6 @@ namespace MoonWalkEvade.Evading
         #region Vars
 
         public SpellDetector SpellDetector { get; private set; }
-        public PathFinding PathFinding { get; private set; }
 
         public EvadeSkillshot[] Skillshots { get; private set; }
         public Geometry.Polygon[] Polygons { get; private set; }
@@ -73,7 +73,6 @@ namespace MoonWalkEvade.Evading
             Skillshots = new EvadeSkillshot[] { };
             Polygons = new Geometry.Polygon[] { };
             ClippedPolygons = new List<Geometry.Polygon>();
-            PathFinding = new PathFinding(this);
             StatusText = new Text("MoonWalkEvade", new Font("Euphemia", 10F, FontStyle.Bold)); //Calisto MT
             _skillshotPolygonCache = new Dictionary<EvadeSkillshot, Geometry.Polygon>();
 
@@ -427,8 +426,8 @@ namespace MoonWalkEvade.Evading
                     if (skillshot.OwnSpellData.ForbidCrossing)
                         return false;
 
-                    var firstDangerPoint = intersections.Last();
-                    var crossPoint = intersections.First();
+                    var firstDangerPoint = intersections.OrderBy(x => x.Distance(hero)).First();
+                    var crossPoint = intersections.OrderBy(x => x.Distance(hero)).Last();
 
                     var walkTimeToDangerStart = hero.WalkingTime(hero.Position.To2D(), firstDangerPoint);
                     var walkTimeToDangerEnd = hero.WalkingTime(hero.Position.To2D(), crossPoint);
@@ -436,7 +435,8 @@ namespace MoonWalkEvade.Evading
                     float maxTime1 = skillshot.GetAvailableTime(firstDangerPoint);
                     float time1 = Math.Max(0, maxTime1 - Game.Ping + ServerTimeBuffer);
 
-                    float time2 = GetShortesTimeAvailiableInInsidePath(new[] { pathStart, crossPoint }, skillshot);
+                    float maxTime2 = skillshot.GetAvailableTime(crossPoint);
+                    float time2 = Math.Max(0, maxTime2 - Game.Ping + ServerTimeBuffer);
 
                     bool dangerStartUnsafe = time1 - walkTimeToDangerStart > 0;
                     bool dangerEndUnsafe = walkTimeToDangerEnd > time2;

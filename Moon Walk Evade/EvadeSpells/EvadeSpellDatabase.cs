@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using EloBuddy;
 
-namespace MoonWalkEvade.EvadeSpells
+namespace Moon_Walk_Evade.EvadeSpells
 {
     class EvadeSpellDatabase
     {
