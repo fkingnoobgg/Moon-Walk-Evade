@@ -16,8 +16,9 @@ namespace Moon_Walk_Evade
             Loading.OnLoadingComplete += delegate
             {
                 _spellDetector = new SpellDetector(DeveloperMode ? DetectionTeam.AnyTeam : DetectionTeam.EnemyTeam);
-                new Evading.MoonWalkEvade(_spellDetector);
                 EvadeMenu.CreateMenu();
+                new Evading.MoonWalkEvade(_spellDetector);
+                
 
                 Collision.Init();
                 Debug.Init(ref _spellDetector);
