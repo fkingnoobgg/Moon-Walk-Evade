@@ -350,7 +350,17 @@ namespace Moon_Walk_Evade.Evading
                     var skillshot = pair.Key;
                     var polygon = pair.Value;
 
-                    if (polygon.IsInside(start) && polygon.IsInside(end))
+                    Func<Vector2, bool> isInside = point =>
+                    {
+                        if (skillshot.OwnSpellData.IsVeigarE)
+                        {
+                            return skillshot.ToInnerPolygon().IsOutside(point) && skillshot.ToOuterPolygon().IsInside(point);
+                        }
+
+                        return polygon.IsInside(point);
+                    };
+
+                    if (isInside(start) && isInside(end))
                     {
                         //var time1 = skillshot.GetAvailableTime(start);
                         var time2 = skillshot.GetAvailableTime(end);
@@ -373,7 +383,7 @@ namespace Moon_Walk_Evade.Evading
                             var point1 = intersections[i2];
                             var point2 = intersections[i2 + 1];
 
-                            if (polygon.IsInside(point2) || polygon.IsInside(point1))
+                            if (isInside(point2) || isInside(point1))
                             {
                                 //var time1 = polygon.IsInside(point1) ? skillshot.GetAvailableTime(point1) : short.MaxValue;
                                 var time2 = polygon.IsInside(point2) ? skillshot.GetAvailableTime(point2) : short.MaxValue;
