@@ -9,8 +9,6 @@ c:\users\daniel\documents\visual studio 2015\Projects\Moon Walk Evade\Moon Walk 
 c:\users\daniel\documents\visual studio 2015\Projects\Moon Walk Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.exe
 c:\users\daniel\documents\visual studio 2015\Projects\Moon Walk Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\Moon Walk Evade.exe.config
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.exe
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\Moon Walk Evade.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\Moon Walk Evade.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\EloBuddy.dll
@@ -18,3 +16,5 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk 
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\SharpDX.Direct3D9.dll
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\SharpDX.dll
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.pdb

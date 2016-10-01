@@ -2606,25 +2606,25 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "VeigarDarkMatter"
                     }
                 },
-                new VeigarE
-                {
-                    OwnSpellData = new SpellData
-                    {
-                        DisplayName = "Event Horizon",
-                        ChampionName = "Veigar",
-                        SpellName = "VeigarEventHorizon",
-                        Slot = SpellSlot.E,
-                        Delay = 250,
-                        Range = 700,
-                        Radius = 320,
-                        RingRadius = 150,
-                        MissileSpeed = 0,
-                        DangerValue = 4,
-                        IsDangerous = true,
-                        ObjectCreationName = "",
-                        ForbidCrossing = true
-                    }
-                },
+                //new VeigarE
+                //{
+                //    OwnSpellData = new SpellData
+                //    {
+                //        DisplayName = "Event Horizon",
+                //        ChampionName = "Veigar",
+                //        SpellName = "VeigarEventHorizon",
+                //        Slot = SpellSlot.E,
+                //        Delay = 250,
+                //        Range = 700,
+                //        Radius = 320,
+                //        RingRadius = 150,
+                //        MissileSpeed = 0,
+                //        DangerValue = 4,
+                //        IsDangerous = true,
+                //        ObjectCreationName = "",
+                //        ForbidCrossing = true
+                //    }
+                //},
                 //new CircularSkillshot
                 //{
                 //    OwnSpellData = new OwnSpellData
