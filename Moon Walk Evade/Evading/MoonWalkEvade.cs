@@ -525,6 +525,24 @@ namespace Moon_Walk_Evade.Evading
             return !polPoints.Any() ? Vector2.Zero : polPoints.Last();
         }
 
+        int GetTimeUnitlOutOfDangerArea(Vector2 evadePoint)
+        {
+            IEnumerable<Vector2> inters =
+                (from polygon in SkillshotDetector.ActiveSkillshots.Select(x => x.ToRealPolygon())
+                 let intersections = polygon.GetIntersectionPointsWithLineSegment(Player.Instance.Position.To2D(), evadePoint)
+                 .OrderBy(x => x.Distance(Player.Instance))
+                 where intersections.Any()
+                 select intersections.Last()).ToList();
+
+            if (inters.Any())
+            {
+                var farest = inters.OrderBy(x => x.Distance(Player.Instance)).Last();
+                return Player.Instance.WalkingTime(farest);
+            }
+
+            return int.MaxValue;
+        }
+
         public EvadeResult CalculateEvade(Vector2 anchor)
         {
             var playerPos = Player.Instance.ServerPosition.To2D();
@@ -539,13 +557,12 @@ namespace Moon_Walk_Evade.Evading
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
             }
 
-            var evadePoint = points.OrderByDescending(p => p.Distance(playerPos)).Last();
+            var evadePoint =
+                points.OrderBy(p => !p.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos))
+                    .FirstOrDefault();
 
-            //points.OrderByDescending(p => p.Distance(playerPos)).Last();
-            //points.OrderByDescending(p => p.Distance(anchor) + p.Distance(playerPos)).Last();
-            //points.OrderBy(p => p.Distance(playerPos)).ThenBy(p => 1 / p.Distance(anchor)).Last();
-
-            return new EvadeResult(this, evadePoint, anchor, maxTime, time, true);
+            return new EvadeResult(this, evadePoint, anchor, maxTime, time,
+                !IsHeroInDanger() || GetTimeUnitlOutOfDangerArea(evadePoint) < time);
         }
 
         public bool IsHeroPathSafe(EvadeResult evade, Vector3[] desiredPath, AIHeroClient hero = null)
