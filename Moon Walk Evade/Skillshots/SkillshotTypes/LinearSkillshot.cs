@@ -25,7 +25,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public Vector3 _startPos;
         public Vector3 _endPos;
-        private bool DoesCollide, CollisionChecked;
+        private bool DoesCollide;
         private Vector2 LastCollisionPos;
 
         public MissileClient Missile => OwnSpellData.IsPerpendicular ? null : SpawnObject as MissileClient;
@@ -128,6 +128,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
                 _endPos = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
             }
+
+            Vector2 collision = this.GetCollisionPoint();
+            DoesCollide = !collision.IsZero;
+            LastCollisionPos = collision;
+
+            if (DoesCollide && !LastCollisionPos.ProjectOn(StartPosition.To2D(), EndPosition.To2D()).IsOnSegment)
+                DoesCollide = false;
         }
 
         public override void OnTick()
@@ -161,16 +168,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     return;
                 }
             }
-
-            if (!CollisionChecked)
-            {
-                Vector2 collision = this.GetCollisionPoint();
-                DoesCollide = !collision.IsZero;
-                LastCollisionPos = collision;
-                CollisionChecked = true;
-            }
-            else if (DoesCollide && !LastCollisionPos.ProjectOn(StartPosition.To2D(), EndPosition.To2D()).IsOnSegment)
-                DoesCollide = false;
         }
 
         public override void OnDraw()

@@ -445,7 +445,7 @@ namespace Moon_Walk_Evade.Evading
             var polygons = ClippedPolygons.Where(p => p.IsInside(from)).ToArray();
             var segments = new List<Vector2[]>();
 
-            foreach (var pol in polygons)
+            foreach (var pol in polygons.Select(x => x.ToDetailedPolygon()))
             {
                 for (var i = 0; i < pol.Points.Count; i++)
                 {
@@ -491,8 +491,8 @@ namespace Moon_Walk_Evade.Evading
                 var dist = segment[0].Distance(segment[1]);
                 if (dist > maxdist)
                 {
-                    segment[0] = segment[0].Extend(segment[1], dist / 2 - maxdist / 2);
-                    segment[1] = segment[1].Extend(segment[1], dist / 2 - maxdist / 2);
+                    segment[0] = segment[0].Extend(segment[1], dist / 2 - maxdist / 2f);
+                    segment[1] = segment[1].Extend(segment[1], dist / 2 - maxdist / 2f);
                     dist = maxdist;
                 }
 
@@ -510,7 +510,11 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            return points.ToArray();
+            return LastEvadeResult != null && Environment.TickCount - LastEvadeResult.Time <= 500 && !LastEvadeResult.EvadePoint.IsZero 
+                ? 
+                points.Where(p => p.Distance(LastEvadeResult.EvadePoint) >= 225).ToArray() 
+                : 
+                points.ToArray();
         }
 
         public Vector2 GetClosestEvadePoint(Vector2 from)
@@ -556,7 +560,7 @@ namespace Moon_Walk_Evade.Evading
             {
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
             }
-
+            
             var evadePoint =
                 points.OrderBy(p => !p.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos))
                     .FirstOrDefault();
