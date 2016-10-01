@@ -44,9 +44,9 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             // Set up main menu
-            MainMenu.AddGroupLabel("General Settings");
-            MainMenu.Add("evadeMode", new ComboBox("moonWalkEvade Mode", 0, "Smooth - Moon Walk Style", "Fast - MoonWalkEvade Style"));
-            MainMenu.AddSeparator();
+            //MainMenu.AddGroupLabel("General Settings");
+            //MainMenu.Add("evadeMode", new ComboBox("moonWalkEvade Mode", 0, "Smooth - Moon Walk Style", "Fast - MoonWalkEvade Style"));
+            //MainMenu.AddSeparator();
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
@@ -55,11 +55,11 @@ namespace Moon_Walk_Evade
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After moonWalkEvade", false));
             MainMenu.AddSeparator();
 
-            MainMenu.Add("minComfortDist", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
-            MainMenu.AddLabel("If possible");
-            MainMenu.AddSeparator(10);
-            MainMenu.Add("ignoreComfort", new Slider("Ignore Comfort Distance For X Enemies", 1, 1, 5));
-            MainMenu.AddSeparator();
+            //MainMenu.Add("minComfortDist", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
+            //MainMenu.AddLabel("If possible");
+            //MainMenu.AddSeparator(10);
+            //MainMenu.Add("ignoreComfort", new Slider("Ignore Comfort Distance For X Enemies", 1, 1, 5));
+            //MainMenu.AddSeparator();
 
             MainMenu.AddGroupLabel("Humanizer");
             MainMenu.Add("skillshotActivationDelay", new Slider("Reaction Delay", 0, 0, 400));

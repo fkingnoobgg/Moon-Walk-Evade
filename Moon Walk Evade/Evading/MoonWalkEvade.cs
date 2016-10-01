@@ -657,7 +657,7 @@ namespace Moon_Walk_Evade.Evading
                 }
                 else
                 {
-                    if (!evade.EnoughTime && LastEvadeResult == null && !IsHeroPathSafe(evade, desiredPath))
+                    if (!evade.EnoughTime && !IsHeroPathSafe(evade, desiredPath))
                     {
                         return EvadeSpellManager.TryEvadeSpell(evade, this);
                     }
