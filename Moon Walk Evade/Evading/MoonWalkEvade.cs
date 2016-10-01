@@ -657,10 +657,8 @@ namespace Moon_Walk_Evade.Evading
                 }
                 else
                 {
-                    if (!evade.EnoughTime && !IsHeroPathSafe(evade, desiredPath))
-                    {
-                        return EvadeSpellManager.TryEvadeSpell(evade, this);
-                    }
+                    Chat.Print("asd");
+                    return EvadeSpellManager.TryEvadeSpell(evade, this);
                 }
 
                 if (LastEvadeResult != null) //&& LastEvadeResult.EvadePoint.Distance(hero) > hero.HitBoxRadius()
