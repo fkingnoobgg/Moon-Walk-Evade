@@ -657,7 +657,6 @@ namespace Moon_Walk_Evade.Evading
                 }
                 else
                 {
-                    Chat.Print("asd");
                     return EvadeSpellManager.TryEvadeSpell(evade, this);
                 }
 
