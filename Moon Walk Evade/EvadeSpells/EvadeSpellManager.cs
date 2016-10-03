@@ -109,7 +109,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
             var evadePoint =
                 points.Where
-                (x => moonWalkMoonWalkEvade.IsPointSafe(x) && !Utils.Utils.IsWall(x)).OrderBy(x => x.Distance(Game.CursorPos)).
+                (x => moonWalkMoonWalkEvade.IsPointSafe(x) && !x.IsWall()).OrderBy(x => x.Distance(Game.CursorPos)).
                 FirstOrDefault();
             return evadePoint;
         }

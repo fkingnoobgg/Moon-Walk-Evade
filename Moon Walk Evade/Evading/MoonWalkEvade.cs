@@ -83,7 +83,7 @@ namespace Moon_Walk_Evade.Evading
 
         #region Vars
 
-        public SpellDetector SkillshotDetector { get; private set; }
+        public SpellDetector SkillshotDetector { get; set; }
         public PathFinding PathFinding { get; private set; }
 
         public EvadeSkillshot[] Skillshots { get; private set; }
@@ -173,6 +173,8 @@ namespace Moon_Walk_Evade.Evading
                 CurrentEvadeResult = null;
                 return;
             }
+            //if (CurrentEvadeResult != null && Player.Instance.Distance(CurrentEvadeResult.WalkPoint) <= 200)
+            //    CurrentEvadeResult = null;
 
             if (CurrentEvadeResult == null)
                 CheckEvade();
@@ -328,20 +330,20 @@ namespace Moon_Walk_Evade.Evading
 
         public bool IsPathSafe(Vector2[] path)
         {
-            return IsPathSafeEx(path);
-
-            for (var i = 0; i < path.Length - 1; i++)
+            foreach (var evadeSkillshot in Skillshots)
             {
-                var start = path[i];
-                var end = path[i + 1];
-
-                if (ClippedPolygons.Any(p => p.IsInside(end) || p.IsInside(start) || p.IsIntersectingWithLineSegment(start, end)))
+                try
                 {
-                    return false;
+                    if (!evadeSkillshot.IsSafePath(path))
+                        return false;
+                }
+                catch (Exception ex)
+                {
+                    Chat.Print(evadeSkillshot.DisplayText);
                 }
             }
-
             return true;
+            //return IsPathSafeEx(path);
         }
 
         public bool IsPathSafe(Vector3[] path)
@@ -484,7 +486,7 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            return points.Where(p => IsPointSafe(p) && IsPathSafeEx(p)).ToArray();
+            return points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToArray();
         }
 
         public Vector2 GetClosestEvadePoint(Vector2 from)
@@ -529,7 +531,7 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any())
             {
-                Chat.Print("no point found");
+                //Chat.Print("no point found");
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, false);
             }
 

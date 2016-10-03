@@ -12,24 +12,6 @@ namespace Moon_Walk_Evade.Skillshots
         {
             Database = new List<EvadeSkillshot>
             {
-                new SummonerMark
-                {
-                    OwnSpellData = new SpellData
-                    {
-                        DisplayName = "Mark",
-                        ChampionName = "AllChampions",
-                        SpellName = "summonersnowball",
-                        Slot = SpellSlot.Summoner1,
-                        Delay = 0,
-                        Range = 1600,
-                        Radius = 60,
-                        MissileSpeed = 1300,
-                        DangerValue = 1,
-                        IsDangerous = true,
-                        ObjectCreationName = "disabled/TestCubeRender",
-                        ToggleParticleName = "Summoner_Snowball_Explosion_Sound.troy"
-                    }
-                },
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData

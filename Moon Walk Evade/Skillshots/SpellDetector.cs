@@ -62,7 +62,7 @@ namespace Moon_Walk_Evade.Skillshots
         public void AddSkillshot(EvadeSkillshot skillshot, bool isProcessSpell = false, bool triggerEvent = true)
         {
             if (LimitDetectionRange && !skillshot.OwnSpellData.IsGlobal &&
-                skillshot.GetPosition().Distance(Player.Instance, true) > (2 * skillshot.OwnSpellData.Range).Pow())
+                skillshot.GetCurrentPosition().Distance(Player.Instance, true) > (2 * skillshot.OwnSpellData.Range).Pow())
             {
                 return;
             }

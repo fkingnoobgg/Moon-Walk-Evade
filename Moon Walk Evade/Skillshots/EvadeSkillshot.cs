@@ -6,6 +6,20 @@ namespace Moon_Walk_Evade.Skillshots
 {
     public abstract class EvadeSkillshot
     {
+        protected struct FoundIntersection
+        {
+            public float Distance;
+            public Vector2 Point;
+            public int Time;
+
+            public FoundIntersection(float distance, int time, Vector2 point, Vector2 comingFrom)
+            {
+                Distance = distance;
+                Point = point;
+                Time = time;
+            }
+        }
+
         public SpellDetector SpellDetector { get; set; }
         public GameObject SpawnObject { get; set; }
         public Obj_AI_Base Caster { get; set; }
@@ -22,7 +36,9 @@ namespace Moon_Walk_Evade.Skillshots
 
         public string DisplayText => $"{OwnSpellData.ChampionName} {OwnSpellData.Slot} - {OwnSpellData.DisplayName}";
 
-        public abstract Vector3 GetPosition();
+        public abstract Vector3 GetCurrentPosition();
+
+        public abstract Vector2 GetMissilePosition(int extraTime);
 
         /// <summary>
         /// with missile
@@ -89,5 +105,9 @@ namespace Moon_Walk_Evade.Skillshots
         {
             return $"{OwnSpellData.ChampionName}_{OwnSpellData.Slot}_{OwnSpellData.DisplayName}";
         }
+
+        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0);
+
+        public abstract bool IsSafe(Vector2? p = null);
     }
 }

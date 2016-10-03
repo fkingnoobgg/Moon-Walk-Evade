@@ -44,8 +44,8 @@ namespace Moon_Walk_Evade.Utils
                 if (lastKSkillshot.GetType() == typeof(LinearSkillshot))
                 {
                     var skill = (LinearSkillshot)lastKSkillshot;
-                    if (skill.StartPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius && 
-                        Player.Instance.Position.To2D().ProjectOn(skill.StartPosition.To2D(), skill.EndPosition.To2D()).IsOnSegment && skill.Missile != null)
+                    if (skill.CurrentPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius && 
+                        Player.Instance.Position.To2D().ProjectOn(skill.CurrentPosition.To2D(), skill.EndPosition.To2D()).IsOnSegment && skill.Missile != null)
                     {
                         Chat.Print(Game.Time + "  Hit");
                         lastKSkillshot = null;

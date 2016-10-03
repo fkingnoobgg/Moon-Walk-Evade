@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -23,16 +24,14 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public Vector3 _startPos;
-        public Vector3 _endPos;
+        public Vector3 FixedStartPos;
+        public Vector3 FixedEndPos;
         private bool DoesCollide;
         private Vector2 LastCollisionPos;
 
-        public Vector3 RealMissileStartPos { get; set; }
-
         public MissileClient Missile => OwnSpellData.IsPerpendicular ? null : SpawnObject as MissileClient;
 
-        public Vector3 StartPosition
+        public Vector3 CurrentPosition
         {
             get
             {
@@ -41,7 +40,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 {
                     if (debugMode)
                         return Debug.GlobalStartPos;
-                    return _startPos;
+                    return FixedStartPos;
                 }
 
                 
@@ -53,7 +52,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     return Debug.GlobalStartPos.Extend(Debug.GlobalEndPos, traveledDist).To3D();
                 }
 
-                if (DoesCollide && Missile.Position.Distance(RealMissileStartPos) >= LastCollisionPos.Distance(RealMissileStartPos))
+                if (DoesCollide && Missile.Position.Distance(Missile.StartPosition) >= LastCollisionPos.Distance(Missile.StartPosition))
                     return LastCollisionPos.To3D();
 
                 return Missile.Position;
@@ -71,7 +70,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
                 if (Missile == null)
                 {
-                    return _endPos;
+                    return FixedEndPos;
                 }
 
                 if (DoesCollide)
@@ -82,9 +81,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public override Vector3 GetPosition()
+        public override Vector3 GetCurrentPosition()
         {
-            return StartPosition;
+            return CurrentPosition;
         }
 
         public override EvadeSkillshot NewInstance(bool debug = false)
@@ -95,8 +94,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 bool isProjectile = EvadeMenu.HotkeysMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
                 var newDebugInst = new LinearSkillshot
                 {
-                    OwnSpellData = OwnSpellData, _startPos = Debug.GlobalStartPos,
-                    _endPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping-45,
+                    OwnSpellData = OwnSpellData, FixedStartPos = Debug.GlobalStartPos,
+                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping-45,
                     SpawnObject = isProjectile ? new MissileClient() : null
                 };
                 return newDebugInst;
@@ -119,12 +118,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             if (missile != null && !DoesCollide) //missle
             {
-                RealMissileStartPos = missile.Position;
                 Vector2 collision = this.GetCollisionPoint();
                 DoesCollide = !collision.IsZero;
                 LastCollisionPos = collision;
 
-                //if (DoesCollide && !LastCollisionPos.ProjectOn(StartPosition.To2D(), EndPosition.To2D()).IsOnSegment)
+                //if (DoesCollide && !LastCollisionPos.ProjectOn(CurrentPosition.To2D(), FixedEndPosition.To2D()).IsOnSegment)
                 //    DoesCollide = false;s
             }
         }
@@ -133,17 +131,17 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             if (!OwnSpellData.IsPerpendicular)
             {
-                _startPos = Caster.ServerPosition;
-                _endPos = _startPos.ExtendVector3(CastArgs.End, OwnSpellData.Range);
+                FixedStartPos = Caster.ServerPosition;
+                FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, OwnSpellData.Range);
             }
             else
             {
                 OwnSpellData.Direction = (CastArgs.End - CastArgs.Start).To2D().Normalized();
 
                 var direction = OwnSpellData.Direction;
-                _startPos = (CastArgs.End.To2D() - direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
+                FixedStartPos = (CastArgs.End.To2D() - direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
 
-                _endPos = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
+                FixedEndPos = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
             }
         }
 
@@ -188,13 +186,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            Utils.Utils.Draw3DRect(StartPosition, EndPosition, OwnSpellData.Radius * 2, Color.White);
+            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White);
         }
 
         public override Geometry.Polygon ToRealPolygon()
         {
             var halfWidth = OwnSpellData.Radius;
-            var d1 = StartPosition.To2D();
+            var d1 = CurrentPosition.To2D();
             var d2 = EndPosition.To2D();
             var direction = (d1 - d2).Perpendicular().Normalized();
 
@@ -218,7 +216,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 extrawidth += Player.Instance.HitBoxRadius();
             }
 
-            return new Geometry.Polygon.Rectangle(StartPosition, EndPosition.ExtendVector3(StartPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
+            return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
         }
 
         public override int GetAvailableTime(Vector2 pos)
@@ -228,34 +226,164 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected));
             }
 
-            var proj = pos.ProjectOn(StartPosition.To2D(), EndPosition.To2D());
+            var proj = pos.ProjectOn(CurrentPosition.To2D(), EndPosition.To2D());
             if (!proj.IsOnSegment)
                 return short.MaxValue;
 
             var dest = proj.SegmentPoint;
             var InsidePath = Player.Instance.GetPath(dest.To3D(), true).Where(segment => ToPolygon().IsInside(segment));
-            var point = InsidePath.OrderBy(x => x.Distance(StartPosition)).FirstOrDefault();
+            var point = InsidePath.OrderBy(x => x.Distance(CurrentPosition)).FirstOrDefault();
 
             if (point == default(Vector3))
                 return short.MaxValue;
 
-            float skillDist = point.Distance(StartPosition);
+            float skillDist = point.Distance(CurrentPosition);
             return (int)(skillDist/OwnSpellData.MissileSpeed*1000);
-
-            //var dist1 =
-            //    Math.Abs((EndPosition.Y - StartPosition.Y) * pos.X - (EndPosition.X - StartPosition.X) * pos.Y +
-            //             EndPosition.X * StartPosition.Y - EndPosition.Y * StartPosition.X) / StartPosition.Distance(EndPosition);
-
-            //var actualDist = Math.Sqrt(StartPosition.Distance(pos).Pow() - dist1.Pow());
-
-            //var time = OwnSpellData.MissileSpeed > 0 ? (int) (actualDist / OwnSpellData.MissileSpeed * 1000) : 0;
-
-            //return time;
         }
 
         public override bool IsFromFow()
         {
             return Missile != null && !Missile.SpellCaster.IsVisible;
         }
+
+        public override bool IsSafe(Vector2? p = null)
+        {
+            return ToPolygon().IsOutside(p ?? Player.Instance.Position.To2D());
+        }
+
+        public override Vector2 GetMissilePosition(int extraTime)
+        {
+            if (Missile == null)
+                return FixedStartPos.To2D();//Missile not even created
+
+            float dist = OwnSpellData.MissileSpeed/1000f*extraTime;
+            return CurrentPosition.Extend(Missile.EndPosition, dist);
+        }
+
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        {
+            var Distance = 0f;
+            timeOffset += Game.Ping / 2;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+            var allIntersections = new List<FoundIntersection>();
+            for (var i = 0; i <= path.Length - 2; i++)
+            {
+                var from = path[i];
+                var to = path[i + 1];
+                var segmentIntersections = new List<FoundIntersection>();
+                var polygon = ToPolygon();
+
+                for (var j = 0; j <= polygon.Points.Count - 1; j++)
+                {
+                    var sideStart = polygon.Points[j];
+                    var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
+
+                    var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                    if (intersection.Intersects)
+                    {
+                        segmentIntersections.Add(
+                            new FoundIntersection(
+                                Distance + intersection.Point.Distance(from),
+                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed),
+                                intersection.Point, from));
+                    }
+                }
+
+                var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+                allIntersections.AddRange(sortedList);
+
+                Distance += from.Distance(to);
+            }
+
+            //Skillshot with missile.
+            if (Missile != null)
+            {
+                //Outside the skillshot
+                if (IsSafe())
+                {
+                    //No intersections -> Safe
+                    if (allIntersections.Count == 0)
+                    {
+                        return true;
+                    }
+
+                    for (var i = 0; i <= allIntersections.Count - 1; i = i + 2)
+                    {
+                        var enterIntersection = allIntersections[i];
+                        var enterIntersectionProjection = enterIntersection.Point.ProjectOn(Missile.StartPosition.To2D(), EndPosition.To2D()).SegmentPoint;
+
+                        //Intersection with no exit point.
+                        if (i == allIntersections.Count - 1)
+                        {
+                            var missilePositionOnIntersection = GetMissilePosition(enterIntersection.Time - timeOffset);
+                            return
+                                EndPosition.Distance(missilePositionOnIntersection) + 50 <=
+                                EndPosition.Distance(enterIntersectionProjection) &&
+                                ObjectManager.Player.MoveSpeed < OwnSpellData.MissileSpeed;
+                        }
+
+
+                        var exitIntersection = allIntersections[i + 1];
+                        var exitIntersectionProjection = exitIntersection.Point.ProjectOn(Missile.StartPosition.To2D(), EndPosition.To2D()).SegmentPoint;
+
+                        var missilePosOnEnter = GetMissilePosition(enterIntersection.Time - timeOffset);
+                        var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
+
+                        //Missile didnt pass.
+                        if (missilePosOnEnter.Distance(EndPosition) + 50 > enterIntersectionProjection.Distance(EndPosition))
+                        {
+                            if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+
+                //Inside the skillshot.
+                if (allIntersections.Count == 0)
+                {
+                    return false;
+                }
+
+                if (allIntersections.Count > 0)
+                {
+                    //Check only for the exit point
+                    var exitIntersection = allIntersections[0];
+                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(FixedStartPos.To2D(), EndPosition.To2D()).SegmentPoint;
+
+                    var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
+                    if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return IsSafe();
+            }
+
+            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
+
+            if (!IsSafe(myPositionWhenExplodes))
+            {
+                return false;
+            }
+
+            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
+
+            return IsSafe(myPositionWhenExplodesWithOffset);
+        }
+
     }
 }

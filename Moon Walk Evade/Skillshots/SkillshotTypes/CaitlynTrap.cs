@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using EloBuddy;
@@ -28,7 +29,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public MissileClient Missile => SpawnObject as MissileClient;
 
-        public override Vector3 GetPosition()
+        public override Vector3 GetCurrentPosition()
         {
             return EndPosition;
         }
@@ -103,7 +104,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         /// </summary>
         public override void OnTick()
         {
-            if (EntityManager.Heroes.Allies.Any(x => x.Distance(EndPosition) <= 100 &&
+            if (EntityManager.Heroes.Allies.Any(x => x.Distance(EndPosition) <= 80 &&
                     x.HasBuff("caitlynyordletrapdebuff")) && IsValid)
                 IsValid = false;
             
@@ -146,6 +147,74 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override bool IsFromFow()
         {
             return false;
+        }
+
+        public override bool IsSafe(Vector2? p = null)
+        {
+            return ToPolygon().IsOutside(p ?? Player.Instance.Position.To2D());
+        }
+
+        public override Vector2 GetMissilePosition(int extraTime)
+        {
+            return EndPosition.To2D();
+        }
+
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        {
+            var Distance = 0f;
+            timeOffset += Game.Ping / 2;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+            var allIntersections = new List<FoundIntersection>();
+            for (var i = 0; i <= path.Length - 2; i++)
+            {
+                var from = path[i];
+                var to = path[i + 1];
+                var segmentIntersections = new List<FoundIntersection>();
+                var polygon = ToPolygon();
+
+                for (var j = 0; j <= polygon.Points.Count - 1; j++)
+                {
+                    var sideStart = polygon.Points[j];
+                    var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
+
+                    var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                    if (intersection.Intersects)
+                    {
+                        segmentIntersections.Add(
+                            new FoundIntersection(
+                                Distance + intersection.Point.Distance(from),
+                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed),
+                                intersection.Point, from));
+                    }
+                }
+
+                var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+                allIntersections.AddRange(sortedList);
+
+                Distance += from.Distance(to);
+            }
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return IsSafe();
+            }
+
+            var timeToExplode = Environment.TickCount - TimeDetected + OwnSpellData.Delay;
+
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
+
+            if (!IsSafe(myPositionWhenExplodes))
+            {
+                return false;
+            }
+
+            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
+
+            return IsSafe(myPositionWhenExplodesWithOffset);
         }
     }
 }

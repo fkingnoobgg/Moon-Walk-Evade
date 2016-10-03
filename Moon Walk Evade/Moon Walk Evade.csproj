@@ -74,7 +74,6 @@
     <Compile Include="Skillshots\SkillshotTypes\ConeSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\LinearSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\MultiCircleSkillshot.cs" />
-    <Compile Include="Skillshots\SkillshotTypes\SummonerMark.cs" />
     <Compile Include="Skillshots\SkillshotTypes\VeigarE.cs" />
     <Compile Include="Skillshots\SkillshotTypes\YasuoQ.cs" />
     <Compile Include="Skillshots\SpellData.cs" />

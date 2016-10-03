@@ -88,13 +88,13 @@ namespace Moon_Walk_Evade.Evading
             Vector2 leftEdge = edges[1];
 
             var triangle = new Geometry.Polygon();
-            triangle.Points.AddRange(new List<Vector2> { skillshot.RealStartPosition.To2D(), rightEdge, leftEdge});
+            triangle.Points.AddRange(new List<Vector2> { skillshot.FixedStartPosition.To2D(), rightEdge, leftEdge});
 
             if (EvadeMenu.CollisionMenu["minion"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (var minion in
                     EntityManager.MinionsAndMonsters.AlliedMinions.Where(x => !x.IsDead && x.IsValid && x.Health >= 100 &&
-                                                        x.Distance(skillshot.RealStartPosition) < skillshot.OwnSpellData.Range))
+                                                        x.Distance(skillshot.FixedStartPosition) < skillshot.OwnSpellData.Range))
                 {
                     if (GetHitboxCirclePoints(minion).Any(x => triangle.IsInside(x)))
                     {
@@ -139,7 +139,7 @@ namespace Moon_Walk_Evade.Evading
 
             var collisions = new List<Vector2>();
             
-            var currentSpellPos = skillshot.GetPosition().To2D();
+            var currentSpellPos = skillshot.GetCurrentPosition().To2D();
             var spellEndPos = skillshot.EndPosition;
             var rect = new Geometry.Polygon.Rectangle(currentSpellPos, spellEndPos.To2D(), skillshot.OwnSpellData.Radius*2);
 
@@ -148,14 +148,14 @@ namespace Moon_Walk_Evade.Evading
                 bool useProj = EvadeMenu.CollisionMenu["useProj"].Cast<CheckBox>().CurrentValue;
                 foreach (var minion in
                     EntityManager.MinionsAndMonsters.AlliedMinions.Where(x => !x.IsDead && x.IsValid && x.Health >= 50 &&
-                                                        x.Distance(skillshot.StartPosition) <= skillshot.OwnSpellData.Range + 100))
+                                                        x.Distance(skillshot.CurrentPosition) <= skillshot.OwnSpellData.Range + 100))
                 {
                     if (rect.IsInside(minion) && !useProj)
                         collisions.Add(minion.Position.To2D());
                     else if (useProj)
                     {
                         var proj = minion.Position.To2D()
-                            .ProjectOn(skillshot.StartPosition.To2D(), skillshot.EndPosition.To2D());
+                            .ProjectOn(skillshot.CurrentPosition.To2D(), skillshot.EndPosition.To2D());
                         if (proj.IsOnSegment && proj.SegmentPoint.Distance(minion) <= skillshot.OwnSpellData.Radius)
                             collisions.Add(proj.SegmentPoint);
                     }
@@ -181,7 +181,7 @@ namespace Moon_Walk_Evade.Evading
                     var wallEnd = wallStart - wallWidth*wallDirection;
                     var wallPolygon = new Geometry.Polygon.Rectangle(wallStart, wallEnd, 75);
 
-                    var intersections = wallPolygon.GetIntersectionPointsWithLineSegment(skillshot.GetPosition().To2D(),
+                    var intersections = wallPolygon.GetIntersectionPointsWithLineSegment(skillshot.GetCurrentPosition().To2D(),
                         skillshot.EndPosition.To2D());
 
 
