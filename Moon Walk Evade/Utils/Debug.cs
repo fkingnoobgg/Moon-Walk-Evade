@@ -73,8 +73,6 @@ namespace Moon_Walk_Evade.Utils
             var nSkillshot = skillshot.NewInstance(true);
             spellDetector.AddSkillshot(nSkillshot);
             lastKSkillshot = nSkillshot;
-
-
         }
 
         private static void GameOnOnWndProc(WndEventArgs args)

@@ -28,6 +28,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         private bool DoesCollide;
         private Vector2 LastCollisionPos;
 
+        public Vector3 RealMissileStartPos { get; set; }
+
         public MissileClient Missile => OwnSpellData.IsPerpendicular ? null : SpawnObject as MissileClient;
 
         public Vector3 StartPosition
@@ -50,6 +52,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     float traveledDist = speed * timeElapsed / 1000;
                     return Debug.GlobalStartPos.Extend(Debug.GlobalEndPos, traveledDist).To3D();
                 }
+
+                if (DoesCollide && Missile.Position.Distance(RealMissileStartPos) >= LastCollisionPos.Distance(RealMissileStartPos))
+                    return LastCollisionPos.To3D();
 
                 return Missile.Position;
             }
@@ -91,7 +96,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new LinearSkillshot
                 {
                     OwnSpellData = OwnSpellData, _startPos = Debug.GlobalStartPos,
-                    _endPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount,
+                    _endPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping-45,
                     SpawnObject = isProjectile ? new MissileClient() : null
                 };
                 return newDebugInst;
@@ -103,12 +108,24 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             var missile = obj as MissileClient;
 
-            if (SpawnObject == null && missile != null)
+            bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+            if (SpawnObject == null && missile != null && !debugMode)
             {
                 if (missile.SData.Name == OwnSpellData.ObjectCreationName && missile.SpellCaster.Index == Caster.Index)
                 {
                     IsValid = false;
                 }
+            }
+
+            if (missile != null && !DoesCollide) //missle
+            {
+                RealMissileStartPos = missile.Position;
+                Vector2 collision = this.GetCollisionPoint();
+                DoesCollide = !collision.IsZero;
+                LastCollisionPos = collision;
+
+                //if (DoesCollide && !LastCollisionPos.ProjectOn(StartPosition.To2D(), EndPosition.To2D()).IsOnSegment)
+                //    DoesCollide = false;s
             }
         }
 
@@ -128,17 +145,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
                 _endPos = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
             }
-
-            Vector2 collision = this.GetCollisionPoint();
-            DoesCollide = !collision.IsZero;
-            LastCollisionPos = collision;
-
-            if (DoesCollide && !LastCollisionPos.ProjectOn(StartPosition.To2D(), EndPosition.To2D()).IsOnSegment)
-                DoesCollide = false;
         }
 
         public override void OnTick()
         {
+            var debug = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
             if (Missile == null)
             {
                 if (Environment.TickCount > TimeDetected + OwnSpellData.Delay + 250)
@@ -147,7 +158,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     return;
                 }
             }
-            else if (Missile != null)
+            else if (Missile != null && !debug)
             {
                 if (Environment.TickCount > TimeDetected + 6000)
                 {
@@ -156,7 +167,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 }
             }
 
-            if (EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            if (debug)
             {
                 float speed = OwnSpellData.MissileSpeed;
                 float timeElapsed = Environment.TickCount - TimeDetected - OwnSpellData.Delay;
@@ -202,7 +213,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Geometry.Polygon ToPolygon(float extrawidth = 0)
         {
-            extrawidth = 20;
             if (OwnSpellData.AddHitbox)
             {
                 extrawidth += Player.Instance.HitBoxRadius();
@@ -213,20 +223,34 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override int GetAvailableTime(Vector2 pos)
         {
-            var dist1 =
-                Math.Abs((EndPosition.Y - StartPosition.Y) * pos.X - (EndPosition.X - StartPosition.X) * pos.Y +
-                         EndPosition.X * StartPosition.Y - EndPosition.Y * StartPosition.X) / StartPosition.Distance(EndPosition);
-
-            var actualDist = Math.Sqrt(StartPosition.Distance(pos).Pow() - dist1.Pow());
-
-            var time = OwnSpellData.MissileSpeed > 0 ? (int) (actualDist / OwnSpellData.MissileSpeed * 1000) : 0;
-
             if (Missile == null)
             {
                 return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected));
             }
 
-            return time;
+            var proj = pos.ProjectOn(StartPosition.To2D(), EndPosition.To2D());
+            if (!proj.IsOnSegment)
+                return short.MaxValue;
+
+            var dest = proj.SegmentPoint;
+            var InsidePath = Player.Instance.GetPath(dest.To3D(), true).Where(segment => ToPolygon().IsInside(segment));
+            var point = InsidePath.OrderBy(x => x.Distance(StartPosition)).FirstOrDefault();
+
+            if (point == default(Vector3))
+                return short.MaxValue;
+
+            float skillDist = point.Distance(StartPosition);
+            return (int)(skillDist/OwnSpellData.MissileSpeed*1000);
+
+            //var dist1 =
+            //    Math.Abs((EndPosition.Y - StartPosition.Y) * pos.X - (EndPosition.X - StartPosition.X) * pos.Y +
+            //             EndPosition.X * StartPosition.Y - EndPosition.Y * StartPosition.X) / StartPosition.Distance(EndPosition);
+
+            //var actualDist = Math.Sqrt(StartPosition.Distance(pos).Pow() - dist1.Pow());
+
+            //var time = OwnSpellData.MissileSpeed > 0 ? (int) (actualDist / OwnSpellData.MissileSpeed * 1000) : 0;
+
+            //return time;
         }
 
         public override bool IsFromFow()

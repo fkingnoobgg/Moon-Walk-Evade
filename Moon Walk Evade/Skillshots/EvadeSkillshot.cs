@@ -46,6 +46,9 @@ namespace Moon_Walk_Evade.Skillshots
 
         public virtual void OnDispose() { }
 
+        /// <summary>
+        /// real danger area
+        /// </summary>
         public abstract void OnDraw();
 
         public abstract void OnTick();

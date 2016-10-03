@@ -43,29 +43,19 @@ namespace Moon_Walk_Evade
 
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
-            // Set up main menu
-            //MainMenu.AddGroupLabel("General Settings");
-            //MainMenu.Add("evadeMode", new ComboBox("moonWalkEvade Mode", 0, "Smooth - Moon Walk Style", "Fast - MoonWalkEvade Style"));
-            //MainMenu.AddSeparator();
-
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
-            MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of moonWalkEvade Position", false));
+            MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After moonWalkEvade", false));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 30, 0, 150));
             MainMenu.AddSeparator();
-
-            //MainMenu.Add("minComfortDist", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
-            //MainMenu.AddLabel("If possible");
-            //MainMenu.AddSeparator(10);
-            //MainMenu.Add("ignoreComfort", new Slider("Ignore Comfort Distance For X Enemies", 1, 1, 5));
-            //MainMenu.AddSeparator();
 
             MainMenu.AddGroupLabel("Humanizer");
             MainMenu.Add("skillshotActivationDelay", new Slider("Reaction Delay", 0, 0, 400));
             MainMenu.AddSeparator();
 
-            MainMenu.Add("extraEvadeRange", new Slider("Extra moonWalkEvade Range", 0, 0, 300));
+            MainMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 0, 0, 300));
             MainMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Range", false));
 
             var heroes = Program.DeveloperMode ? EntityManager.Heroes.AllHeroes : EntityManager.Heroes.Enemies;
@@ -143,14 +133,14 @@ namespace Moon_Walk_Evade
 
             DrawMenu = MainMenu.AddSubMenu("Drawings");
             DrawMenu.Add("disableAllDrawings", new CheckBox("Disable All Drawings", false));
-            DrawMenu.Add("drawEvadePoint", new CheckBox("Draw moonWalkEvade Point"));
-            DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw moonWalkEvade Status"));
+            DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point"));
+            DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw Evade Status"));
             DrawMenu.Add("drawSkillshots", new CheckBox("Draw Skillshots"));
             DrawMenu.Add("drawDangerPolygon", new CheckBox("Draw Danger Polygon"));
 
 
             HotkeysMenu = MainMenu.AddSubMenu("KeyBinds");
-            HotkeysMenu.Add("enableEvade", new KeyBind("Enable moonWalkEvade", true, KeyBind.BindTypes.PressToggle, 'M'));
+            HotkeysMenu.Add("enableEvade", new KeyBind("Enable Evade", true, KeyBind.BindTypes.PressToggle, 'M'));
             HotkeysMenu.Add("dodgeOnlyDangerousH", new KeyBind("Dodge Only Dangerous (Hold)", false, KeyBind.BindTypes.HoldActive));
             HotkeysMenu.Add("dodgeOnlyDangerousT", new KeyBind("Dodge Only Dangerous (Toggle)", false, KeyBind.BindTypes.PressToggle));
             HotkeysMenu.AddSeparator();

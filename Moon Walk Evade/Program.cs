@@ -7,7 +7,7 @@ namespace Moon_Walk_Evade
 {
     internal static class Program
     {
-        public static bool DeveloperMode = false;
+        public static bool DeveloperMode = true;
 
         private static SpellDetector _spellDetector;
 

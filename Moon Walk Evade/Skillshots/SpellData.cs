@@ -1,17 +1,26 @@
 ﻿using EloBuddy;
+using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 
 namespace Moon_Walk_Evade.Skillshots
 {
     public class SpellData
     {
+        private int _radius;
         public string DisplayName { get; set; }
         public string SpellName { get; set; }
         public string ObjectCreationName { get; set; }
         public SpellSlot Slot { get; set; }
         public int Delay { get; set; }
         public int Range { get; set; }
-        public int Radius { get; set; }
+
+        private int radiusBuffer => EvadeMenu.MainMenu["extraRadius"].Cast<Slider>().CurrentValue;
+        public int Radius
+        {
+            get { return _radius + radiusBuffer; }
+            set { _radius = value; }
+        }
+
         public float MissileSpeed { get; set; }
         public int DangerValue { get; set; }
         public bool IsDangerous { get; set; }
