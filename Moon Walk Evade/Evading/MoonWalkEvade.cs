@@ -198,7 +198,10 @@ namespace Moon_Walk_Evade.Evading
                     return;
                 }
 
-                EvadeSpellManager.TryEvadeSpell(evade, this);
+                var edgePoint = GetClosestEvadePoint(Player.Instance.Position.To2D());
+
+                if (Player.Instance.Distance(edgePoint) >= 100)
+                    EvadeSpellManager.TryEvadeSpell(evade, this);
                 return;
             }
 
@@ -532,7 +535,7 @@ namespace Moon_Walk_Evade.Evading
             if (!points.Any())
             {
                 //Chat.Print("no point found");
-                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, false);
+                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
             }
 
             var evadePoint =
