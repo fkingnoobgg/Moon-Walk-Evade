@@ -519,7 +519,7 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any())
             {
-                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
+                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, false);
             }
 
             var evadePoint =
