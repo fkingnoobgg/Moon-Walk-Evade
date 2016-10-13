@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -15,6 +16,19 @@ namespace Moon_Walk_Evade.Utils
         private static SpellDetector spellDetector;
         public static int LastCreationTick;
 
+        private static List<Vector2> DrawList = new List<Vector2>(5);
+
+        public static void AddDrawVector(this Vector3 v)
+        {
+            if (!DrawList.Contains(v.To2D()))
+                DrawList.Add(v.To2D());
+        }
+        public static void AddDrawVector(this Vector2 v)
+        {
+            if (!DrawList.Contains(v))
+                DrawList.Add(v);
+        }
+
         public static void Init(ref SpellDetector detector)
         {
             spellDetector = detector;
@@ -26,6 +40,12 @@ namespace Moon_Walk_Evade.Utils
                     new Circle { Color = System.Drawing.Color.DodgerBlue, Radius = 100 }.Draw(GlobalEndPos);
                 if (!GlobalStartPos.IsZero)
                     new Circle { Color = System.Drawing.Color.Red, Radius = 100 }.Draw(GlobalStartPos);
+
+                if (DrawList.Count >= 5) DrawList.Clear();
+                foreach (var vector2 in DrawList)
+                {
+                    new Circle { Color = System.Drawing.Color.BlueViolet, Radius = 100 }.Draw(vector2.To3D());
+                }
             };
             Game.OnUpdate += GameOnOnUpdate;
         }

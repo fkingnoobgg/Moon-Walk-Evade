@@ -333,20 +333,7 @@ namespace Moon_Walk_Evade.Evading
 
         public bool IsPathSafe(Vector2[] path)
         {
-            foreach (var evadeSkillshot in Skillshots)
-            {
-                try
-                {
-                    if (!evadeSkillshot.IsSafePath(path))
-                        return false;
-                }
-                catch (Exception ex)
-                {
-                    Chat.Print(evadeSkillshot.DisplayText);
-                }
-            }
-            return true;
-            //return IsPathSafeEx(path);
+            return IsPathSafeEx(path);
         }
 
         public bool IsPathSafe(Vector3[] path)
@@ -392,6 +379,7 @@ namespace Moon_Walk_Evade.Evading
 
         public bool IsPathSafeEx(Vector2[] path, AIHeroClient hero = null)
         {
+            return Skillshots.All(evadeSkillshot => evadeSkillshot.IsSafePath(path));
             hero = hero ?? Player.Instance;
 
             for (var i = 0; i < path.Length - 1; i++)
@@ -534,7 +522,6 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any())
             {
-                //Chat.Print("no point found");
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
             }
 

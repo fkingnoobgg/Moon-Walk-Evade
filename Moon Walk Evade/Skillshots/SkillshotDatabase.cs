@@ -388,23 +388,23 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                new CaitlynTrap
-                {
-                    OwnSpellData = new SpellData
-                    {
-                        DisplayName = "Yordle Trap",
-                        ChampionName = "Caitlyn",
-                        SpellName = "CaitlynYordleTrap",
-                        Slot = SpellSlot.W,
-                        Delay = 1500,
-                        Range = 800,
-                        Radius = 70,
-                        MissileSpeed = 0,
-                        DangerValue = 2,
-                        IsDangerous = false,
-                        ObjectCreationName = "CaitlynTrap",
-                    }
-                },
+                //new CaitlynTrap
+                //{
+                //    OwnSpellData = new SpellData
+                //    {
+                //        DisplayName = "Yordle Trap",
+                //        ChampionName = "Caitlyn",
+                //        SpellName = "CaitlynYordleTrap",
+                //        Slot = SpellSlot.W,
+                //        Delay = 1500,
+                //        Range = 800,
+                //        Radius = 70,
+                //        MissileSpeed = 0,
+                //        DangerValue = 2,
+                //        IsDangerous = false,
+                //        ObjectCreationName = "CaitlynTrap",
+                //    }
+                //},
                 new ConeSkillshot
                 {
                     OwnSpellData = new SpellData
