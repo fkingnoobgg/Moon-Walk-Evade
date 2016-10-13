@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using EloBuddy;
+using EloBuddy.SDK;
 
 namespace Moon_Walk_Evade.EvadeSpells
 {
@@ -1137,7 +1138,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 fixedRange = true, //test
                 Delay = 50,
                 isSummonerSpell = true,
-                Slot = SpellSlot.R,
+                Slot = Player.Instance.FindSummonerSpellSlotFromName("summonerflash"),
                 EvadeType = EvadeType.Blink,
                 CastType = CastType.Position
             });

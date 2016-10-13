@@ -51,7 +51,7 @@ namespace Moon_Walk_Evade
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
             MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After moonWalkEvade", false));
-            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 30, 0, 150));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 30, 0, 50));
             MainMenu.AddSeparator();
 
             MainMenu.AddGroupLabel("Humanizer");

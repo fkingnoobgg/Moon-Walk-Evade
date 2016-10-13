@@ -22,7 +22,7 @@ namespace Moon_Walk_Evade.Skillshots
         }
 
         public float MissileSpeed { get; set; }
-        public int DangerValue { get; set; }
+        public int DangerValue { get; set; }    
         public bool IsDangerous { get; set; }
         public string ChampionName { get; set; }
         public string ToggleParticleName { get; set; }

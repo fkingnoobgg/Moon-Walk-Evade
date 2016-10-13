@@ -241,7 +241,7 @@ namespace Moon_Walk_Evade.Evading
                 var edgePoint = GetClosestEvadePoint(Player.Instance.Position.To2D());
 
                 if (Player.Instance.Distance(edgePoint) >= 100)
-                    EvadeSpellManager.TryEvadeSpell(evade, this);
+                    EvadeSpellManager.TryEvadeSpell(evade.TimeAvailable, this);
                 return;
             }
 
@@ -512,14 +512,14 @@ namespace Moon_Walk_Evade.Evading
             var playerPos = Player.Instance.ServerPosition.To2D();
             var maxTime = GetTimeAvailable();
             var time = Math.Max(0, maxTime - (Game.Ping + ServerTimeBuffer));
-            var moveRadius = time / 1000F * Player.Instance.MoveSpeed;
 
             // ReSharper disable once SimplifyConditionalTernaryExpression
             var points = GetEvadePoints();
 
             if (!points.Any())
             {
-                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true);
+                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, 
+                    !EvadeSpellManager.TryEvadeSpell(time, this, false));
             }
 
             var evadePoint =

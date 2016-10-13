@@ -203,6 +203,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return IsSafe();
             }
 
+            if (allIntersections.Count > 1)
+                return false;
+
             var timeToExplode = Environment.TickCount - TimeDetected + OwnSpellData.Delay;
 
             var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);

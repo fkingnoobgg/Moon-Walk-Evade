@@ -95,7 +95,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 for (var i = 0; i < count; i++)
                 {
                     var point = segment[0].Extend(segment[1], i * step);
-                    if (!Extensions.IsWall(point))
+                    if (!point.IsWall())
                     {
                         points.Add(point);
                     }
@@ -114,33 +114,27 @@ namespace Moon_Walk_Evade.EvadeSpells
             return evadePoint;
         }
 
-        public static bool TryEvadeSpell(MoonWalkEvade.EvadeResult evadeResult,
-            MoonWalkEvade moonWalkMoonWalkEvadeInstance)
+        public static bool TryEvadeSpell(int TimeAvailable, MoonWalkEvade moonWalkMoonWalkEvadeInstance, bool cast = true)
         {
             IEnumerable<EvadeSpellData> evadeSpells = EvadeMenu.MenuEvadeSpells.Where(evadeSpell =>
                 EvadeMenu.SpellMenu[evadeSpell.SpellName + "/enable"].Cast<CheckBox>().CurrentValue);
 
-            foreach (EvadeSpellData evadeSpell in evadeSpells.OrderBy(x => 
-                x.SpellName.ToLower().Contains("flash")).ThenBy(x => x.DangerValue))
+            foreach (EvadeSpellData evadeSpell in evadeSpells)
             {
                 int dangerValue =
                         EvadeMenu.MenuEvadeSpells.First(x => x.SpellName == evadeSpell.SpellName).DangerValue;
                 if (moonWalkMoonWalkEvadeInstance.GetDangerValue() < dangerValue)
                     continue;
 
-                if (evadeSpell.SpellName.ToLower().Contains("flash"))
-                {
-                    return ProcessFlash(moonWalkMoonWalkEvadeInstance);
-                }
-
                 //dash
                 if (evadeSpell.Range != 0)
                 {
                     var evadePos = GetBlinkCastPos(moonWalkMoonWalkEvadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
                     float castTime = evadeSpell.Delay;
-                    if (evadeResult.TimeAvailable >= castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
+                    if (TimeAvailable >= castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
                     {
-                        CastEvadeSpell(evadeSpell, evadePos);
+                        if (cast)
+                            CastEvadeSpell(evadeSpell, evadePos);
                         return true;
                     }
                 }
@@ -152,7 +146,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                     float speed = Player.Instance.MoveSpeed;
                     speed += speed * evadeSpell.speedArray[Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).Level - 1] / 100;
-                    float maxTime = evadeResult.TimeAvailable - evadeSpell.Delay;
+                    float maxTime = TimeAvailable - evadeSpell.Delay;
                     float maxTravelDist = speed * (maxTime / 1000);
 
                     var evadePoints = moonWalkMoonWalkEvadeInstance.GetEvadePoints();
@@ -160,7 +154,8 @@ namespace Moon_Walk_Evade.EvadeSpells
                     var evadePoint = evadePoints.OrderBy(x => !x.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
                     if (evadePoint != default(Vector2))
                     {
-                        CastEvadeSpell(evadeSpell, evadeSpell.isItem ? Vector2.Zero : evadePoint);
+                        if (cast)
+                            CastEvadeSpell(evadeSpell, evadeSpell.isItem ? Vector2.Zero : evadePoint);
                         return true;
                     }
                 }
@@ -168,7 +163,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 //items
                 if (evadeSpell.isItem && evadeSpell.EvadeType != EvadeType.MovementSpeedBuff)
                 {
-                    if (evadeResult.TimeAvailable >= evadeSpell.Delay)
+                    if (TimeAvailable >= evadeSpell.Delay & cast)
                         CastEvadeSpell(evadeSpell, Vector2.Zero);
                     return true;
                 }
