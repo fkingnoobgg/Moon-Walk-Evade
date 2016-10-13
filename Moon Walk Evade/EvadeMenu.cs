@@ -44,6 +44,9 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 45, 0, 200));
+            MainMenu.AddLabel("Evade 45 milliseconds earlier than excepected");
+            MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
             MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
@@ -57,6 +60,15 @@ namespace Moon_Walk_Evade
 
             MainMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 0, 0, 300));
             MainMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Range", false));
+            MainMenu.AddSeparator();
+            MainMenu.Add("stutterDistanceTrigget", new Slider("Stutter Trigger Distance", 200, 0, 400));
+            MainMenu.AddLabel("When your evade point is 200 units or less from you away");
+            MainMenu.AddLabel("it will be changed to prevent you from standing still at the old point");
+            MainMenu.AddSeparator();
+            MainMenu.AddStringList("stutterPointFindType", "Anti Stutter Evade Point Search", new []{"Mouse Position", "Same As Player Direction", "Farest Away"}, 0);
+            MainMenu.AddLabel("It's the kind of searching method to find a new point");
+
+
 
             var heroes = Program.DeveloperMode ? EntityManager.Heroes.AllHeroes : EntityManager.Heroes.Enemies;
             var heroNames = heroes.Select(obj => obj.ChampionName).ToArray();
@@ -143,11 +155,12 @@ namespace Moon_Walk_Evade
             HotkeysMenu.Add("enableEvade", new KeyBind("Enable Evade", true, KeyBind.BindTypes.PressToggle, 'M'));
             HotkeysMenu.Add("dodgeOnlyDangerousH", new KeyBind("Dodge Only Dangerous (Hold)", false, KeyBind.BindTypes.HoldActive));
             HotkeysMenu.Add("dodgeOnlyDangerousT", new KeyBind("Dodge Only Dangerous (Toggle)", false, KeyBind.BindTypes.PressToggle));
-            HotkeysMenu.AddSeparator();
+            HotkeysMenu.AddGroupLabel("DEBUG MODE OPTIONS");
             HotkeysMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
             HotkeysMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 5000));
             HotkeysMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
             HotkeysMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
+            HotkeysMenu.Add("manageMovementDeay", new CheckBox("Manage Orbwalker Movement Delay"));
 
             CollisionMenu = MainMenu.AddSubMenu("Collision");
             CollisionMenu.Add("minion", new CheckBox("Attend Minion Collision"));

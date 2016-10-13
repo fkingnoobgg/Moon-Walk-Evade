@@ -155,7 +155,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                     float maxTime = evadeResult.TimeAvailable - evadeSpell.Delay;
                     float maxTravelDist = speed * (maxTime / 1000);
 
-                    var evadePoints = moonWalkMoonWalkEvadeInstance.GetEvadePoints(playerPos, maxTravelDist);
+                    var evadePoints = moonWalkMoonWalkEvadeInstance.GetEvadePoints();
 
                     var evadePoint = evadePoints.OrderBy(x => !x.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
                     if (evadePoint != default(Vector2))

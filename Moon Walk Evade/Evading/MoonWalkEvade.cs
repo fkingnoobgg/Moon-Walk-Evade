@@ -21,7 +21,7 @@ namespace Moon_Walk_Evade.Evading
 
         public int ServerTimeBuffer
         {
-            get { return 0 + 45; }
+            get { return EvadeMenu.MainMenu["serverTimeBuffer"].Cast<Slider>().CurrentValue; }
         }
 
         public bool EvadeEnabled
@@ -78,6 +78,25 @@ namespace Moon_Walk_Evade.Evading
         {
             get { return 0 /*Game.Ping * 2*/; }
         }
+
+        public enum StutterSearchType
+        {
+            MousePos, PlayerFaceDirection, FarestAway, 
+        }
+        public StutterSearchType AntiStutterSearchType => (StutterSearchType)EvadeMenu.MainMenu["stutterPointFindType"].Cast<Slider>().CurrentValue;
+
+        private int _oldMovementDelay = -1;
+        public int OldMovementDelay
+        {
+            get { return _oldMovementDelay; }
+            private set
+            {
+                if (_oldMovementDelay == -1)
+                    _oldMovementDelay = value;
+            }
+        }
+
+        public bool manageOrbwalker => EvadeMenu.HotkeysMenu["manageMovementDeay"].Cast<CheckBox>().CurrentValue;
 
         #endregion
 
@@ -157,8 +176,20 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
+        
         private void OnUpdate(EventArgs args)
         {
+            if (manageOrbwalker && Orbwalker.MovementDelay < 225)
+            {
+                OldMovementDelay = Orbwalker.MovementDelay;
+                Orbwalker.MovementDelay = 225;
+            }
+            else if (!manageOrbwalker && OldMovementDelay != -1)
+            {
+                Orbwalker.MovementDelay = OldMovementDelay;
+                _oldMovementDelay = -1;
+            }
+
             if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing())
             {
                 CurrentEvadeResult = null;
@@ -181,7 +212,16 @@ namespace Moon_Walk_Evade.Evading
 
             if (CurrentEvadeResult != null) //&& CurrentEvadeResult.EvadePoint.Distance(hero) > hero.HitBoxRadius()
             {
-                MoveTo(CurrentEvadeResult.WalkPoint, false);
+                if (!CurrentEvadeResult.ShouldPreventStuttering)
+                    MoveTo(CurrentEvadeResult.WalkPoint, false);
+                else
+                {
+                    Vector2 newPoint = GetEvadePoints(CurrentEvadeResult.WalkPoint.To2D()).FirstOrDefault();
+                    if (newPoint != default(Vector2))
+                    {
+                        CurrentEvadeResult.WalkPoint = newPoint.To3D();
+                    }
+                }
             }
         }
 
@@ -212,6 +252,7 @@ namespace Moon_Walk_Evade.Evading
 
                 if (evade.IsValid)
                 {
+                    evade.IsOutsideEvade = true;
                     CurrentEvadeResult = evade;
                 }
                 return;
@@ -380,67 +421,6 @@ namespace Moon_Walk_Evade.Evading
         public bool IsPathSafeEx(Vector2[] path, AIHeroClient hero = null)
         {
             return Skillshots.All(evadeSkillshot => evadeSkillshot.IsSafePath(path));
-            hero = hero ?? Player.Instance;
-
-            for (var i = 0; i < path.Length - 1; i++)
-            {
-                var start = path[i];
-                var end = path[i + 1];
-
-                foreach (var pair in _skillshotPolygonCache)
-                {
-                    var skillshot = pair.Key;
-                    var polygon = pair.Value;
-
-                    Func<Vector2, bool> IsInside = point =>
-                    {
-                        if (skillshot.OwnSpellData.IsVeigarE)
-                        {
-                            return skillshot.ToInnerPolygon().IsOutside(point) && skillshot.ToOuterPolygon().IsInside(point);
-                        }
-
-                        return polygon.IsInside(point);
-                    };
-
-                    if (IsInside(start) && IsInside(end))
-                    {
-                        //var time1 = skillshot.GetAvailableTime(start);
-                        var time2 = skillshot.GetAvailableTime(end);
-
-                        if (hero.WalkingTime(start, end) >= time2 - Game.Ping)
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        var intersections =
-                            polygon.GetIntersectionPointsWithLineSegment(start, end)
-                                .Concat(new[] { start, end })
-                                .ToList()
-                                .GetSortedPath(start).ToArray();
-
-                        for (var i2 = 0; i2 < intersections.Length - 1; i2++)
-                        {
-                            var point1 = intersections[i2];
-                            var point2 = intersections[i2 + 1];
-
-                            if (IsInside(point2) || IsInside(point1))
-                            {
-                                //var time1 = polygon.IsInside(point1) ? skillshot.GetAvailableTime(point1) : short.MaxValue;
-                                var time2 = IsInside(point2) ? skillshot.GetAvailableTime(point2) : short.MaxValue;
-
-                                if (hero.WalkingTime(point1, point2) >= time2 - Game.Ping)
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return true;
         }
 
         public bool IsPathSafeEx(Vector2 end, AIHeroClient hero = null)
@@ -450,7 +430,7 @@ namespace Moon_Walk_Evade.Evading
             return IsPathSafeEx(hero.GetPath(end.To3DWorld(), true).ToVector2(), hero);
         }
 
-        public Vector2[] GetEvadePoints(Vector2 from, float moveRadius)
+        public Vector2[] GetEvadePoints(Vector2? awayFrom = null)
         {
             int posChecked = 0;
             int maxPosToCheck = 50;
@@ -464,8 +444,8 @@ namespace Moon_Walk_Evade.Evading
             {
                 radiusIndex++;
 
-                int curRadius = radiusIndex * (2 * posRadius);
-                int curCircleChecks = (int)Math.Ceiling((2 * Math.PI * (double)curRadius) / (2 * (double)posRadius));
+                int curRadius = radiusIndex*2*posRadius;
+                int curCircleChecks = (int)Math.Ceiling(2 * Math.PI * curRadius / (2 * (double)posRadius));
 
                 for (int i = 1; i < curCircleChecks; i++)
                 {
@@ -477,7 +457,24 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            return points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToArray();
+            return !awayFrom.HasValue ? 
+                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToArray() :
+                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
+                p =>
+                {
+                    if (AntiStutterSearchType == StutterSearchType.PlayerFaceDirection)
+                    {
+                        var faceVec = 500*ObjectManager.Player.Direction.To2D().Perpendicular();
+                        var destVec = p - Player.Instance.Position.To2D();
+                        return faceVec.AngleBetween(destVec);
+                    }
+
+                    if (AntiStutterSearchType == StutterSearchType.FarestAway)
+                        return -p.Distance(Player.Instance);
+
+                    /*AntiStutterSearchType == StutterSearchType.MousePos*/
+                    return p.Distance(Game.CursorPos);
+                }).ToArray();
         }
 
         public Vector2 GetClosestEvadePoint(Vector2 from)
@@ -518,7 +515,7 @@ namespace Moon_Walk_Evade.Evading
             var moveRadius = time / 1000F * Player.Instance.MoveSpeed;
 
             // ReSharper disable once SimplifyConditionalTernaryExpression
-            var points = GetEvadePoints(playerPos, moveRadius);
+            var points = GetEvadePoints();
 
             if (!points.Any())
             {
@@ -539,34 +536,6 @@ namespace Moon_Walk_Evade.Evading
 
             var path = (desiredPath ?? hero.RealPath()).ToVector2();
             return IsPathSafeEx(path, hero);
-
-            var polygons = ClippedPolygons;
-            var points = new List<Vector2>();
-
-            for (var i = 0; i < path.Length - 1; i++)
-            {
-                var start = path[i];
-                var end = path[i + 1];
-
-                foreach (var pol in polygons)
-                {
-                    var intersections = pol.GetIntersectionPointsWithLineSegment(start, end);
-                    if (intersections.Length > 0 && !pol.IsInside(hero))
-                    {
-                        return false;
-                    }
-
-                    points.AddRange(intersections);
-                }
-            }
-
-            if (points.Count == 1)
-            {
-                var walkTime = hero.WalkingTime(points[0]);
-                return walkTime <= evade.TimeAvailable;
-            }
-
-            return false;
         }
 
         public bool MoveTo(Vector2 point, bool limit = true)
@@ -590,6 +559,15 @@ namespace Moon_Walk_Evade.Evading
         public class EvadeResult
         {
             private MoonWalkEvade _moonWalkEvade;
+
+
+            public bool IsOutsideEvade { get; set; }
+
+            public int StutterDistance => EvadeMenu.MainMenu["stutterDistanceTrigget"].Cast<Slider>().CurrentValue;
+            public bool ShouldPreventStuttering => IsOutsideEvade && Player.Instance.Distance(WalkPoint) <= StutterDistance;
+
+
+
             private int ExtraRange { get; set; }
 
             public int Time { get; set; }
@@ -619,6 +597,7 @@ namespace Moon_Walk_Evade.Evading
 
                     return walkPoint.To3DWorld();
                 }
+                set { throw new NotImplementedException(); }
             }
 
             public EvadeResult(MoonWalkEvade moonWalkEvade, Vector2 evadePoint, Vector2 anchorPoint, int totalTimeAvailable,
