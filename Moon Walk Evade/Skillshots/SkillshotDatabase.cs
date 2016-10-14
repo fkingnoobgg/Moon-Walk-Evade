@@ -1124,6 +1124,23 @@ namespace Moon_Walk_Evade.Skillshots
                     OwnSpellData = new SpellData
                     {
                         DisplayName = "ranscendent Blades",
+                        ChampionName = "Ivern",
+                        SpellName = "IvernQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 110,
+                        Radius = 70,
+                        MissileSpeed = 1300,
+                        DangerValue = 4,
+                        IsDangerous = true,
+                        ObjectCreationName = "Rootcaller"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "ranscendent Blades",
                         ChampionName = "Irelia",
                         SpellName = "IreliaTranscendentBlades",
                         Slot = SpellSlot.R,

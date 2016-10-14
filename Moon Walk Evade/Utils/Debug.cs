@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -10,14 +11,50 @@ using SharpDX;
 
 namespace Moon_Walk_Evade.Utils
 {
+    class HitReportInst
+    {
+        public int NeededTime { get; }
+
+        public HitReportInst(int timeLeft, int neededTime, LinearSkillshot[] flyingSkillshots)
+        {
+            NeededTime = neededTime;
+            TimeLeft = timeLeft;
+            FlyingSkillshots = flyingSkillshots;
+            InitTick = Environment.TickCount;
+        }
+
+        public int TimeLeft { get; }
+        public LinearSkillshot[] FlyingSkillshots { get; }
+        public int InitTick { get; }
+
+        public bool Hit { get; set; }
+        public bool Passed { get; set; }
+
+        public bool Finished { get; set; }
+    }
+
     static class Debug
     {
         public static Vector3 GlobalEndPos = Vector3.Zero, GlobalStartPos = Vector3.Zero;
         private static SpellDetector spellDetector;
         public static int LastCreationTick;
+        
+
+        static List<HitReportInst> hitReports = new List<HitReportInst>(); 
+
+        /// <summary>
+        /// The addon assumes that the evade time is too high => check that
+        /// </summary>
+        /// <param name="timeLeft"></param>
+        /// <param name="neededTime"></param>
+        /// <param name="flyingSkillshots"></param>
+        public static void ReportHit(int timeLeft, int neededTime, List<EvadeSkillshot> flyingSkillshots)
+        {
+            hitReports.Add(new HitReportInst(timeLeft, neededTime, 
+                flyingSkillshots.Where(x => x.SpawnObject != null).Select(x => (LinearSkillshot)x).ToArray()));
+        }
 
         private static List<Vector2> DrawList = new List<Vector2>(5);
-
         public static void AddDrawVector(this Vector3 v)
         {
             if (!DrawList.Contains(v.To2D()))
@@ -53,6 +90,14 @@ namespace Moon_Walk_Evade.Utils
         private static EvadeSkillshot lastKSkillshot;
         private static void GameOnOnUpdate(EventArgs args)
         {
+            CheckReportedHitSkillshots();
+
+            CheckDebugSkillshotHit();
+            CreateDebugSkillshot();
+        }
+
+        private static void CheckDebugSkillshotHit()
+        {
             if (lastKSkillshot != null)
             {
                 if (!lastKSkillshot.IsValid || !lastKSkillshot.IsActive)
@@ -64,7 +109,7 @@ namespace Moon_Walk_Evade.Utils
                 if (lastKSkillshot.GetType() == typeof(LinearSkillshot))
                 {
                     var skill = (LinearSkillshot)lastKSkillshot;
-                    if (skill.CurrentPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius && 
+                    if (skill.CurrentPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius &&
                         Player.Instance.Position.To2D().ProjectOn(skill.CurrentPosition.To2D(), skill.EndPosition.To2D()).IsOnSegment && skill.Missile != null)
                     {
                         Chat.Print(Game.Time + "  Hit");
@@ -72,7 +117,10 @@ namespace Moon_Walk_Evade.Utils
                     }
                 }
             }
+        }
 
+        private static void CreateDebugSkillshot()
+        {
             if (!EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue)
                 return;
 
@@ -93,6 +141,47 @@ namespace Moon_Walk_Evade.Utils
             var nSkillshot = skillshot.NewInstance(true);
             spellDetector.AddSkillshot(nSkillshot);
             lastKSkillshot = nSkillshot;
+        }
+
+        /// <summary>
+        /// Observes the skillshots that should normally hit when "not enough timeLeft" was calculated
+        /// </summary>
+        private static void CheckReportedHitSkillshots()
+        {
+            foreach (var report in hitReports)
+            {
+                bool hit = false;
+                int dodgeCount = 0;
+                foreach (var linearSkillshot in report.FlyingSkillshots)
+                {
+                    var sPos = linearSkillshot.CurrentPosition.To2D();
+                    var ePos = linearSkillshot.EndPosition.To2D();
+                    var playerPos = Player.Instance.Position.To2D();
+                    var playerProjection = playerPos.ProjectOn(sPos, ePos).SegmentPoint;
+
+                    if (sPos.Distance(playerPos) <= linearSkillshot.OwnSpellData.Radius + Player.Instance.BoundingRadius)
+                    {
+                        hit = true;
+                        break;
+                    }
+
+                    if (playerProjection.Distance(ePos) - 50 > sPos.Distance(ePos))
+                        dodgeCount++;
+                }
+
+                if (!hit && dodgeCount == report.FlyingSkillshots.Length)
+                    report.Passed = true;
+                else if (hit)
+                    report.Hit = true;
+            }
+
+            hitReports.RemoveAll(report => report.Hit || report.Finished || Environment.TickCount - report.InitTick > report.TimeLeft + 1000);
+
+            foreach (var report in hitReports.Where(report => report.Passed))
+            {
+                Chat.Print("Calculation Update | Dt: " + (report.NeededTime - report.TimeLeft) + "| T: " + report.TimeLeft);
+                report.Finished = true;
+            }
         }
 
         private static void GameOnOnWndProc(WndEventArgs args)

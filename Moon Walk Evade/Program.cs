@@ -1,7 +1,7 @@
 ﻿using EloBuddy.SDK.Events;
 using Moon_Walk_Evade.Skillshots;
-using Moon_Walk_Evade.Utils;
 using Collision = Moon_Walk_Evade.Evading.Collision;
+using Debug = Moon_Walk_Evade.Utils.Debug;
 
 namespace Moon_Walk_Evade
 {
@@ -18,7 +18,7 @@ namespace Moon_Walk_Evade
                 _spellDetector = new SpellDetector(DeveloperMode ? DetectionTeam.AnyTeam : DetectionTeam.EnemyTeam);
                 EvadeMenu.CreateMenu();
                 new Evading.MoonWalkEvade(_spellDetector);
-                
+
 
                 Collision.Init();
                 Debug.Init(ref _spellDetector);

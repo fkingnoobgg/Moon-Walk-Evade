@@ -160,7 +160,7 @@ namespace Moon_Walk_Evade
             HotkeysMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 5000));
             HotkeysMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
             HotkeysMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
-            HotkeysMenu.Add("manageMovementDeay", new CheckBox("Manage Orbwalker Movement Delay"));
+            HotkeysMenu.Add("manageMovementDeay", new CheckBox("Manage Orbwalker Movement Delay", false));
 
             CollisionMenu = MainMenu.AddSubMenu("Collision");
             CollisionMenu.Add("minion", new CheckBox("Attend Minion Collision"));

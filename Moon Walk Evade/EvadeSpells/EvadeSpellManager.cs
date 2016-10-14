@@ -117,8 +117,12 @@ namespace Moon_Walk_Evade.EvadeSpells
         public static bool TryEvadeSpell(int TimeAvailable, MoonWalkEvade moonWalkMoonWalkEvadeInstance, bool cast = true)
         {
             IEnumerable<EvadeSpellData> evadeSpells = EvadeMenu.MenuEvadeSpells.Where(evadeSpell =>
-                EvadeMenu.SpellMenu[evadeSpell.SpellName + "/enable"].Cast<CheckBox>().CurrentValue);
-
+            {
+                var item = EvadeMenu.SpellMenu[evadeSpell.SpellName + "/enable"];
+                // ReSharper disable once SimplifyConditionalTernaryExpression
+                // ReSharper disable once MergeConditionalExpression
+                return item != null ? item.Cast<CheckBox>().CurrentValue : false;
+            });
             foreach (EvadeSpellData evadeSpell in evadeSpells)
             {
                 int dangerValue =
@@ -139,8 +143,8 @@ namespace Moon_Walk_Evade.EvadeSpells
                     }
                 }
 
-                //speed buff (spell or item)
-                if (evadeSpell.EvadeType == EvadeType.MovementSpeedBuff)
+                //speed buff (spell or item NOT)
+                if (evadeSpell.EvadeType == EvadeType.MovementSpeedBuff && !evadeSpell.isItem)
                 {
                     var playerPos = Player.Instance.Position.To2D();
 
@@ -161,9 +165,10 @@ namespace Moon_Walk_Evade.EvadeSpells
                 }
 
                 //items
-                if (evadeSpell.isItem && evadeSpell.EvadeType != EvadeType.MovementSpeedBuff)
+                if (evadeSpell.isItem && evadeSpell.EvadeType != EvadeType.MovementSpeedBuff && 
+                    Player.Instance.GetSpellSlotFromName(evadeSpell.SpellName) != SpellSlot.Unknown)
                 {
-                    if (TimeAvailable >= evadeSpell.Delay & cast)
+                    if (TimeAvailable >= evadeSpell.Delay && cast)
                         CastEvadeSpell(evadeSpell, Vector2.Zero);
                     return true;
                 }

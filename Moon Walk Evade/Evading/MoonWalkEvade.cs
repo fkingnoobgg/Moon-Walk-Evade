@@ -9,6 +9,7 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Moon_Walk_Evade.EvadeSpells;
 using Moon_Walk_Evade.Skillshots;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
@@ -235,13 +236,8 @@ namespace Moon_Walk_Evade.Evading
                 if (evade.IsValid && evade.EnoughTime)
                 {
                     CurrentEvadeResult = evade;
-                    return;
                 }
 
-                var edgePoint = GetClosestEvadePoint(Player.Instance.Position.To2D());
-
-                if (Player.Instance.Distance(edgePoint) >= 100)
-                    EvadeSpellManager.TryEvadeSpell(evade.TimeAvailable, this);
                 return;
             }
 
@@ -255,6 +251,7 @@ namespace Moon_Walk_Evade.Evading
                     evade.IsOutsideEvade = true;
                     CurrentEvadeResult = evade;
                 }
+
                 return;
             }
 
@@ -430,7 +427,13 @@ namespace Moon_Walk_Evade.Evading
             return IsPathSafeEx(hero.GetPath(end.To3DWorld(), true).ToVector2(), hero);
         }
 
-        public Vector2[] GetEvadePoints(Vector2? awayFrom = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="awayFrom"></param>
+        /// <param name="managed">Check for path safety</param>
+        /// <returns></returns>
+        public Vector2[] GetEvadePoints(Vector2? awayFrom = null, bool managed = true)
         {
             int posChecked = 0;
             int maxPosToCheck = 50;
@@ -456,6 +459,9 @@ namespace Moon_Walk_Evade.Evading
                     points.Add(pos);
                 }
             }
+
+            if (!managed)
+                return points.Where(p => IsPointSafe(p) && !p.IsWall()).ToArray();
 
             return !awayFrom.HasValue ? 
                 points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToArray() :
@@ -516,18 +522,15 @@ namespace Moon_Walk_Evade.Evading
             // ReSharper disable once SimplifyConditionalTernaryExpression
             var points = GetEvadePoints();
 
-            if (!points.Any())
+            if (!points.Any() && !EvadeSpellManager.TryEvadeSpell(time, this))
             {
-                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, 
-                    !EvadeSpellManager.TryEvadeSpell(time, this, false));
+                var closestPoint = GetClosestEvadePoint(playerPos);
+                /*no points => no evade spell => closest walk dist*/
+                return new EvadeResult(this, closestPoint, anchor, maxTime, time, true);
             }
 
-            var evadePoint =
-                points.OrderBy(p => GetTimeUnitlOutOfDangerArea(p) < time).ThenBy(p => !p.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos))
-                    .FirstOrDefault();
-
-            return new EvadeResult(this, evadePoint, anchor, maxTime, time,
-                !IsHeroInDanger() || GetTimeUnitlOutOfDangerArea(evadePoint) < time);
+            var evadePoint = points.OrderBy(p => !p.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
+            return new EvadeResult(this, evadePoint, anchor, maxTime, time, true);
         }
 
         public bool IsHeroPathSafe(EvadeResult evade, Vector3[] desiredPath, AIHeroClient hero = null)

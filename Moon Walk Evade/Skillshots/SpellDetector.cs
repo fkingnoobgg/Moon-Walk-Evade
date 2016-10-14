@@ -166,8 +166,8 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void GameObjectOnCreate(GameObject sender, EventArgs args)
         {
-           //if (!Utils.Utils.GetGameObjectName(sender).ToLower().Contains("sru"))
-           //     Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
+           //if (sender.Type == GameObjectType.MissileClient)
+                //Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))
             {
@@ -217,8 +217,7 @@ namespace Moon_Walk_Evade.Skillshots
             //if (Utils.GetTeam(sender) == Utils.PlayerTeam())
             //    Chat.Print("delete {0} {1} {2} {3}", sender.Team, sender.GetType().ToString(), Utils.GetGameObjectName(sender), sender.Index);
 
-            foreach (
-                var c in DetectedSkillshots.Where(v => v.SpawnObject != null && v.SpawnObject.IndexEquals(sender)))
+            foreach (var c in DetectedSkillshots.Where(v => v.SpawnObject != null && v.SpawnObject.IndexEquals(sender)))
             {
                 if (c.OnDeleteMissile(sender))
                     c.IsValid = false;
