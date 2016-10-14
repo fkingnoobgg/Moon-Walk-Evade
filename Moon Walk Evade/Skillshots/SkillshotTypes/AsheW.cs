@@ -35,7 +35,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
 
                 if (debugMode)
                     return Debug.GlobalStartPos;
@@ -59,7 +59,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             get
             {
 
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (debugMode)
                     return Debug.GlobalEndPos;
 

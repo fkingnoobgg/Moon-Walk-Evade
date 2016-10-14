@@ -5,6 +5,7 @@ using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using Moon_Walk_Evade.EvadeSpells;
+using Moon_Walk_Evade.Evading;
 using Moon_Walk_Evade.Skillshots;
 
 namespace Moon_Walk_Evade
@@ -21,15 +22,20 @@ namespace Moon_Walk_Evade
             };
         }
     }
-    internal class EvadeMenu
+    internal class EvadeMenu : SpellBlocker
     {
         public static Menu MainMenu { get; private set; }
+
+        public static Menu HumanizerMenu { get; private set; }
+
+        public static Menu SpellBlockerMenu { get; private set; }
         public static Menu SkillshotMenu { get; private set; }
-        public static Menu SpellMenu { get; private set; }
+        public static Menu EvadeSpellMenu { get; private set; }
         public static Menu DrawMenu { get; private set; }
         public static Menu HotkeysMenu { get; private set; }
-
         public static Menu CollisionMenu { get; private set; }
+
+        public static Menu DebugMenu { get; private set; }
 
         public static readonly Dictionary<string, EvadeSkillshot> MenuSkillshots = new Dictionary<string, EvadeSkillshot>();
         public static readonly List<EvadeSpellData> MenuEvadeSpells = new List<EvadeSpellData>();
@@ -57,21 +63,30 @@ namespace Moon_Walk_Evade
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));
 
-            MainMenu.AddGroupLabel("Humanizer");
-            MainMenu.Add("skillshotActivationDelay", new Slider("Reaction Delay", 0, 0, 400));
-            MainMenu.AddSeparator();
+            HumanizerMenu = MainMenu.AddSubMenu("Humanizer");
+            HumanizerMenu.Add("skillshotActivationDelay", new Slider("Reaction Delay", 0, 0, 400));
+            HumanizerMenu.AddSeparator();
 
-            MainMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 0, 0, 300));
-            MainMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Range", false));
-            MainMenu.AddSeparator();
-            MainMenu.Add("stutterDistanceTrigget", new Slider("Stutter Trigger Distance", 200, 0, 400));
-            MainMenu.AddLabel("When your evade point is 200 units or less from you away");
-            MainMenu.AddLabel("it will be changed to prevent you from standing still at the old point");
-            MainMenu.AddSeparator();
-            MainMenu.AddStringList("stutterPointFindType", "Anti Stutter Evade Point Search", new []{"Mouse Position", "Same As Player Direction", "Farest Away"}, 0);
-            MainMenu.AddLabel("It's the kind of searching method to find a new point");
+            HumanizerMenu.Add("extraEvadeRange", new Slider("Extra Evade Range", 0, 0, 300));
+            HumanizerMenu.Add("randomizeExtraEvadeRange", new CheckBox("Randomize Extra Range", false));
+            HumanizerMenu.AddSeparator();
+            HumanizerMenu.Add("stutterDistanceTrigger", new Slider("Stutter Trigger Distance", 200, 0, 400));
+            HumanizerMenu.AddLabel("When your evade point is 200 units or less from you away");
+            HumanizerMenu.AddLabel("it will be changed to prevent you from standing still at the old point");
+            HumanizerMenu.AddSeparator();
+            HumanizerMenu.AddStringList("stutterPointFindType", "Anti Stutter Evade Point Search", new []{"Mouse Position", "Same As Player Direction", "Farest Away"}, 0);
+            HumanizerMenu.AddLabel("It's the kind of searching method to find a new point");
 
-
+            SpellBlockerMenu = MainMenu.AddSubMenu("Spell Blocker");
+            SpellBlockerMenu.AddGroupLabel("Spells to block while evading");
+            SpellBlockerMenu.Add("blockDangerousDashes", new CheckBox("Block Dangerous Dashes"));
+            SpellBlockerMenu.AddSeparator(10);
+            for (int slot = 0; slot < 4; slot++)
+            {
+                var currentSlot = (SpellSlot) slot;
+                bool block = SpellBlocker.ShouldBlock(currentSlot);
+                SpellBlockerMenu.Add("block/" + currentSlot, new CheckBox("Block " + currentSlot, block));
+            }
 
             var heroes = Program.DeveloperMode ? EntityManager.Heroes.AllHeroes : EntityManager.Heroes.Enemies;
             var heroNames = heroes.Select(obj => obj.ChampionName).ToArray();
@@ -120,7 +135,7 @@ namespace Moon_Walk_Evade
             }
 
             // Set up spell menu
-            SpellMenu = MainMenu.AddSubMenu("Evading Spells");
+            EvadeSpellMenu = MainMenu.AddSubMenu("Evading Spells");
 
             foreach (var e in evadeSpells)
             {
@@ -131,8 +146,8 @@ namespace Moon_Walk_Evade
 
                 MenuEvadeSpells.Add(e);
 
-                SpellMenu.AddGroupLabel(evadeSpellString);
-                SpellMenu.Add(evadeSpellString + "/enable", new CheckBox("Use " + (!e.isItem ? e.Slot.ToString() : "")));
+                EvadeSpellMenu.AddGroupLabel(evadeSpellString);
+                EvadeSpellMenu.Add(evadeSpellString + "/enable", new CheckBox("Use " + (!e.isItem ? e.Slot.ToString() : "")));
 
                 var dangerValueSlider = new Slider("Danger Value", e.DangerValue, 1, 5);
                 dangerValueSlider.OnValueChange += delegate (ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args)
@@ -140,9 +155,9 @@ namespace Moon_Walk_Evade
                     MenuEvadeSpells.First(x =>
                         x.SpellName.Contains(sender.SerializationId.Split('/')[0])).DangerValue = args.NewValue;
                 };
-                SpellMenu.Add(evadeSpellString + "/dangervalue", dangerValueSlider);
+                EvadeSpellMenu.Add(evadeSpellString + "/dangervalue", dangerValueSlider);
 
-                SpellMenu.AddSeparator();
+                EvadeSpellMenu.AddSeparator();
             }
 
 
@@ -158,17 +173,18 @@ namespace Moon_Walk_Evade
             HotkeysMenu.Add("enableEvade", new KeyBind("Enable Evade", true, KeyBind.BindTypes.PressToggle, 'M'));
             HotkeysMenu.Add("dodgeOnlyDangerousH", new KeyBind("Dodge Only Dangerous (Hold)", false, KeyBind.BindTypes.HoldActive));
             HotkeysMenu.Add("dodgeOnlyDangerousT", new KeyBind("Dodge Only Dangerous (Toggle)", false, KeyBind.BindTypes.PressToggle));
-            HotkeysMenu.AddGroupLabel("DEBUG MODE OPTIONS");
-            HotkeysMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
-            HotkeysMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 5000));
-            HotkeysMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
-            HotkeysMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
-            HotkeysMenu.Add("manageMovementDeay", new CheckBox("Manage Orbwalker Movement Delay", false));
 
             CollisionMenu = MainMenu.AddSubMenu("Collision");
             CollisionMenu.Add("minion", new CheckBox("Attend Minion Collision"));
             CollisionMenu.Add("yasuoWall", new CheckBox("Attend Yasuo Wall"));
             CollisionMenu.Add("useProj", new CheckBox("Use Spell Projection", false));
+
+            DebugMenu = MainMenu.AddSubMenu("Debug");
+            DebugMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
+            DebugMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 5000));
+            DebugMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
+            DebugMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
+            DebugMenu.Add("manageMovementDelay", new CheckBox("Manage Orbwalker Movement Delay", false));
         }
 
         private static EvadeSkillshot GetSkillshot(string s)
@@ -180,14 +196,23 @@ namespace Moon_Walk_Evade
         {
             var valueBase = SkillshotMenu[skillshot + "/enable"];
             return (valueBase != null && valueBase.Cast<CheckBox>().CurrentValue) ||
-                HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
         }
 
         public static bool IsSkillshotDrawingEnabled(EvadeSkillshot skillshot)
         {
             var valueBase = SkillshotMenu[skillshot + "/draw"];
             return (valueBase != null && valueBase.Cast<CheckBox>().CurrentValue) ||
-                HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+        }
+
+        public static bool IsEvadeSkillhotEnabled(EvadeSpellData spell)
+        {
+            if (spell == null)
+                return false;
+
+            var valueBase = EvadeSpellMenu[spell.SpellName + "/enable"];
+            return valueBase != null && valueBase.Cast<CheckBox>().CurrentValue;
         }
     }
 }

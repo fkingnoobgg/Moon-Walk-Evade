@@ -35,7 +35,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (Missile == null)
                 {
                     if (debugMode)
@@ -64,7 +64,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             get
             {
 
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (debugMode)
                     return Debug.GlobalEndPos;
 
@@ -91,7 +91,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             var newInstance = new LinearSkillshot { OwnSpellData = OwnSpellData };
             if (debug)
             {
-                bool isProjectile = EvadeMenu.HotkeysMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
+                bool isProjectile = EvadeMenu.DebugMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
                 var newDebugInst = new LinearSkillshot
                 {
                     OwnSpellData = OwnSpellData, FixedStartPos = Debug.GlobalStartPos,
@@ -107,7 +107,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             var missile = obj as MissileClient;
 
-            bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+            bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
             if (SpawnObject == null && missile != null && !debugMode)
             {
                 if (missile.SData.Name == OwnSpellData.ObjectCreationName && missile.SpellCaster.Index == Caster.Index)
@@ -147,7 +147,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override void OnTick()
         {
-            var debug = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+            var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
             if (Missile == null)
             {
                 if (Environment.TickCount > TimeDetected + OwnSpellData.Delay + 250)
@@ -291,7 +291,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         segmentIntersections.Add(
                             new FoundIntersection(
                                 Distance + intersection.Point.Distance(from),
-                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed),
+                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed) + delay,
                                 intersection.Point, from));
                     }
                 }
@@ -305,7 +305,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             //Skillshot with missile.
             if (Missile != null)
             {
-                var debug = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 var MissileStartPosition = debug ? Debug.GlobalStartPos.To2D() : Missile.StartPosition.To2D();
                 //Outside the skillshot
                 if (IsSafe())

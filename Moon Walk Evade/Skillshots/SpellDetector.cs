@@ -43,7 +43,7 @@ namespace Moon_Walk_Evade.Skillshots
 
         public bool LimitDetectionRange => EvadeMenu.MainMenu["limitDetectionRange"].Cast<CheckBox>().CurrentValue;
 
-        public int SkillshotActivationDelay => EvadeMenu.MainMenu["skillshotActivationDelay"].Cast<Slider>().CurrentValue;
+        public int SkillshotActivationDelay => EvadeMenu.HumanizerMenu["skillshotActivationDelay"].Cast<Slider>().CurrentValue;
 
         public bool EnableSpellDetection => EvadeMenu.MainMenu["processSpellDetection"].Cast<CheckBox>().CurrentValue;
 

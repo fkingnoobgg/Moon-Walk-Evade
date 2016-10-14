@@ -107,9 +107,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 return Vector2.Zero;
             }
 
-            var evadePoint =
-                points.Where
-                (x => moonWalkMoonWalkEvade.IsPointSafe(x) && !x.IsWall()).OrderBy(x => x.Distance(Game.CursorPos)).
+            var evadePoint = points.Where(x => moonWalkMoonWalkEvade.IsPointSafe(x) && !x.IsWall()).OrderBy(x => x.Distance(Game.CursorPos)).
                 FirstOrDefault();
             return evadePoint;
         }
@@ -118,7 +116,7 @@ namespace Moon_Walk_Evade.EvadeSpells
         {
             IEnumerable<EvadeSpellData> evadeSpells = EvadeMenu.MenuEvadeSpells.Where(evadeSpell =>
             {
-                var item = EvadeMenu.SpellMenu[evadeSpell.SpellName + "/enable"];
+                var item = EvadeMenu.EvadeSpellMenu[evadeSpell.SpellName + "/enable"];
                 // ReSharper disable once SimplifyConditionalTernaryExpression
                 // ReSharper disable once MergeConditionalExpression
                 return item != null ? item.Cast<CheckBox>().CurrentValue : false;
@@ -144,8 +142,11 @@ namespace Moon_Walk_Evade.EvadeSpells
                     float castTime = evadeSpell.Delay;
                     if (TimeAvailable >= castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
                     {
-                        CastEvadeSpell(evadeSpell, evadePos);
-                        return true;
+                        //if (IsDashSafe(evadeSpell.Slot, evadePos, moonWalkMoonWalkEvadeInstance))
+                        //{
+                            CastEvadeSpell(evadeSpell, evadePos);
+                            return true;
+                        //}
                     }
                 }
 
@@ -208,5 +209,21 @@ namespace Moon_Walk_Evade.EvadeSpells
                     break;
             }
         }
+
+        public static bool IsDashSafe(SpellSlot slot, Vector2 endPos, MoonWalkEvade evadeInstance)
+        {
+            var evadeSpell =
+                EvadeSpellDatabase.Spells.FirstOrDefault(
+                    x => x.ChampionName == Player.Instance.ChampionName && x.Slot == slot);
+            if (evadeSpell == null)
+                return false;
+
+            return evadeInstance.IsPathSafeEx(Player.Instance.GetPath(endPos.To3D()).ToVector2(), (int) evadeSpell.Speed,
+                (int) evadeSpell.Delay);
+        }
+
+
+        public static bool IsDashSpell(SpellSlot slot) => 
+            EvadeSpellDatabase.Spells.Any(x => x.ChampionName == Player.Instance.ChampionName && x.Slot == slot && x.EvadeType == EvadeType.Dash);
     }
 }

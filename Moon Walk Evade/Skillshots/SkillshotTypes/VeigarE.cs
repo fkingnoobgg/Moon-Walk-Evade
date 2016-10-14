@@ -47,7 +47,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             var newInstance = new VeigarE { OwnSpellData = OwnSpellData };
             if (debug)
             {
-                bool isProjectile = EvadeMenu.HotkeysMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
+                bool isProjectile = EvadeMenu.DebugMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
                 var newDebugInst = new VeigarE
                 {
                     OwnSpellData = OwnSpellData,

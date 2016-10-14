@@ -124,21 +124,21 @@ namespace Moon_Walk_Evade.Utils
 
         private static void CreateDebugSkillshot()
         {
-            if (!EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            if (!EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
                 return;
 
             if (GlobalStartPos.IsZero || GlobalEndPos.IsZero)
                 return;
 
-            if (Environment.TickCount - LastCreationTick < EvadeMenu.HotkeysMenu["debugModeIntervall"].Cast<Slider>().CurrentValue)
+            if (Environment.TickCount - LastCreationTick < EvadeMenu.DebugMenu["debugModeIntervall"].Cast<Slider>().CurrentValue)
                 return;
 
             LastCreationTick = Environment.TickCount;
             var skillshot =
-                SkillshotDatabase.Database[EvadeMenu.HotkeysMenu["debugMissile"].Cast<Slider>().CurrentValue];
+                SkillshotDatabase.Database[EvadeMenu.DebugMenu["debugMissile"].Cast<Slider>().CurrentValue];
             if (skillshot.GetType() == typeof(CircularSkillshot) ||
                 skillshot.GetType() == typeof(MultiCircleSkillshot))
-                EvadeMenu.HotkeysMenu["isProjectile"].Cast<CheckBox>().CurrentValue = false;
+                EvadeMenu.DebugMenu["isProjectile"].Cast<CheckBox>().CurrentValue = false;
 
 
             var nSkillshot = skillshot.NewInstance(true);
@@ -189,7 +189,7 @@ namespace Moon_Walk_Evade.Utils
 
         private static void GameOnOnWndProc(WndEventArgs args)
         {
-            if (!EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            if (!EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
                 return;
 
             if (args.Msg == 0x0201)//mouse down

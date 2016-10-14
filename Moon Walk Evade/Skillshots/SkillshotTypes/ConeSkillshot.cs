@@ -32,7 +32,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
 
                 if (debugMode)
                     return Debug.GlobalStartPos;
@@ -48,7 +48,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (Missile == null)
                 {
                     if (debugMode)
@@ -73,7 +73,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                bool debugMode = EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (debugMode)
                     return Debug.GlobalEndPos;
 
@@ -94,7 +94,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             var newInstance = new ConeSkillshot { OwnSpellData = OwnSpellData };
             if (debug)
             {
-                bool isProjectile = EvadeMenu.HotkeysMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
+                bool isProjectile = EvadeMenu.DebugMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
                 var newDebugInst = new ConeSkillshot
                 {
                     OwnSpellData = OwnSpellData,
@@ -146,7 +146,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 }
             }
 
-            if (EvadeMenu.HotkeysMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
             {
                 float speed = OwnSpellData.MissileSpeed;
                 float timeElapsed = Environment.TickCount - TimeDetected - OwnSpellData.Delay;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,7 +9,6 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Moon_Walk_Evade.EvadeSpells;
 using Moon_Walk_Evade.Skillshots;
-using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
@@ -38,12 +36,12 @@ namespace Moon_Walk_Evade.Evading
 
         public int ExtraEvadeRange
         {
-            get { return EvadeMenu.MainMenu["extraEvadeRange"].Cast<Slider>().CurrentValue; }
+            get { return EvadeMenu.HumanizerMenu["extraEvadeRange"].Cast<Slider>().CurrentValue; }
         }
 
         public bool RandomizeExtraEvadeRange
         {
-            get { return EvadeMenu.MainMenu["randomizeExtraEvadeRange"].Cast<CheckBox>().CurrentValue; }
+            get { return EvadeMenu.HumanizerMenu["randomizeExtraEvadeRange"].Cast<CheckBox>().CurrentValue; }
         }
 
         public bool AllowRecalculateEvade
@@ -85,7 +83,7 @@ namespace Moon_Walk_Evade.Evading
         {
             MousePos, PlayerFaceDirection, FarestAway, 
         }
-        public StutterSearchType AntiStutterSearchType => (StutterSearchType)EvadeMenu.MainMenu["stutterPointFindType"].Cast<Slider>().CurrentValue;
+        public StutterSearchType AntiStutterSearchType => (StutterSearchType)EvadeMenu.HumanizerMenu["stutterPointFindType"].Cast<Slider>().CurrentValue;
 
         private int _oldMovementDelay = -1;
         public int OldMovementDelay
@@ -98,19 +96,20 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
-        public bool manageOrbwalker => EvadeMenu.HotkeysMenu["manageMovementDeay"].Cast<CheckBox>().CurrentValue;
+        public bool manageOrbwalker => EvadeMenu.DebugMenu["manageMovementDelay"].Cast<CheckBox>().CurrentValue;
 
         public bool ForceEvade => EvadeMenu.MainMenu["forceEvade"].Cast<CheckBox>().CurrentValue;
 
         public int minComfortDistance => EvadeMenu.MainMenu["minComfortDistance"].Cast<Slider>().CurrentValue;
         public int minEnemyComfortCount => EvadeMenu.MainMenu["enemyComfortCount"].Cast<Slider>().CurrentValue;
 
+        public bool BlockDangerousDashes => EvadeMenu.SpellBlockerMenu["blockDangerousDashes"].Cast<CheckBox>().CurrentValue;
+
         #endregion
 
         #region Vars
 
         public SpellDetector SkillshotDetector { get; set; }
-        public PathFinding PathFinding { get; private set; }
 
         public EvadeSkillshot[] Skillshots { get; private set; }
         public Geometry.Polygon[] Polygons { get; private set; }
@@ -121,7 +120,7 @@ namespace Moon_Walk_Evade.Evading
 
         private EvadeResult CurrentEvadeResult { get; set; }
 
-        private Text StatusText;
+        private Text StatusText, WarnText;
         private int EvadeIssurOrderTime;
 
         #endregion
@@ -131,8 +130,8 @@ namespace Moon_Walk_Evade.Evading
             Skillshots = new EvadeSkillshot[] { };
             Polygons = new Geometry.Polygon[] { };
             ClippedPolygons = new List<Geometry.Polygon>();
-            PathFinding = new PathFinding(this);
             StatusText = new Text("MoonWalkEvade Enabled", new Font("Euphemia", 10F, FontStyle.Bold)); //Calisto MT
+            WarnText = new Text("", new Font("Euphemia", 18F, FontStyle.Bold)); //Calisto MT
             _skillshotPolygonCache = new Dictionary<EvadeSkillshot, Geometry.Polygon>();
 
             SkillshotDetector = detector;
@@ -142,7 +141,7 @@ namespace Moon_Walk_Evade.Evading
             SkillshotDetector.OnSkillshotDeleted += OnSkillshotDeleted;
 
             Player.OnIssueOrder += PlayerOnIssueOrder;
-            Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+            Spellbook.OnCastSpell += SpellbookOnOnCastSpell;
             Dash.OnDash += OnDash;
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
@@ -170,13 +169,7 @@ namespace Moon_Walk_Evade.Evading
         {
             if (RestorePosition && !SkillshotDetector.DetectedSkillshots.Any())
             {
-                if (AutoPathing.IsPathing && Player.Instance.IsWalking())
-                {
-                    var destination = AutoPathing.Destination;
-                    AutoPathing.StopPath();
-                    Player.IssueOrder(GameObjectOrder.MoveTo, destination.To3DWorld(), false);
-                }
-                else if (CurrentEvadeResult != null && Player.Instance.IsMovingTowards(CurrentEvadeResult.EvadePoint))
+                if (CurrentEvadeResult != null && Player.Instance.IsMovingTowards(CurrentEvadeResult.EvadePoint))
                 {
                     Player.IssueOrder(GameObjectOrder.MoveTo, LastIssueOrderPos.To3DWorld(), false);
                 }
@@ -283,7 +276,7 @@ namespace Moon_Walk_Evade.Evading
             {
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
-
+            
             if (CurrentEvadeResult != null)
             {
                 args.Process = false;
@@ -291,28 +284,38 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
-        private void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        private void SpellbookOnOnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        {
+            if (!sender.Owner.IsMe || !EvadeEnabled)
+            {
+                return;
+            }
+
+            if (SpellBlocker.WillBlock(args.Slot) && IsHeroInDanger())
+            {
+                args.Process = false;
+                return;
+            }
+
+            if (BlockDangerousDashes && EvadeSpellManager.IsDashSpell(args.Slot) && !IsHeroInDanger())
+            {
+                if (!EvadeSpellManager.IsDashSafe(args.Slot, args.EndPosition.To2D(), this))
+                    args.Process = false;
+            }
+        }
+
+        private void OnDash(Obj_AI_Base sender, Dash.DashEventArgs dashEventArgs)
         {
             if (!sender.IsMe)
             {
                 return;
             }
 
-            if (args.SData.Name == "summonerflash")
+            if (CurrentEvadeResult != null)
             {
                 CurrentEvadeResult = null;
+                Player.IssueOrder(GameObjectOrder.MoveTo, LastIssueOrderPos.To3DWorld(), false);
             }
-        }
-
-        private void OnDash(Obj_AI_Base sender, Dash.DashEventArgs dashEventArgs)
-        {
-            if (!sender.IsMe || CurrentEvadeResult == null)
-            {
-                return;
-            }
-
-            CurrentEvadeResult = null;
-            Player.IssueOrder(GameObjectOrder.MoveTo, LastIssueOrderPos.To3DWorld(), false);
         }
 
         private void OnDraw(EventArgs args)
@@ -333,9 +336,27 @@ namespace Moon_Walk_Evade.Evading
             if (DrawEvadeStatus)
             {
                 StatusText.Color = EvadeEnabled ? Color.White : Color.Red;
+                if (DodgeDangerousOnly)
+                    StatusText.Color = Color.Orange;
                 StatusText.TextValue = "MoonWalkEvade " + (EvadeEnabled ? "Enabled" : "Disabled");
-                StatusText.Position = Player.Instance.Position.WorldToScreen() - new Vector2(StatusText.Bounding.Width / 2, -25);
+                StatusText.Position = Player.Instance.Position.WorldToScreen() - new Vector2(StatusText.Bounding.Width / 2f, -25);
                 StatusText.Draw();
+            }
+
+            /*Check spell block paradoxon*/
+            for (int i = 0; i < 4; i++)
+            {
+                var slot = (SpellSlot) i;
+                var evadeSpell = EvadeMenu.MenuEvadeSpells.FirstOrDefault(spell => spell.Slot == slot);
+
+                if (EvadeMenu.SpellBlockerMenu["block/" + slot].Cast<CheckBox>().CurrentValue
+                    && EvadeMenu.IsEvadeSkillhotEnabled(evadeSpell))
+                {
+                    WarnText.Color = Color.Red;
+                    WarnText.TextValue = "Evade spell '" + evadeSpell.SpellName + "' is checked in SpellBlocker!";
+                    WarnText.Position = Player.Instance.Position.WorldToScreen() - new Vector2(WarnText.Bounding.Width / 2f, -50);
+                    WarnText.Draw();
+                }
             }
 
             if (DrawDangerPolygon)
@@ -345,9 +366,6 @@ namespace Moon_Walk_Evade.Evading
                     pol.DrawPolygon(Color.White, 3);
                 }
             }
-
-            //Utils.DrawPath(PathFinding.GetPath(Player.Instance.Position.To2D(), Game.CursorPos.To2D()), Color.Blue);
-            //Utils.DrawPath(Player.Instance.GetPath(Game.CursorPos, true).ToVector2(), Color.Blue);
         }
 
         private void CacheSkillshots()
@@ -421,16 +439,14 @@ namespace Moon_Walk_Evade.Evading
             return values.Any() ? values.First() : 0;
         }
 
-        public bool IsPathSafeEx(Vector2[] path, AIHeroClient hero = null)
+        public bool IsPathSafeEx(Vector2[] path, int speed = -1, int delay = 0)
         {
-            return Skillshots.All(evadeSkillshot => evadeSkillshot.IsSafePath(path));
+            return Skillshots.All(evadeSkillshot => evadeSkillshot.IsSafePath(path, 0, speed, delay));
         }
 
-        public bool IsPathSafeEx(Vector2 end, AIHeroClient hero = null)
+        public bool IsPathSafeEx(Vector2 end)
         {
-            hero = hero ?? Player.Instance;
-
-            return IsPathSafeEx(hero.GetPath(end.To3DWorld(), true).ToVector2(), hero);
+            return IsPathSafeEx(Player.Instance.GetPath(end.To3DWorld(), true).ToVector2());
         }
 
         /// <summary>
@@ -497,24 +513,6 @@ namespace Moon_Walk_Evade.Evading
             return !polPoints.Any() ? Vector2.Zero : polPoints.Last();
         }
 
-        int GetTimeUnitlOutOfDangerArea(Vector2 evadePoint)
-        {
-            IEnumerable<Vector2> inters =
-                (from polygon in SkillshotDetector.ActiveSkillshots.Select(x => x.ToRealPolygon())
-                 let intersections = polygon.GetIntersectionPointsWithLineSegment(Player.Instance.Position.To2D(), evadePoint)
-                 .OrderBy(x => x.Distance(Player.Instance))
-                 where intersections.Any()
-                 select intersections.Last()).ToList();
-
-            if (inters.Any())
-            {
-                var farest = inters.OrderBy(x => x.Distance(Player.Instance)).Last();
-                return Player.Instance.WalkingTime(farest);
-            }
-
-            return int.MaxValue;
-        }
-
         public bool IsComfortPoint(Vector2 p) => !EntityManager.Heroes.Enemies.Any(x => x.IsValid && !x.IsDead && x.Distance(p) <= minComfortDistance);
         public bool DoesComfortPointExist(IEnumerable<Vector2> points) => points.Any(IsComfortPoint);
         public bool HasToAttendComfort() => 
@@ -531,6 +529,7 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any() && !EvadeSpellManager.TryEvadeSpell(time, this))
             {
+                Chat.Print(Game.Time);
                 /*no points => no evade spell => closest walk dist*/
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
             }
@@ -542,12 +541,10 @@ namespace Moon_Walk_Evade.Evading
             return new EvadeResult(this, evadePoint, anchor, maxTime, time, true);
         }
 
-        public bool IsHeroPathSafe(EvadeResult evade, Vector3[] desiredPath, AIHeroClient hero = null)
+        public bool IsHeroPathSafe(EvadeResult evade, Vector3[] desiredPath)
         {
-            hero = hero ?? Player.Instance;
-
-            var path = (desiredPath ?? hero.RealPath()).ToVector2();
-            return IsPathSafeEx(path, hero);
+            var path = (desiredPath ?? Player.Instance.RealPath()).ToVector2();
+            return IsPathSafeEx(path);
         }
 
         public bool MoveTo(Vector2 point, bool limit = true)
@@ -575,7 +572,7 @@ namespace Moon_Walk_Evade.Evading
 
             public bool IsOutsideEvade { get; set; }
 
-            public int StutterDistance => EvadeMenu.MainMenu["stutterDistanceTrigget"].Cast<Slider>().CurrentValue;
+            public int StutterDistance => EvadeMenu.HumanizerMenu["stutterDistanceTrigger"].Cast<Slider>().CurrentValue;
             public bool ShouldPreventStuttering => IsOutsideEvade && Player.Instance.Distance(WalkPoint) <= StutterDistance;
 
 
