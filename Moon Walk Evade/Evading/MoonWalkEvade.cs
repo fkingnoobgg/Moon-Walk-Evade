@@ -529,7 +529,6 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any() && !EvadeSpellManager.TryEvadeSpell(time, this))
             {
-                Chat.Print(Game.Time);
                 /*no points => no evade spell => closest walk dist*/
                 return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
             }
