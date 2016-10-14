@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -98,6 +99,11 @@ namespace Moon_Walk_Evade.Evading
         }
 
         public bool manageOrbwalker => EvadeMenu.HotkeysMenu["manageMovementDeay"].Cast<CheckBox>().CurrentValue;
+
+        public bool ForceEvade => EvadeMenu.MainMenu["forceEvade"].Cast<CheckBox>().CurrentValue;
+
+        public int minComfortDistance => EvadeMenu.MainMenu["minComfortDistance"].Cast<Slider>().CurrentValue;
+        public int minEnemyComfortCount => EvadeMenu.MainMenu["enemyComfortCount"].Cast<Slider>().CurrentValue;
 
         #endregion
 
@@ -431,9 +437,8 @@ namespace Moon_Walk_Evade.Evading
         /// 
         /// </summary>
         /// <param name="awayFrom"></param>
-        /// <param name="managed">Check for path safety</param>
         /// <returns></returns>
-        public Vector2[] GetEvadePoints(Vector2? awayFrom = null, bool managed = true)
+        public List<Vector2> GetEvadePoints(Vector2? awayFrom = null)
         {
             int posChecked = 0;
             int maxPosToCheck = 50;
@@ -460,11 +465,8 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            if (!managed)
-                return points.Where(p => IsPointSafe(p) && !p.IsWall()).ToArray();
-
             return !awayFrom.HasValue ? 
-                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToArray() :
+                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall()).ToList() :
                 points.Where(p => IsPointSafe(p) && IsPathSafeEx(p) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
                 p =>
                 {
@@ -480,7 +482,7 @@ namespace Moon_Walk_Evade.Evading
 
                     /*AntiStutterSearchType == StutterSearchType.MousePos*/
                     return p.Distance(Game.CursorPos);
-                }).ToArray();
+                }).ToList();
         }
 
         public Vector2 GetClosestEvadePoint(Vector2 from)
@@ -512,7 +514,12 @@ namespace Moon_Walk_Evade.Evading
 
             return int.MaxValue;
         }
-        
+
+        public bool IsComfortPoint(Vector2 p) => !EntityManager.Heroes.Enemies.Any(x => x.IsValid && !x.IsDead && x.Distance(p) <= minComfortDistance);
+        public bool DoesComfortPointExist(IEnumerable<Vector2> points) => points.Any(IsComfortPoint);
+        public bool HasToAttendComfort() => 
+            EntityManager.Heroes.Enemies.Count(x => x.IsValid && !x.IsDead && x.Distance(Player.Instance) <= 1000) >= minEnemyComfortCount;
+
         public EvadeResult CalculateEvade(Vector2 anchor, bool outside = false)
         {
             var playerPos = Player.Instance.ServerPosition.To2D();
@@ -524,10 +531,12 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any() && !EvadeSpellManager.TryEvadeSpell(time, this))
             {
-                var closestPoint = GetClosestEvadePoint(playerPos);
                 /*no points => no evade spell => closest walk dist*/
-                return new EvadeResult(this, closestPoint, anchor, maxTime, time, true);
+                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
             }
+
+            if (DoesComfortPointExist(points) && HasToAttendComfort())
+                points.RemoveAll(p => !IsComfortPoint(p));
 
             var evadePoint = points.OrderBy(p => !p.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
             return new EvadeResult(this, evadePoint, anchor, maxTime, time, true);

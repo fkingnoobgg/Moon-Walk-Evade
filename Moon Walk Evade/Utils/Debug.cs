@@ -60,10 +60,13 @@ namespace Moon_Walk_Evade.Utils
             if (!DrawList.Contains(v.To2D()))
                 DrawList.Add(v.To2D());
         }
-        public static void AddDrawVector(this Vector2 v)
+        public static void AddDrawVector(this Vector2 v, int time = short.MaxValue)
         {
             if (!DrawList.Contains(v))
                 DrawList.Add(v);
+
+            if (time != short.MaxValue)
+                Core.DelayAction(() => DrawList.Remove(v), time);
         }
 
         public static void Init(ref SpellDetector detector)
@@ -81,7 +84,7 @@ namespace Moon_Walk_Evade.Utils
                 if (DrawList.Count >= 5) DrawList.Clear();
                 foreach (var vector2 in DrawList)
                 {
-                    new Circle { Color = System.Drawing.Color.BlueViolet, Radius = 100 }.Draw(vector2.To3D());
+                    new Circle { Color = System.Drawing.Color.BlueViolet, Radius = 50, BorderWidth = 20}.Draw(vector2.To3D());
                 }
             };
             Game.OnUpdate += GameOnOnUpdate;
