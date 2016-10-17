@@ -1103,7 +1103,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                 SpellName = "TalismanOfAscension",
                 Delay = 250,
-                Slot = SpellSlot.Q,
+                Slot = SpellSlot.Unknown,
                 EvadeType = EvadeType.MovementSpeedBuff,
                 speedArray = new[] { 40f, 40f, 40f, 40f, 40f },
                 CastType = CastType.Self,
@@ -1119,7 +1119,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                 SpellName = "YoumuusGhostblade",
                 Delay = 250,
-                Slot = SpellSlot.Q,
+                Slot = SpellSlot.Unknown,
                 EvadeType = EvadeType.MovementSpeedBuff,
                 speedArray = new[] { 20f, 20f, 20f, 20f, 20f },
                 CastType = CastType.Self,
@@ -1151,7 +1151,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                 SpellName = "ZhonyasHourglass",
                 Delay = 50,
-                Slot = SpellSlot.Q,
+                Slot = SpellSlot.Unknown,
                 EvadeType = EvadeType.SpellShield, //Invulnerability
                 CastType = CastType.Self,
                 isItem = true,
@@ -1166,7 +1166,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                 SpellName = "Witchcap",
                 Delay = 50,
-                Slot = SpellSlot.Q,
+                Slot = SpellSlot.Unknown,
                 EvadeType = EvadeType.SpellShield, //Invulnerability
                 CastType = CastType.Self,
                 isItem = true,

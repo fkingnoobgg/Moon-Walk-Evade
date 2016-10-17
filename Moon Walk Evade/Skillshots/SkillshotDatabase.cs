@@ -362,7 +362,7 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "CaitlynPiltoverPeacemaker",
                         Slot = SpellSlot.Q,
                         Delay = 625,
-                        Range = 1300,
+                        Range = 1500,
                         Radius = 100,
                         MissileSpeed = 2200,
                         DangerValue = 2,
