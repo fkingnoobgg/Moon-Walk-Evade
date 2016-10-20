@@ -10,7 +10,7 @@ using Color = System.Drawing.Color;
 
 namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
-    class CaitlynTrap : EvadeSkillshot
+    class CaitlynTrap : CircularSkillshot
     {
         public CaitlynTrap()
         {
@@ -22,12 +22,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             IsValid = true;
             TimeDetected = Environment.TickCount;
         }
-
-        public Vector3 EndPosition { get; set; }
-
         public bool _missileDeleted;
-
-        public MissileClient Missile => SpawnObject as MissileClient;
 
         public override Vector3 GetCurrentPosition()
         {
@@ -123,14 +118,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             ToPolygon().DrawPolygon(Color.White);
         }
 
-        public override Geometry.Polygon ToRealPolygon()
+        public override Geometry.Polygon ToPolygon()
         {
-            return ToPolygon();
-        }
-
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
-        {
-            extrawidth = 20;
+            float extrawidth = 20;
             if (OwnSpellData.AddHitbox)
             {
                 extrawidth += Player.Instance.HitBoxRadius();

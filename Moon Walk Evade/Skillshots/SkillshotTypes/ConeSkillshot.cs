@@ -172,11 +172,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public override Geometry.Polygon ToRealPolygon()
-        {
-            return ToPolygon();
-        }
-
         Vector2 RotateAroundPoint(Vector2 start, Vector2 end, float theta)
         {
             float px = end.X, py = end.Y;
@@ -227,7 +222,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return new[] { CurrentPos.To2D(),  CurrentPos.To2D() };
         }
 
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToPolygon()
         {
             List<Vector2> coneSegemnts = new List<Vector2>();
             for (float i = -OwnSpellData.ConeAngle / 2f; i <= OwnSpellData.ConeAngle / 2f; i++)
@@ -248,6 +243,38 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             polygon.Points.AddRange(coneSegemnts);
 
             return polygon;
+        }
+
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
+        {
+            var poly = ToPolygon();
+            var poly2 = new Geometry.Polygon();
+
+            for (int i = 0; i < poly.Points.Count; i++)
+            {
+                var p = poly.Points[i];
+                var nextP = poly.Points[i == poly.Points.Count - 1 ? 0 : i + 1];
+
+                if (p.Distance(nextP) > 50)
+                {
+                    int steps = (int)Math.Floor(p.Distance(nextP) / 50);
+
+                    float extendDist = 50;
+                    for (int step = 0; step < steps; step++)
+                    {
+                        poly2.Points.Add(p.Extend(nextP, extendDist));
+                        extendDist += 50;
+                    }
+
+                    if (p.Distance(nextP) % 50 != 0)
+                        poly2.Points.Add(nextP);
+                }
+                else
+                {
+                    poly2.Points.Add(nextP);
+                }
+            }
+            return poly2;
         }
 
         public override int GetAvailableTime(Vector2 pos)

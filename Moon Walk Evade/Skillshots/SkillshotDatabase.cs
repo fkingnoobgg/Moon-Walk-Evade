@@ -287,6 +287,42 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "Doom Rocket Grab",
+                        ChampionName = "Blitzcrank",
+                        SpellName = "NightmareBotBlitzcrankRocketGrab",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1050,
+                        Radius = 70,
+                        MissileSpeed = 1800,
+                        DangerValue = 4,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotBlitzcrankRocketGrabMissile",
+                        MinionCollision = true
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Doom Rocket Side Grab",
+                        ChampionName = "Blitzcrank",
+                        SpellName = "NightmareBotBlitzcrankRocketGrab",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1050,
+                        Radius = 70,
+                        MissileSpeed = 1800,
+                        DangerValue = 4,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotBlitzcrankRocketGrabSideMissile",
+                        MinionCollision = true
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Sear",
                         ChampionName = "Brand",
                         SpellName = "BrandQ",
@@ -728,6 +764,24 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "DoomBot Mystic Shot",
+                        ChampionName = "Ezreal",
+                        SpellName = "NightmareBotEzrealQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1200,
+                        Radius = 60,
+                        MissileSpeed = 2000,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotEzrealQMissile",
+                        MinionCollision = true
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Trueshot Barrage",
                         ChampionName = "Ezreal",
                         SpellName = "EzrealTrueshotBarrage",
@@ -745,6 +799,57 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "DoomBot Trueshot Barrage",
+                        ChampionName = "Ezreal",
+                        SpellName = "NightmareBotEzrealR",
+                        Slot = SpellSlot.R,
+                        Delay = 1000,
+                        Range = 20000,
+                        Radius = 160,
+                        MissileSpeed = 2000,
+                        DangerValue = 3,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotEzrealR"
+                    }
+                },
+                 new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Trueshot Barrage 2",
+                        ChampionName = "Ezreal",
+                        SpellName = "NightmareBotEzrealR2",
+                        Slot = SpellSlot.R,
+                        Delay = 1000,
+                        Range = 20000,
+                        Radius = 160,
+                        MissileSpeed = 2000,
+                        DangerValue = 3,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotEzrealR2"
+                    }
+                },
+                  new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Trueshot Barrage 3",
+                        ChampionName = "Ezreal",
+                        SpellName = "NightmareBotEzrealR3",
+                        Slot = SpellSlot.R,
+                        Delay = 1000,
+                        Range = 20000,
+                        Radius = 160,
+                        MissileSpeed = 2000,
+                        DangerValue = 3,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotEzrealR3"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Essence Flux",
                         ChampionName = "Ezreal",
                         SpellName = "EzrealEssenceFlux",
@@ -756,6 +861,23 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 2,
                         IsDangerous = false,
                         ObjectCreationName = "EzrealEssenceFluxMissile"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Essence Flux",
+                        ChampionName = "Ezreal",
+                        SpellName = "NightmareBotEzrealW",
+                        Slot = SpellSlot.W,
+                        Delay = 250,
+                        Range = 1050,
+                        Radius = 80,
+                        MissileSpeed = 1600,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotEzrealWMissile",
                     }
                 },
                 /*
@@ -795,6 +917,23 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "GalioRighteousGust"
                     }
                 },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Righteous Gust",
+                        ChampionName = "Galio",
+                        SpellName = "NightmareBotGalioRighteousGust",
+                        Slot = SpellSlot.E,
+                        Delay = 250,
+                        Range = 1280,
+                        Radius = 120,
+                        MissileSpeed = 1300,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotGalioRighteousGust"
+                    }
+                },
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -812,6 +951,23 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "GalioResoluteSmite"
                     }
                 },
+                 new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Resolute Smite",
+                        ChampionName = "Galio",
+                        SpellName = "NightmareBotGalioResoluteSmite",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1040,
+                        Radius = 235,
+                        MissileSpeed = 1200,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotGalioResoluteSmite"
+                    }
+                },
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -826,7 +982,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 0,
                         DangerValue = 3,
                         AddHitbox = false,
-                        ObjectCreationName = ""
+                        ObjectCreationName = "GalioIdolOfDurand"
                     }
                 },
                 new LinearSkillshot
@@ -1764,6 +1920,23 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "DoomBot Final Spark",
+                        ChampionName = "Lux",
+                        SpellName = "NightmareBotLuxR",
+                        Slot = SpellSlot.R,
+                        Delay = 1000,
+                        Range = 3500,
+                        Radius = 110,
+                        MissileSpeed = 0,
+                        DangerValue = 5,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotLuxR"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Light Binding",
                         ChampionName = "Lux",
                         SpellName = "LuxLightBinding",
@@ -1777,6 +1950,24 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "LuxLightBindingMis"
                     }
                 },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Light Binding",
+                        ChampionName = "Lux",
+                        SpellName = "LuxLightBinding",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 1300,
+                        Radius = 70,
+                        MissileSpeed = 1200,
+                        DangerValue = 3,
+                        IsDangerous = true,
+                        ObjectCreationName = "NightmareBotLuxQSplit"
+                    }
+                },
+
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -1794,21 +1985,22 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "UFSlash"
                     }
                 },
-                //new LinearSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Malzahar",
-                //        SpellName = "AlZaharCalloftheVoid",
-                //        Slot = SpellSlot.Q,
-                //        Delay = 1000,
-                //        Range = 900,
-                //        Radius = 85,
-                //        MissileSpeed = 1600,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "AlZaharCalloftheVoidMissile"
-                //    }
-                //},
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        //DisplayName = "Malzahar Q",
+                        ChampionName = "Malzahar",
+                        SpellName = "MalzaharQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 1000,
+                        Range = 900,
+                        Radius = 85,
+                        MissileSpeed = 1600,
+                        DangerValue = 3,
+                        ObjectCreationName = "MalzaharQMissile"
+                    }
+                },
                 //new CircularSkillshot
                 //{
                 //    OwnSpellData = new OwnSpellData
@@ -2588,6 +2780,24 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Baleful Strike",
+                        ChampionName = "Veigar",
+                        SpellName = "NightmareBotVeigarQMis",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 950,
+                        Radius = 70,
+                        MissileSpeed = 2000,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotVeigarQMis",
+                        MinionCollision = true
+                    }
+                },
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -2884,7 +3094,7 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 3,
                         ObjectCreationName = "YasuoQ3Mis"
                     }
-                },             
+                },
                 new YasuoQ
                 {
                     OwnSpellData = new SpellData
@@ -3018,6 +3228,23 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "DoomBot Bouncing Bomb",
+                        ChampionName = "Ziggs",
+                        SpellName = "ZiggsQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 850,
+                        Radius = 150,
+                        MissileSpeed = 1700,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotZiggsQSpell"
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Bouncing Bomb 2",
                         ChampionName = "Ziggs",
                         SpellName = "ZiggsQ",
@@ -3035,6 +3262,23 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "DoomBot Bouncing Bomb 2",
+                        ChampionName = "Ziggs",
+                        SpellName = "ZiggsQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 850,
+                        Radius = 150,
+                        MissileSpeed = 1700,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotZiggsQSpell2"
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Bouncing Bomb 3",
                         ChampionName = "Ziggs",
                         SpellName = "ZiggsQ",
@@ -3046,6 +3290,23 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 2,
                         IsDangerous = false,
                         ObjectCreationName = "ZiggsQSpell3"
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Bouncing Bomb 3",
+                        ChampionName = "Ziggs",
+                        SpellName = "ZiggsQ",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 850,
+                        Radius = 150,
+                        MissileSpeed = 1700,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotZiggsQSpell3"
                     }
                 },
                 new CircularSkillshot

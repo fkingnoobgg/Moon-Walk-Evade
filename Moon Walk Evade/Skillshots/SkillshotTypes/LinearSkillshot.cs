@@ -189,28 +189,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White);
         }
 
-        public override Geometry.Polygon ToRealPolygon()
+        public override Geometry.Polygon ToPolygon()
         {
-            var halfWidth = OwnSpellData.Radius;
-            var d1 = CurrentPosition.To2D();
-            var d2 = EndPosition.To2D();
-            var direction = (d1 - d2).Perpendicular().Normalized();
-
-            Vector3[] points =
-            {
-                (d1 + direction*halfWidth).To3DPlayer(),
-                (d1 - direction*halfWidth).To3DPlayer(),
-                (d2 - direction*halfWidth).To3DPlayer(),
-                (d2 + direction*halfWidth).To3DPlayer()
-            };
-            var p = new Geometry.Polygon();
-            p.Points.AddRange(points.Select(x => x.To2D()).ToList());
-
-            return p;
-        }
-
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
-        {
+            float extrawidth = 0;
             if (OwnSpellData.AddHitbox)
             {
                 extrawidth += Player.Instance.HitBoxRadius();
@@ -219,11 +200,16 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
         }
 
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
+        {
+            return ToPolygon().ToDetailedPolygon();
+        }
+
         public override int GetAvailableTime(Vector2 pos)
         {
             if (Missile == null)
             {
-                return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected));
+                return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected) - Game.Ping);
             }
 
             var proj = pos.ProjectOn(CurrentPosition.To2D(), EndPosition.To2D());
@@ -238,7 +224,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return short.MaxValue;
 
             float skillDist = point.Distance(CurrentPosition);
-            return (int)(skillDist/OwnSpellData.MissileSpeed*1000);
+            return Math.Max(0, (int)(skillDist/OwnSpellData.MissileSpeed*1000));
         }
 
         public override bool IsFromFow()
@@ -251,6 +237,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return ToPolygon().IsOutside(p ?? Player.Instance.Position.To2D());
         }
 
+        /*ping attened from caller*/
         public override Vector2 GetMissilePosition(int extraTime)
         {
             if (Missile == null)
@@ -267,7 +254,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
             var Distance = 0f;
-            timeOffset += Game.Ping / 2;
+            timeOffset += Game.Ping/2;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 

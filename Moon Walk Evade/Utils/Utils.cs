@@ -11,6 +11,50 @@ namespace Moon_Walk_Evade.Utils
 {
     internal static class Utils
     {
+        public static Vector2[] GetExactPath(this AIHeroClient me)
+        {
+            return me.GetExactPath(me.RealPath().Last().To2D());
+        }
+
+        public static Vector2[] GetExactPath(this AIHeroClient me, Vector2 end)
+        {
+            var path = me.GetPath(end.To3D(), true);
+            var points = new List<Vector2>();
+
+            for (int i = 0; i < path.Length - 1; i++)
+            {
+                var p = path[i].To2D();
+                var nextP = path[i + 1].To2D();
+
+                if (p.Distance(nextP) > 50)
+                {
+                    int steps = (int)Math.Floor(p.Distance(nextP) / 50);
+
+                    if (i == 0)
+                        points.Add(p);
+
+                    float extendDist = 50;
+                    for (int step = 0; step < steps; step++)
+                    {
+                        points.Add(p.Extend(nextP, extendDist));
+                        extendDist += 50;
+                    }
+
+                    if (p.Distance(nextP) % 50 != 0)
+                        points.Add(nextP);
+                }
+                else
+                {
+                    if (i == 0)
+                        points.Add(p);
+
+                    points.Add(nextP);
+                }
+            }
+
+            return points.ToArray();
+        }
+
         public static bool IsZeroArray(this Vector2[] v)
         {
             return v.Length == 1 && v[0].IsZero;

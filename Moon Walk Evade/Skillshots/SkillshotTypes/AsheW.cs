@@ -139,11 +139,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public override Geometry.Polygon ToRealPolygon()
-        {
-            return ToPolygon();
-        }
-
         Vector2[] GetBeginEdgePoints(Vector2[] edges)
         {
             if (FixedStartPosition.Distance(CurrentPosition) <= 50)
@@ -258,7 +253,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return info;
         }
 
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToPolygon()
         {
             Vector2[] edges = GetEdgePoints();
             Vector2 rightEdge = edges[0];
@@ -359,18 +354,58 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return advancedTriangle;
         }
 
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
+        {
+            var poly = ToPolygon();
+            var poly2 = new Geometry.Polygon();
+            
+            for (int i = 0; i < poly.Points.Count; i++)
+            {
+                var p = poly.Points[i];
+                var nextP = poly.Points[i == poly.Points.Count - 1 ? 0 : i + 1];
+
+                if (p.Distance(nextP) > 50)
+                {
+                    int steps = (int) Math.Floor(p.Distance(nextP)/50);
+
+                    float extendDist = 50;
+                    for (int step = 0; step < steps; step++)
+                    {
+                        poly2.Points.Add(p.Extend(nextP, extendDist));
+                        extendDist += 50;
+                    }
+
+                    if (p.Distance(nextP) % 50 != 0)
+                        poly2.Points.Add(nextP);
+                }
+                else
+                {
+                    poly2.Points.Add(nextP);
+                }
+            }
+            return poly2;
+        }
+
         public override int GetAvailableTime(Vector2 pos)
         {
-            //return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected));
-            var dist1 =
-                Math.Abs((FixedEndPosition.Y - CurrentPosition.Y) * pos.X - (FixedEndPosition.X - CurrentPosition.X) * pos.Y +
-                         FixedEndPosition.X * CurrentPosition.Y - FixedEndPosition.Y * CurrentPosition.X) / CurrentPosition.Distance(FixedEndPosition);
+            if (Missile == null)
+            {
+                return Math.Max(0, OwnSpellData.Delay - (Environment.TickCount - TimeDetected) - Game.Ping);
+            }
 
-            var actualDist = Math.Sqrt(CurrentPosition.Distance(pos).Pow() - dist1.Pow());
+            var proj = pos.ProjectOn(CurrentPosition.To2D(), FixedEndPosition.To2D());
+            if (!proj.IsOnSegment)
+                return short.MaxValue;
 
-            var time = OwnSpellData.MissileSpeed > 0 ? (int)(actualDist / OwnSpellData.MissileSpeed * 1000) : 0;
+            var dest = proj.SegmentPoint;
+            var InsidePath = Player.Instance.GetPath(dest.To3D(), true).Where(segment => ToPolygon().IsInside(segment));
+            var point = InsidePath.OrderBy(x => x.Distance(CurrentPosition)).FirstOrDefault();
 
-            return time;
+            if (point == default(Vector3))
+                return short.MaxValue;
+
+            float skillDist = point.Distance(CurrentPosition);
+            return Math.Max(0, (int)(skillDist/OwnSpellData.MissileSpeed*1000));
         }
 
         public override bool IsFromFow()

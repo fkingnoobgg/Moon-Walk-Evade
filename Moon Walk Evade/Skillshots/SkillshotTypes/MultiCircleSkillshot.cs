@@ -98,20 +98,59 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 ToPolygon().Draw(Color.White);
         }
 
-        public override Geometry.Polygon ToRealPolygon()
-        {
-            return ToPolygon();
-        }
-
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToPolygon()
         {
             var endPolygon = new Geometry.Polygon();
             List<Geometry.Polygon.Circle> circles = new List<Geometry.Polygon.Circle>(); 
             for (int i = -30; i <= 30; i+=10)
             {
                 var rotatedDirection = Direction.Rotated(i*(float) Math.PI/180);
-                var c = new Geometry.Polygon.Circle(StartPosition + rotatedDirection.To3D()*distance,
-                    OwnSpellData.Radius + extrawidth);
+                var c = new Geometry.Polygon.Circle(StartPosition + rotatedDirection.To3D()*distance, OwnSpellData.Radius);
+                circles.Add(c);
+            }
+
+            //var circlePointsList = circles.Select(x => x.Points.Where(circlePoint =>
+            //     circles.Where(otherCircle => otherCircle != x).All(y => !y.IsInside(circlePoint))
+            //)).ToList();
+            var circlePointsList = circles.Select(x => x.Points);
+
+            foreach (var circlePoints in circlePointsList)
+            {
+                foreach (var p in circlePoints)
+                {
+                    endPolygon.Add(p);
+                }
+            }
+
+            return endPolygon;
+        }
+
+        Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)
+        {
+            float x = origin.X + (float)(radius * System.Math.Cos(angleInDegrees * Math.PI / 180));
+            float y = origin.Y + (float)(radius * System.Math.Sin(angleInDegrees * Math.PI / 180));
+
+            return new Vector2(x, y);
+        }
+
+        Geometry.Polygon ToExactCircle(float radius, Vector2 origin)
+        {
+            Geometry.Polygon poly = new Geometry.Polygon();
+            for (int i = 0; i < 360; i += 30)
+            {
+                poly.Points.Add(PointOnCircle(radius, i, origin));
+            }
+            return poly;
+        }
+
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
+        {
+            var endPolygon = new Geometry.Polygon();
+            List<Geometry.Polygon> circles = new List<Geometry.Polygon>();
+            for (int i = -30; i <= 30; i += 10)
+            {
+                var rotatedDirection = Direction.Rotated(i * (float)Math.PI / 180);
+                var c = ToExactCircle(OwnSpellData.Radius + extrawidth, StartPosition.To2D() + rotatedDirection * distance);
                 circles.Add(c);
             }
 

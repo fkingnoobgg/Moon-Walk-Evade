@@ -139,20 +139,20 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             ToPolygon().Draw(Color.White);
         }
 
-        public override Geometry.Polygon ToRealPolygon()
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
         {
-            return ToPolygon();
+            return ToPolygon();//todo
         }
 
-        public override Geometry.Polygon ToInnerPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToInnerPolygon()
         {
-            extrawidth = -20;
+            float extrawidth = -20;
             return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.RingRadius + extrawidth);
         }
 
-        public override Geometry.Polygon ToOuterPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToOuterPolygon()
         {
-            extrawidth = 20;
+            float extrawidth = 20;
             return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.RingRadius + OwnSpellData.Radius + extrawidth);
         }
 
@@ -164,9 +164,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return new Vector2(x, y);
         }
 
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
+        public override Geometry.Polygon ToPolygon()
         {
-            extrawidth = -20;
+            float extrawidth = -20;
 
             List<Vector2> points = new List<Vector2>();
             int i = 0;

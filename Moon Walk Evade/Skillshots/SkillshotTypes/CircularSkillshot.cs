@@ -144,19 +144,33 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             ToPolygon().DrawPolygon(Color.White);
         }
 
-        public override Geometry.Polygon ToRealPolygon()
+        public override Geometry.Polygon ToPolygon()
         {
-            return ToPolygon();
-        }
-
-        public override Geometry.Polygon ToPolygon(float extrawidth = 0)
-        {
+            float extrawidth = 0;
             if (OwnSpellData.AddHitbox)
             {
                 extrawidth += Player.Instance.HitBoxRadius();
             }
 
             return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.Radius + extrawidth);
+        }
+
+        Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)
+        {
+            float x = origin.X + (float)(radius * System.Math.Cos(angleInDegrees * Math.PI / 180));
+            float y = origin.Y + (float)(radius * System.Math.Sin(angleInDegrees * Math.PI / 180));
+
+            return new Vector2(x, y);
+        }
+
+        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
+        {
+            Geometry.Polygon poly = new Geometry.Polygon();
+            for (int i = 0; i < 360; i += 30)
+            {
+                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + extrawidth, i, EndPosition.To2D()));
+            }
+            return poly;
         }
 
         public override int GetAvailableTime(Vector2 pos)

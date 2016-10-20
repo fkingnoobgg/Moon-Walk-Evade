@@ -22,7 +22,7 @@ namespace Moon_Walk_Evade
             };
         }
     }
-    internal class EvadeMenu : SpellBlocker
+    internal class EvadeMenu
     {
         public static Menu MainMenu { get; private set; }
 
@@ -85,7 +85,7 @@ namespace Moon_Walk_Evade
             {
                 var currentSlot = (SpellSlot) slot;
                 bool block = SpellBlocker.ShouldBlock(currentSlot);
-                SpellBlockerMenu.Add("block/" + currentSlot, new CheckBox("Block " + currentSlot, block));
+                SpellBlockerMenu.Add("block" + Player.Instance.ChampionName + "/" + currentSlot, new CheckBox("Block " + currentSlot, block));
             }
 
             var heroes = Program.DeveloperMode ? EntityManager.Heroes.AllHeroes : EntityManager.Heroes.Enemies;

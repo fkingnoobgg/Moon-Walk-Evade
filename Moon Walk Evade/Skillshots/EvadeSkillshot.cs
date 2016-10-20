@@ -75,14 +75,14 @@ namespace Moon_Walk_Evade.Skillshots
         /// <param name="sender"></param>
         public virtual void OnSpellDetection(Obj_AI_Base sender) { }
 
-        public abstract Geometry.Polygon ToRealPolygon();
+        public abstract Geometry.Polygon ToPolygon();
 
-        public abstract Geometry.Polygon ToPolygon(float extrawidth = 0);
+        public abstract Geometry.Polygon ToExactPolygon(float extrawidth = 0);
 
         /// <summary>
         /// For Veigar E
         /// </summary>
-        public virtual Geometry.Polygon ToInnerPolygon(float extrawidth = 0)
+        public virtual Geometry.Polygon ToInnerPolygon()
         {
             return new Geometry.Polygon();
         }
@@ -90,7 +90,7 @@ namespace Moon_Walk_Evade.Skillshots
         /// <summary>
         /// For Veigar E
         /// </summary>
-        public virtual Geometry.Polygon ToOuterPolygon(float extrawidth = 0)
+        public virtual Geometry.Polygon ToOuterPolygon()
         {
             return new Geometry.Polygon();
         }

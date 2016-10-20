@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK.Menu.Values;
-using Moon_Walk_Evade.EvadeSpells;
 
 namespace Moon_Walk_Evade.Evading
 {
@@ -15,7 +13,7 @@ namespace Moon_Walk_Evade.Evading
             switch (Player.Instance.ChampionName.ToLowerInvariant())
             {
                 case "aatrox":
-                    Whitelisted_SpellSlots = new List<SpellSlot> { SpellSlot.Q, SpellSlot.W, SpellSlot.R };
+                    Whitelisted_SpellSlots = new List<SpellSlot> { SpellSlot.W, SpellSlot.R };
                     break;
 
                 case "ahri":
@@ -558,7 +556,7 @@ namespace Moon_Walk_Evade.Evading
         /// </summary>
         /// <param name="spellToCast"></param>
         /// <returns></returns>
-        protected static bool ShouldBlock(SpellSlot spellToCast)
+        public static bool ShouldBlock(SpellSlot spellToCast)
         {
             if (spellToCast == SpellSlot.Summoner1 || spellToCast == SpellSlot.Summoner2)
             {
@@ -576,7 +574,7 @@ namespace Moon_Walk_Evade.Evading
 
         public static bool WillBlock(SpellSlot slot)
         {
-            var valueBase = EvadeMenu.SpellBlockerMenu["block/" + slot];
+            var valueBase = EvadeMenu.SpellBlockerMenu["block" + Player.Instance.ChampionName + "/" + slot];
             return valueBase?.Cast<CheckBox>().CurrentValue ?? false;
         }
     }
