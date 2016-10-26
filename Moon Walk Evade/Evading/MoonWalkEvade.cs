@@ -340,10 +340,10 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            foreach (var evadePoint in GetEvadePoints())
-            {
-                Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
-            }
+            //foreach (var evadePoint in GetEvadePoints())
+            //{
+            //    Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
+            //}
         }
 
         private void CacheSkillshots()
