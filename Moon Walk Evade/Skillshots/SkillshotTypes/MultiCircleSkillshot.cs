@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -37,7 +38,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return newInstance;
         }
 
-        public override void OnCreate(GameObject obj)
+        public override void OnCreateUnsafe(GameObject obj)
         {
             if (Missile == null)
             {
@@ -190,7 +191,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return EndPosition.To2D();
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
         {
             var Distance = 0f;
             timeOffset += Game.Ping / 2;

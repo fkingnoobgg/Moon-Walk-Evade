@@ -158,7 +158,7 @@ namespace Moon_Walk_Evade.Skillshots
                 nSkillshot.SData = args.SData;
                 nSkillshot.Team = sender.Team;
 
-                nSkillshot.OnCreate(null);
+                nSkillshot.OnCreateUnsafe(null);
                 nSkillshot.OnSpellDetection(sender);
                 AddSkillshot(nSkillshot, true);
             }
@@ -166,8 +166,10 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void GameObjectOnCreate(GameObject sender, EventArgs args)
         {
-           //if (sender.Type == GameObjectType.MissileClient)
-                //Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
+            bool isMis = sender.Type == GameObjectType.MissileClient &&
+                         !Utils.Utils.GetGameObjectName(sender).Contains("SRU");
+            if (!isMis)return;
+            //    Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))
             {
@@ -180,7 +182,7 @@ namespace Moon_Walk_Evade.Skillshots
                     var nSkillshot = skillshot.NewInstance();
                     nSkillshot.SpawnObject = sender;
                     nSkillshot.Team = Utils.Utils.GetGameObjectTeam(sender);
-                    nSkillshot.OnCreate(sender);
+                    nSkillshot.OnCreateUnsafe(sender);
 
                     if (IsValidTeam(nSkillshot.Team) && (EnableFoWDetection || !nSkillshot.IsFromFow()))
                     {

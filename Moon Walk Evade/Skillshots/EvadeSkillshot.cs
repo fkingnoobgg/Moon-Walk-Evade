@@ -1,4 +1,5 @@
-﻿using EloBuddy;
+﻿using System.Runtime.CompilerServices;
+using EloBuddy;
 using EloBuddy.SDK;
 using SharpDX;
 
@@ -53,7 +54,7 @@ namespace Moon_Walk_Evade.Skillshots
         /// <summary>
         /// obj == null ? procspellcast / no missile : objectcreate / missile
         /// </summary>
-        public virtual void OnCreate(GameObject obj) { }
+        public virtual void OnCreateUnsafe(GameObject obj) { }
 
         public virtual bool OnDeleteMissile(GameObject obj)
         {
@@ -106,7 +107,7 @@ namespace Moon_Walk_Evade.Skillshots
             return $"{OwnSpellData.ChampionName}_{OwnSpellData.Slot}_{OwnSpellData.DisplayName}";
         }
 
-        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0);
+        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null);
 
         public abstract bool IsSafe(Vector2? p = null);
     }

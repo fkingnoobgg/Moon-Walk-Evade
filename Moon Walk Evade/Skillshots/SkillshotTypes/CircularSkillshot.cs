@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -24,9 +25,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public Vector3 StartPosition { get; set; }
+        public Vector3 FixedStartPosition { get; set; }
 
-        public Vector3 EndPosition { get; set; }
+        public Vector3 FixedEndPosition { get; set; }
 
         public MissileClient Missile => SpawnObject as MissileClient;
 
@@ -35,7 +36,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector3 GetCurrentPosition()
         {
-            return EndPosition;
+            return FixedEndPosition;
         }
 
         /// <summary>
@@ -51,8 +52,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new CircularSkillshot
                 {
                     OwnSpellData = OwnSpellData,
-                    StartPosition = Debug.GlobalStartPos,
-                    EndPosition = Debug.GlobalEndPos,
+                    FixedStartPosition = Debug.GlobalStartPos,
+                    FixedEndPosition = Debug.GlobalEndPos,
                     IsValid = true,
                     IsActive = true,
                     TimeDetected = Environment.TickCount,
@@ -63,15 +64,15 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return newInstance;
         }
 
-        public override void OnCreate(GameObject obj)
+        public override void OnCreateUnsafe(GameObject obj)
         {
             if (Missile == null)
             {
-                EndPosition = CastArgs.End;
+                FixedEndPosition = CastArgs.End;
             }
             else
             {
-                EndPosition = Missile.EndPosition;
+                FixedEndPosition = Missile.EndPosition;
             }
         }
 
@@ -105,7 +106,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (Missile != null && _missileDeleted && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
             {
                 var r = new Regex(OwnSpellData.ToggleParticleName);
-                if (r.Match(obj.Name).Success && obj.Distance(EndPosition, true) <= 100 * 100)
+                if (r.Match(obj.Name).Success && obj.Distance(FixedEndPosition, true) <= 100 * 100)
                 {
                     IsValid = false;
                 }
@@ -137,8 +138,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
             if (Missile != null && !_missileDeleted)
-                new Geometry.Polygon.Circle(EndPosition,
-                    StartPosition.To2D().Distance(Missile.Position.To2D()) / (StartPosition.To2D().Distance(EndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
+                new Geometry.Polygon.Circle(FixedEndPosition,
+                    FixedStartPosition.To2D().Distance(Missile.Position.To2D()) / (FixedStartPosition.To2D().Distance(FixedEndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
                         Color.DodgerBlue);
 
             ToPolygon().DrawPolygon(Color.White);
@@ -152,7 +153,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 extrawidth += Player.Instance.HitBoxRadius();
             }
 
-            return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.Radius + extrawidth);
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + extrawidth);
         }
 
         Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)
@@ -168,7 +169,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             Geometry.Polygon poly = new Geometry.Polygon();
             for (int i = 0; i < 360; i += 30)
             {
-                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + extrawidth, i, EndPosition.To2D()));
+                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + extrawidth, i, FixedEndPosition.To2D()));
             }
             return poly;
         }
@@ -182,7 +183,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             if (!_missileDeleted)
             {
-                return (int) (Missile.Position.To2D().Distance(EndPosition.To2D()) / OwnSpellData.MissileSpeed * 1000);
+                return (int) (Missile.Position.To2D().Distance(FixedEndPosition.To2D()) / OwnSpellData.MissileSpeed * 1000);
             }
 
             return -1;
@@ -200,10 +201,10 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector2 GetMissilePosition(int extraTime)
         {
-            return EndPosition.To2D();
+            return FixedEndPosition.To2D();
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
         {
             var Distance = 0f;
             timeOffset += Game.Ping / 2;

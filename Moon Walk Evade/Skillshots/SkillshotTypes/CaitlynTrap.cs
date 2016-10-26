@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -26,7 +27,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector3 GetCurrentPosition()
         {
-            return EndPosition;
+            return FixedEndPosition;
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new CaitlynTrap
                 {
                     OwnSpellData = OwnSpellData,
-                    EndPosition = Debug.GlobalEndPos,
+                    FixedEndPosition = Debug.GlobalEndPos,
                     IsValid = true,
                     IsActive = true,
                     TimeDetected = Environment.TickCount,
@@ -52,9 +53,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return newInstance;
         }
 
-        public override void OnCreate(GameObject obj)
+        public override void OnSpellDetection(Obj_AI_Base sender)
         {
-            EndPosition = Missile?.EndPosition ?? CastArgs.End;
+            FixedEndPosition = CastArgs.End;
         }
 
         public override void OnCreateObject(GameObject obj)
@@ -87,7 +88,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (Missile != null && _missileDeleted && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
             {
                 var r = new Regex(OwnSpellData.ToggleParticleName);
-                if (r.Match(obj.Name).Success && obj.Distance(EndPosition, true) <= 100 * 100)
+                if (r.Match(obj.Name).Success && obj.Distance(FixedEndPosition, true) <= 100 * 100)
                 {
                     IsValid = false;
                 }
@@ -99,7 +100,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         /// </summary>
         public override void OnTick()
         {
-            if (EntityManager.Heroes.Allies.Any(x => x.Distance(EndPosition) <= 80 &&
+            if (EntityManager.Heroes.Allies.Any(x => x.Distance(FixedEndPosition) <= 80 &&
                     x.HasBuff("caitlynyordletrapdebuff")) && IsValid)
                 IsValid = false;
             
@@ -126,7 +127,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 extrawidth += Player.Instance.HitBoxRadius();
             }
 
-            return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.Radius + extrawidth);
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + extrawidth);
         }
 
         public override int GetAvailableTime(Vector2 pos)
@@ -146,10 +147,10 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector2 GetMissilePosition(int extraTime)
         {
-            return EndPosition.To2D();
+            return FixedEndPosition.To2D();
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
         {
             var Distance = 0f;
             timeOffset += Game.Ping / 2;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -40,10 +41,10 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 {
                     if (debugMode)
                         return Debug.GlobalStartPos;
+
                     return FixedStartPos;
                 }
 
-                
                 if (debugMode)//Simulate Position
                 {
                     float speed = OwnSpellData.MissileSpeed;
@@ -75,7 +76,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
                 if (DoesCollide)
                     return LastCollisionPos.To3D();
-
 
                 return Missile.StartPosition.ExtendVector3(Missile.EndPosition, OwnSpellData.Range + 100);
             }
@@ -123,7 +123,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 LastCollisionPos = collision;
 
                 //if (DoesCollide && !LastCollisionPos.ProjectOn(CurrentPosition.To2D(), FixedEndPosition.To2D()).IsOnSegment)
-                //    DoesCollide = false;s
+                //    DoesCollide = false;
             }
         }
 
@@ -251,46 +251,42 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return CurrentPosition.Extend(EndPosition, dist);
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
         {
-            var Distance = 0f;
-            timeOffset += Game.Ping/2;
+            if (path.Length <= 1) //lastissue = playerpos
+                return IsSafe();
+
+            timeOffset -= 40;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
             var allIntersections = new List<FoundIntersection>();
-            for (var i = 0; i <= path.Length - 2; i++)
+            var segmentIntersections = new List<FoundIntersection>();
+            var polygon = ToExactPolygon();
+
+            var from = path[0];
+            var to = path[1];
+
+            for (var j = 0; j <= polygon.Points.Count - 1; j++)
             {
-                var from = path[i];
-                var to = path[i + 1];
-                var segmentIntersections = new List<FoundIntersection>();
-                var polygon = ToPolygon();
+                var sideStart = polygon.Points[j];
+                var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
 
-                for (var j = 0; j <= polygon.Points.Count - 1; j++)
+                var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                if (intersection.Intersects)
                 {
-                    var sideStart = polygon.Points[j];
-                    var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
-
-                    var intersection = from.Intersection(to, sideStart, sideEnd);
-
-                    if (intersection.Intersects)
-                    {
-                        segmentIntersections.Add(
-                            new FoundIntersection(
-                                Distance + intersection.Point.Distance(from),
-                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed) + delay,
-                                intersection.Point, from));
-                    }
+                    segmentIntersections.Add(
+                        new FoundIntersection(intersection.Point.Distance(from), (int)(intersection.Point.Distance(from) * 1000 / speed) + delay,
+                            intersection.Point, from));
                 }
-
-                var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-                allIntersections.AddRange(sortedList);
-
-                Distance += from.Distance(to);
             }
 
+            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+            allIntersections.AddRange(sortedList);
+
             //Skillshot with missile.
-            if (Missile != null)
+            if (SpawnObject != null)
             {
                 var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 var MissileStartPosition = debug ? Debug.GlobalStartPos.To2D() : Missile.StartPosition.To2D();
@@ -334,7 +330,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         }
                     }
 
-                    return true;
+                    return false;
                 }
 
                 //Inside the skillshot.
@@ -347,13 +343,23 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 {
                     //Check only for the exit point
                     var exitIntersection = allIntersections[0];
-                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(FixedStartPos.To2D(), EndPosition.To2D()).SegmentPoint;
+                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, EndPosition.To2D()).SegmentPoint;
 
                     var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-                    if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
-                    {
-                        return false;
-                    }
+                    return missilePosOnExit.Distance(EndPosition) > exitIntersectionProjection.Distance(EndPosition);
+                    //if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
+                    //{
+                        //missilePosOnExit.AddDrawVector();
+                        //exitIntersectionProjection.AddDrawVector();
+                        //missilePosOnExit.AddDrawLine();
+                        //exitIntersectionProjection.AddDrawLine();
+
+                        //float deltaX = missilePosOnExit.Distance(EndPosition) -
+                        //                exitIntersectionProjection.Distance(EndPosition);
+                        //float dt = deltaX/speed*1000;
+                        //Chat.Print("dt: " + dt);
+                        //return false;
+                    //}
                 }
             }
 

@@ -354,6 +354,23 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "BrandFissure"
                     }
                 },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "DoomBot Pillar of Flame",
+                        ChampionName = "Brand",
+                        SpellName = "NightmareBotBrandW",
+                        Slot = SpellSlot.W,
+                        Delay = 500,
+                        Range = 1100,
+                        Radius = 250,
+                        MissileSpeed = 0,
+                        DangerValue = 2,
+                        IsDangerous = false,
+                        ObjectCreationName = "NightmareBotBrandW"
+                    }
+                },
                 new LinearSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -1279,17 +1296,17 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
-                        DisplayName = "ranscendent Blades",
+                        DisplayName = "Ranscendent Blades",
                         ChampionName = "Ivern",
                         SpellName = "IvernQ",
                         Slot = SpellSlot.Q,
-                        Delay = 250,
-                        Range = 110,
+                        Delay = 200,
+                        Range = 1100,
                         Radius = 70,
                         MissileSpeed = 1300,
                         DangerValue = 4,
                         IsDangerous = true,
-                        ObjectCreationName = "Rootcaller"
+                        ObjectCreationName = "IvernQ",
                     }
                 },
                 new LinearSkillshot
@@ -1998,7 +2015,8 @@ namespace Moon_Walk_Evade.Skillshots
                         Radius = 85,
                         MissileSpeed = 1600,
                         DangerValue = 3,
-                        ObjectCreationName = "MalzaharQMissile"
+                        ObjectCreationName = "MalzaharQMissile",
+                        IsPerpendicular = true
                     }
                 },
                 //new CircularSkillshot

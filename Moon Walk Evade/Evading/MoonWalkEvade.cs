@@ -9,6 +9,7 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Moon_Walk_Evade.EvadeSpells;
 using Moon_Walk_Evade.Skillshots;
+using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
@@ -148,10 +149,10 @@ namespace Moon_Walk_Evade.Evading
 
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
-            if (skillshot.ToPolygon().IsInside(Player.Instance))
-            {
-                CurrentEvadeResult = null;
-            }
+            //if (skillshot.ToPolygon().IsInside(Player.Instance))
+            //{
+            //    CurrentEvadeResult = null;
+            //}
         }
 
         private void OnSkillshotDeleted(EvadeSkillshot skillshot)
@@ -168,26 +169,25 @@ namespace Moon_Walk_Evade.Evading
         
         private void OnUpdate(EventArgs args)
         {
+            
+        }
+
+        /// <summary>
+        /// block movement? | set evade
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckEvade(Vector3 clickPos)
+        {
             if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing())
             {
                 CurrentEvadeResult = null;
-                return;
+                return false;
             }
 
-            CheckEvade();
-
-            if (CurrentEvadeResult != null)
-            {
-                MoveTo(CurrentEvadeResult.WalkPoint, false);
-            }
-        }
-
-        private void CheckEvade()
-        {
             CacheSkillshots();
 
-            bool goodPath = IsPathSafeEx(LastIssueOrderPos);
-            if (!goodPath && CurrentEvadeResult == null)
+            bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? clickPos.To2D());
+            if (!goodPath)
             {
                 bool oustside = !IsHeroInDanger();
                 var evade = CalculateEvade(LastIssueOrderPos, oustside);
@@ -196,12 +196,18 @@ namespace Moon_Walk_Evade.Evading
                 {
                     evade.IsOutsideEvade = oustside;
                     CurrentEvadeResult = evade;
+                    return true;
                 }
             }
-            else if (goodPath && CurrentEvadeResult != null)
+
+            if (IsPathSafeEx(clickPos.To2D()))
             {
+                //Chat.Print(Environment.TickCount);
                 CurrentEvadeResult = null;
+                return false;
             }
+
+            return true;
         }
 
         private void PlayerOnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
@@ -224,11 +230,12 @@ namespace Moon_Walk_Evade.Evading
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
 
-            CheckEvade();
-            if (CurrentEvadeResult != null)
-            {
+            bool block = CheckEvade(args.TargetPosition);
+            if (block)
                 args.Process = false;
-            }
+
+            if (CurrentEvadeResult != null)
+                MoveTo(CurrentEvadeResult.WalkPoint, false);
         }
 
         private void SpellbookOnOnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -345,16 +352,6 @@ namespace Moon_Walk_Evade.Evading
             return !ClippedPolygons.Any(p => p.IsInside(point));
         }
 
-        public bool IsPathSafe(Vector2[] path)
-        {
-            return IsPathSafeEx(path);
-        }
-
-        public bool IsPathSafe(Vector3[] path)
-        {
-            return IsPathSafe(path.ToVector2());
-        }
-
         public bool IsHeroInDanger(AIHeroClient hero = null)
         {
             hero = hero ?? Player.Instance;
@@ -393,12 +390,18 @@ namespace Moon_Walk_Evade.Evading
 
         public bool IsPathSafeEx(Vector2[] path, int speed = -1, int delay = 0)
         {
-            return Skillshots.All(evadeSkillshot => evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay));
+            return Skillshots.All(evadeSkillshot =>
+            {
+                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
+                //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
+                //    if (!safe)
+                return safe;
+            });
         }
 
         public bool IsPathSafeEx(Vector2 end)
         {
-            return IsPathSafeEx(Player.Instance.GetExactPath(end));
+            return IsPathSafeEx(Player.Instance.GetPath(end.To3D()).ToVector2());
         }
 
         /// <summary>
@@ -478,9 +481,10 @@ namespace Moon_Walk_Evade.Evading
 
             var points = GetEvadePoints();
 
-            if (!points.Any() && !EvadeSpellManager.TryEvadeSpell(time, this))
+            if (!points.Any())
             {
-                return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
+                if (!EvadeSpellManager.TryEvadeSpell(time, this))
+                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
             }
 
             if (DoesComfortPointExist(points) && HasToAttendComfort())

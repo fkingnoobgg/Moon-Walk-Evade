@@ -8,6 +8,7 @@ using EloBuddy.SDK.Rendering;
 using Moon_Walk_Evade.Skillshots;
 using Moon_Walk_Evade.Skillshots.SkillshotTypes;
 using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace Moon_Walk_Evade.Utils
 {
@@ -35,6 +36,7 @@ namespace Moon_Walk_Evade.Utils
 
     static class Debug
     {
+        public static bool TempBool { get; set; }
         public static Vector3 GlobalEndPos = Vector3.Zero, GlobalStartPos = Vector3.Zero;
         private static SpellDetector spellDetector;
         public static int LastCreationTick;
@@ -54,19 +56,31 @@ namespace Moon_Walk_Evade.Utils
                 flyingSkillshots.Where(x => x.SpawnObject != null).Select(x => (LinearSkillshot)x).ToArray()));
         }
 
-        private static List<Vector2> DrawList = new List<Vector2>(5);
+        private static List<Vector2> DrawList = new List<Vector2>();
+        private static List<Vector2> DrawLineList = new List<Vector2>();
         public static void AddDrawVector(this Vector3 v)
         {
             if (!DrawList.Contains(v.To2D()))
                 DrawList.Add(v.To2D());
         }
-        public static void AddDrawVector(this Vector2 v, int time = short.MaxValue)
+        public static void AddDrawVector(this Vector2 v, int time = 10000)
         {
             if (!DrawList.Contains(v))
                 DrawList.Add(v);
 
             if (time != short.MaxValue)
                 Core.DelayAction(() => DrawList.Remove(v), time);
+        }
+
+        public static void AddDrawLine(this Vector2 v, int time = 10000)
+        {
+            var wtc = Drawing.WorldToScreen(v.To3D());
+
+            if (!DrawLineList.Contains(wtc))
+                DrawLineList.Add(wtc);
+
+            if (time != short.MaxValue)
+                Core.DelayAction(() => DrawLineList.Remove(wtc), time);
         }
 
         public static void Init(ref SpellDetector detector)
@@ -85,6 +99,12 @@ namespace Moon_Walk_Evade.Utils
                 foreach (var vector2 in DrawList)
                 {
                     new Circle { Color = System.Drawing.Color.BlueViolet, Radius = 50, BorderWidth = 20}.Draw(vector2.To3D());
+                }
+
+                if (DrawLineList.Count >= 5) DrawLineList.Clear();
+                foreach (var vector2 in DrawLineList)
+                {
+                    Drawing.DrawLine(Player.Instance.Position.WorldToScreen(), vector2, 5, Color.Aqua);
                 }
             };
             Game.OnUpdate += GameOnOnUpdate;
@@ -109,9 +129,13 @@ namespace Moon_Walk_Evade.Utils
                     return;
                 }
 
-                if (lastKSkillshot.GetType() == typeof(LinearSkillshot))
+                var skillshot = lastKSkillshot as LinearSkillshot;
+                if (skillshot != null)
                 {
-                    var skill = (LinearSkillshot)lastKSkillshot;
+                    var skill = skillshot;
+                    if (skill == null || skill.CurrentPosition == default(Vector3))
+                        return;
+
                     if (skill.CurrentPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius &&
                         Player.Instance.Position.To2D().ProjectOn(skill.CurrentPosition.To2D(), skill.EndPosition.To2D()).IsOnSegment && skill.Missile != null)
                     {

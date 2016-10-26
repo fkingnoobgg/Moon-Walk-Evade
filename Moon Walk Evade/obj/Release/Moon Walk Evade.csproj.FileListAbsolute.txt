@@ -9,3 +9,4 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk 
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Release\Moon Walk Evade.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Release\Moon Walk Evade.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Release\Moon Walk Evade.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Release\EloBuddy.Sandbox.dll

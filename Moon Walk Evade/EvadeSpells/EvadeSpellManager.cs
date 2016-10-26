@@ -140,13 +140,13 @@ namespace Moon_Walk_Evade.EvadeSpells
                 {
                     var evadePos = GetBlinkCastPos(moonWalkMoonWalkEvadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
                     float castTime = evadeSpell.Delay;
-                    if (TimeAvailable >= castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
+                    if (TimeAvailable > castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
                     {
-                        //if (IsDashSafe(evadeSpell.Slot, evadePos, moonWalkMoonWalkEvadeInstance))
-                        //{
+                        if (IsDashSafe(evadeSpell.Slot, evadePos, moonWalkMoonWalkEvadeInstance))
+                        {
                             CastEvadeSpell(evadeSpell, evadePos);
                             return true;
-                        //}
+                        }
                     }
                 }
 
