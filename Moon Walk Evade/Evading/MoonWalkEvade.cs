@@ -200,7 +200,7 @@ namespace Moon_Walk_Evade.Evading
 
             CacheSkillshots();
 
-            bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? clickPos.To2D());
+            bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
             if (!goodPath)
             {
                 bool oustside = !IsHeroInDanger();

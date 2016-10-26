@@ -153,23 +153,43 @@ namespace Moon_Walk_Evade.EvadeSpells
                     }
                 }
 
-                //speed buff (spell or item NOT)
+                if (evadeSpell.Slot == SpellSlot.Unknown && evadeSpell.isItem)
+                {
+                    var inventoryItem = Player.Instance.InventoryItems.FirstOrDefault(item => item.Id == evadeSpell.itemID);
+                    if (inventoryItem != null)
+                    {
+                        evadeSpell.Slot = inventoryItem.SpellSlot;
+                    }
+                }
+
+                //speed buff (spell or item)
                 if (evadeSpell.EvadeType == EvadeType.MovementSpeedBuff)
                 {
                     float speed = Player.Instance.MoveSpeed;
-                    speed += speed * evadeSpell.speedArray[Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).Level - 1] / 100;
-                    float maxTime = TimeAvailable - evadeSpell.Delay;
+                    float speedArrayValue = !evadeSpell.isItem
+                        ? evadeSpell.speedArray[Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).Level - 1]
+                        : evadeSpell.speedArray[0];
+                    speed += speed * speedArrayValue / 100;
 
                     var evadePoints = evadeInstance.GetEvadePoints(null, speed, evadeSpell.Delay);
 
                     var evadePoint = evadePoints.OrderBy(x => !x.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
-                    if (TimeAvailable > maxTime && evadePoint != default(Vector2))
+                    if (evadeSpell.Delay < TimeAvailable && evadePoint != default(Vector2))
                     {
                         evadePointOut = evadePoint;
                         CastEvadeSpell(evadeSpell, evadeSpell.isItem ? Vector2.Zero : evadePoint);
                         return true;
                     }
                 }
+
+                /*shield spell or item*/
+                if (evadeSpell.EvadeType == EvadeType.SpellShield && evadeSpell.Delay < TimeAvailable)
+                {
+                    evadePointOut = evadeInstance.LastIssueOrderPos;
+                    CastEvadeSpell(evadeSpell, Vector2.Zero);
+                    return true;
+                }
+
             }
 
             return false;
@@ -195,7 +215,10 @@ namespace Moon_Walk_Evade.EvadeSpells
                             evadePos.Extend(Player.Instance, evadePos.Distance(Player.Instance) + evadeSpell.Range).To3D());
                     break;
                 case CastType.Self:
-                    Player.Instance.Spellbook.CastSpell(evadeSpell.Slot, Player.Instance);
+                    if (!evadeSpell.isItem)
+                        Player.Instance.Spellbook.CastSpell(evadeSpell.Slot, Player.Instance);
+                    else
+                        Player.Instance.InventoryItems.First(item => item.Id == evadeSpell.itemID).Cast();
                 break;
             }
         }
