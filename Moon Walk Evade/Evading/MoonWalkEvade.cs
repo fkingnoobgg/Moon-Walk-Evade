@@ -177,10 +177,10 @@ namespace Moon_Walk_Evade.Evading
                     var point = newPoints.FirstOrDefault();
                     if (point != default(Vector2))
                     {
-                        Chat.Print(Environment.TickCount);
-                        point.AddDrawVector();
-                        CurrentEvadeResult.WalkPoint.AddDrawVector();
-                        CurrentEvadeResult.WalkPoint = point.To3D();
+                        //Chat.Print(Environment.TickCount);
+                        //point.AddDrawVector();
+                        //CurrentEvadeResult.WalkPoint.AddDrawVector();
+                        CurrentEvadeResult.EvadePoint = point;
                     }
                 }
             }
@@ -568,7 +568,6 @@ namespace Moon_Walk_Evade.Evading
 
                     return walkPoint.To3DWorld();
                 }
-                set { throw new NotImplementedException(); }
             }
 
             public EvadeResult(MoonWalkEvade moonWalkEvade, Vector2 evadePoint, Vector2 anchorPoint, int totalTimeAvailable,
