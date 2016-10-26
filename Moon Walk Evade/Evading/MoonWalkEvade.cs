@@ -169,6 +169,8 @@ namespace Moon_Walk_Evade.Evading
         
         private void OnUpdate(EventArgs args)
         {
+            PlayerOnIssueOrder(Player.Instance, new PlayerIssueOrderEventArgs(GameObjectOrder.MoveTo, LastIssueOrderPos.To3D(), null, false));
+
             if (CurrentEvadeResult != null)
             {
                 if (CurrentEvadeResult.ShouldPreventStuttering)
@@ -183,6 +185,8 @@ namespace Moon_Walk_Evade.Evading
                         CurrentEvadeResult.EvadePoint = point;
                     }
                 }
+
+                MoveTo(CurrentEvadeResult.WalkPoint, false);
             }
         }
 
@@ -335,10 +339,10 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            //foreach (var evadePoint in GetEvadePoints())
-            //{
-            //    Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
-            //}
+            foreach (var evadePoint in GetEvadePoints())
+            {
+                Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
+            }
         }
 
         private void CacheSkillshots()
@@ -407,6 +411,8 @@ namespace Moon_Walk_Evade.Evading
             return Skillshots.All(evadeSkillshot =>
             {
                 bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
+                if (safe)
+                Chat.Print(safe);
                 //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
                 //    if (!safe)
                 return safe;

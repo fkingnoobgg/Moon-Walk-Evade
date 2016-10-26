@@ -1927,7 +1927,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Delay = 1000,
                         Range = 3500,
                         Radius = 110,
-                        MissileSpeed = 0,
+                        MissileSpeed = int.MaxValue,
                         DangerValue = 5,
                         IsDangerous = true,
                         ObjectCreationName = "LuxRVfxMis"
