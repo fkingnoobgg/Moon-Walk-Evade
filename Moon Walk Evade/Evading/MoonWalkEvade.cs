@@ -108,7 +108,7 @@ namespace Moon_Walk_Evade.Evading
 
         private readonly Dictionary<EvadeSkillshot, Geometry.Polygon> _skillshotPolygonCache;
 
-        private EvadeResult CurrentEvadeResult { get; set; }
+        public EvadeResult CurrentEvadeResult { get; set; }
 
         private Text StatusText, WarnText;
         private int EvadeIssurOrderTime;
@@ -169,7 +169,21 @@ namespace Moon_Walk_Evade.Evading
         
         private void OnUpdate(EventArgs args)
         {
-            
+            if (CurrentEvadeResult != null)
+            {
+                if (CurrentEvadeResult.ShouldPreventStuttering)
+                {
+                    var newPoints = GetEvadePoints(CurrentEvadeResult.WalkPoint.To2D());
+                    var point = newPoints.FirstOrDefault();
+                    if (point != default(Vector2))
+                    {
+                        Chat.Print(Environment.TickCount);
+                        point.AddDrawVector();
+                        CurrentEvadeResult.WalkPoint.AddDrawVector();
+                        CurrentEvadeResult.WalkPoint = point.To3D();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -399,18 +413,15 @@ namespace Moon_Walk_Evade.Evading
             });
         }
 
-        public bool IsPathSafeEx(Vector2 end)
+        public bool IsPathSafeEx(Vector2 end, float speed = -1, float delay = 0)
         {
-            return IsPathSafeEx(Player.Instance.GetPath(end.To3D()).ToVector2());
+            return IsPathSafeEx(Player.Instance.GetPath(end.To3D()).ToVector2(), (int)speed, (int)delay);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="awayFrom"></param>
-        /// <returns></returns>
-        public List<Vector2> GetEvadePoints(Vector2? awayFrom = null)
+        public List<Vector2> GetEvadePoints(Vector2? awayFrom = null, float speed = -1, float delay = 0)
         {
+            speed = speed == -1 ? Player.Instance.MoveSpeed : speed;
+
             int posChecked = 0;
             int maxPosToCheck = 50;
             int posRadius = 50;
@@ -437,8 +448,8 @@ namespace Moon_Walk_Evade.Evading
             }
 
             return !awayFrom.HasValue ?
-                points.Where(p => IsPathSafeEx(p) && !p.IsWall()).ToList() :
-                points.Where(p => IsPathSafeEx(p) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
+                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall()).ToList() :
+                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
                 p =>
                 {
                     if (AntiStutterSearchType == StutterSearchType.PlayerFaceDirection)
@@ -483,8 +494,12 @@ namespace Moon_Walk_Evade.Evading
 
             if (!points.Any())
             {
-                if (!EvadeSpellManager.TryEvadeSpell(time, this))
+                Vector2 evadeSpellEvadePoint;
+                if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
                     return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
+                else //can use evade spell
+                    CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
+
             }
 
             if (DoesComfortPointExist(points) && HasToAttendComfort())

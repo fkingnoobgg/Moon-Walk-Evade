@@ -112,8 +112,10 @@ namespace Moon_Walk_Evade.EvadeSpells
             return evadePoint;
         }
 
-        public static bool TryEvadeSpell(int TimeAvailable, MoonWalkEvade moonWalkMoonWalkEvadeInstance)
+        public static bool TryEvadeSpell(int TimeAvailable, MoonWalkEvade evadeInstance, out Vector2 evadePointOut)
         {
+            evadePointOut = Vector2.Zero;
+
             IEnumerable<EvadeSpellData> evadeSpells = EvadeMenu.MenuEvadeSpells.Where(evadeSpell =>
             {
                 var item = EvadeMenu.EvadeSpellMenu[evadeSpell.SpellName + "/enable"];
@@ -125,7 +127,7 @@ namespace Moon_Walk_Evade.EvadeSpells
             {
                 int dangerValue =
                         EvadeMenu.MenuEvadeSpells.First(x => x.SpellName == evadeSpell.SpellName).DangerValue;
-                if (moonWalkMoonWalkEvadeInstance.GetDangerValue() < dangerValue)
+                if (evadeInstance.GetDangerValue() < dangerValue)
                     continue;
 
                 bool isReady = !evadeSpell.isItem ? Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).IsReady &&
@@ -138,12 +140,13 @@ namespace Moon_Walk_Evade.EvadeSpells
                 //dash
                 if (evadeSpell.Range != 0)
                 {
-                    var evadePos = GetBlinkCastPos(moonWalkMoonWalkEvadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
+                    var evadePos = GetBlinkCastPos(evadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
                     float castTime = evadeSpell.Delay;
-                    if (TimeAvailable > castTime && !evadePos.IsZero && moonWalkMoonWalkEvadeInstance.IsPointSafe(evadePos))
+                    if (TimeAvailable > castTime && !evadePos.IsZero && evadeInstance.IsPointSafe(evadePos))
                     {
-                        if (IsDashSafe(evadeSpell.Slot, evadePos, moonWalkMoonWalkEvadeInstance))
+                        if (IsDashSafe(evadeSpell.Slot, evadePos, evadeInstance))
                         {
+                            evadePointOut = evadePos;
                             CastEvadeSpell(evadeSpell, evadePos);
                             return true;
                         }
@@ -151,32 +154,19 @@ namespace Moon_Walk_Evade.EvadeSpells
                 }
 
                 //speed buff (spell or item NOT)
-                if (evadeSpell.EvadeType == EvadeType.MovementSpeedBuff && !evadeSpell.isItem)
+                if (evadeSpell.EvadeType == EvadeType.MovementSpeedBuff)
                 {
-                    var playerPos = Player.Instance.Position.To2D();
-
                     float speed = Player.Instance.MoveSpeed;
                     speed += speed * evadeSpell.speedArray[Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).Level - 1] / 100;
                     float maxTime = TimeAvailable - evadeSpell.Delay;
-                    float maxTravelDist = speed * (maxTime / 1000);
 
-                    var evadePoints = moonWalkMoonWalkEvadeInstance.GetEvadePoints();
+                    var evadePoints = evadeInstance.GetEvadePoints(null, speed, evadeSpell.Delay);
 
                     var evadePoint = evadePoints.OrderBy(x => !x.IsUnderTurret()).ThenBy(p => p.Distance(Game.CursorPos)).FirstOrDefault();
-                    if (evadePoint != default(Vector2))
+                    if (TimeAvailable > maxTime && evadePoint != default(Vector2))
                     {
+                        evadePointOut = evadePoint;
                         CastEvadeSpell(evadeSpell, evadeSpell.isItem ? Vector2.Zero : evadePoint);
-                        return true;
-                    }
-                }
-
-                //items
-                if (evadeSpell.isItem && evadeSpell.EvadeType != EvadeType.MovementSpeedBuff && 
-                    Player.Instance.GetSpellSlotFromName(evadeSpell.SpellName) != SpellSlot.Unknown)
-                {
-                    if (TimeAvailable >= evadeSpell.Delay)
-                    {
-                        CastEvadeSpell(evadeSpell, Vector2.Zero);
                         return true;
                     }
                 }
@@ -206,7 +196,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                     break;
                 case CastType.Self:
                     Player.Instance.Spellbook.CastSpell(evadeSpell.Slot, Player.Instance);
-                    break;
+                break;
             }
         }
 
