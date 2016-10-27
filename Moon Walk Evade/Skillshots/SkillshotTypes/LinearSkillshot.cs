@@ -262,7 +262,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             var allIntersections = new List<FoundIntersection>();
             var segmentIntersections = new List<FoundIntersection>();
-            var polygon = ToExactPolygon();
+            var polygon = ToPolygon();
 
             var from = path[0];
             var to = path[1];
