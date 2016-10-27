@@ -345,7 +345,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Brand",
                         SpellName = "BrandW",
                         Slot = SpellSlot.W,
-                        Delay = 500,
+                        Delay = 400,
                         Range = 1100,
                         Radius = 250,
                         MissileSpeed = 0,
@@ -1916,7 +1916,7 @@ namespace Moon_Walk_Evade.Skillshots
                         EnabledByDefault = false
                     }
                 },
-                new LinearSkillshot
+                new LuxR
                 {
                     OwnSpellData = new SpellData
                     {
@@ -1930,7 +1930,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = int.MaxValue,
                         DangerValue = 5,
                         IsDangerous = true,
-                        ObjectCreationName = "LuxRVfxMis"
+                        ObjectCreationName = "LuxRVfxMis",
                     }
                 },
                 new LinearSkillshot

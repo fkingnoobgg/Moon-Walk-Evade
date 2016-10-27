@@ -114,6 +114,9 @@ namespace Moon_Walk_Evade.Evading
             get { return _currentEvadeResult; }
             set
             {
+                //if (Environment.TickCount - LastEvadeSetTick <= 50 && value != null)
+                //    return;
+
                 _currentEvadeResult = value;
                 LastEvadeSetTick = Environment.TickCount;
             }
@@ -159,10 +162,11 @@ namespace Moon_Walk_Evade.Evading
 
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
-            //if (skillshot.ToPolygon().IsInside(Player.Instance))
-            //{
-            //    CurrentEvadeResult = null;
-            //}
+            if (CurrentEvadeResult != null)
+                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer + Game.Ping))
+                {
+                    CurrentEvadeResult = null;
+                }
         }
 
         private void OnSkillshotDeleted(EvadeSkillshot skillshot)
@@ -215,9 +219,7 @@ namespace Moon_Walk_Evade.Evading
             CacheSkillshots();
 
             bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
-            //dont change decision so fast
-            bool canReset = (CurrentEvadeResult != null && Environment.TickCount - LastEvadeSetTick >= 50) || CurrentEvadeResult == null;
-            if (!goodPath && canReset)
+            if (!goodPath && CurrentEvadeResult == null)
             {
                 bool oustside = !IsHeroInDanger();
                 var evade = CalculateEvade(LastIssueOrderPos, oustside);
@@ -364,11 +366,11 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
-            foreach (var evadePoint in GetEvadePoints())
-            {
-                Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
-            }
+            //if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            //foreach (var evadePoint in GetEvadePoints())
+            //{
+            //    Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
+            //}
         }
 
         private void CacheSkillshots()
@@ -436,8 +438,7 @@ namespace Moon_Walk_Evade.Evading
         {
             return Skillshots.All(evadeSkillshot =>
             {
-                int timeNeededIfSafe;
-                bool safe = evadeSkillshot.IsSafePath(path, timeOffset: ServerTimeBuffer, speed: speed, delay: delay);
+                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer + Game.Ping, speed, delay);
                 //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
                 //    if (!safe)
                 return safe;
@@ -566,7 +567,7 @@ namespace Moon_Walk_Evade.Evading
             public bool IsOutsideEvade { get; set; }
 
             public int StutterDistance => EvadeMenu.HumanizerMenu["stutterDistanceTrigger"].Cast<Slider>().CurrentValue;
-            public bool ShouldPreventStuttering => IsOutsideEvade && Player.Instance.Distance(WalkPoint) <= StutterDistance;
+            public bool ShouldPreventStuttering => /*IsOutsideEvade &&*/ Player.Instance.Distance(WalkPoint) <= StutterDistance;
 
 
 

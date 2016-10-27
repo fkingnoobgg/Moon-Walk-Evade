@@ -18,3 +18,5 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk 
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon_Walk_Evade.Properties.Resources.resources
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.csproj.GenerateResource.Cache

@@ -72,26 +72,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public override bool OnDeleteMissile(GameObject obj)
-        {
-            if (Missile != null && obj.Index == Missile.Index && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
-            {
-                _missileDeleted = true;
-                return false;
-            }
-
-            return true;
-        }
-
         public override void OnDeleteObject(GameObject obj)
         {
-            if (Missile != null && _missileDeleted && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
+            if (obj.Name.Contains("caitlyn_Base_yordleTrap_set.troy"))
             {
-                var r = new Regex(OwnSpellData.ToggleParticleName);
-                if (r.Match(obj.Name).Success && obj.Distance(FixedEndPosition, true) <= 100 * 100)
-                {
-                    IsValid = false;
-                }
+                Chat.Print(obj.Name);
+                IsValid = false;
             }
         }
 
@@ -100,11 +86,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         /// </summary>
         public override void OnTick()
         {
-            if (EntityManager.Heroes.Allies.Any(x => x.Distance(FixedEndPosition) <= 80 &&
-                    x.HasBuff("caitlynyordletrapdebuff")) && IsValid)
-                IsValid = false;
-            
-
            if (Environment.TickCount >= TimeDetected + OwnSpellData.Delay + 90 * 1000)
                 IsValid = false;
         }
