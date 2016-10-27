@@ -25,7 +25,7 @@ namespace Moon_Walk_Evade
                 Collision.Init();
                 Debug.Init(ref _spellDetector);
                 
-                Core.DelayAction(() => Chat.Print("<font size='24' color='#7FFFD4'>Wanna add more skillshots to evade? Watch forum page</font>"), 5000);
+                Core.DelayAction(() => Chat.Print("<b><font size='20' color='#4B0082'>Moon Walk Evade</font><font size='20' color='#FFA07A'> Loaded</font></b>"), 5000);
             };
         }
     }
