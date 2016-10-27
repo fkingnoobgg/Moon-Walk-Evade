@@ -169,7 +169,7 @@ namespace Moon_Walk_Evade.Evading
         
         private void OnUpdate(EventArgs args)
         {
-            CheckEvade(LastIssueOrderPos.To3D());
+            CheckEvade();
 
             if (CurrentEvadeResult != null)
             {
@@ -194,7 +194,7 @@ namespace Moon_Walk_Evade.Evading
         /// block movement? | set evade
         /// </summary>
         /// <returns></returns>
-        private bool CheckEvade(Vector3 clickPos)
+        private bool CheckEvade()
         {
             if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing())
             {
@@ -216,14 +216,6 @@ namespace Moon_Walk_Evade.Evading
                     CurrentEvadeResult = evade;
                     return true;
                 }
-            }
-
-
-            if (IsPathSafeEx(clickPos.To2D()))
-            {
-                //Chat.Print(Environment.TickCount);
-                CurrentEvadeResult = null;
-                return false;
             }
 
             return true;
@@ -249,12 +241,14 @@ namespace Moon_Walk_Evade.Evading
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
 
-            bool block = CheckEvade(args.TargetPosition);
-            if (block)
-                args.Process = false;
+            if (IsPathSafeEx(args.TargetPosition.To2D()))
+            {
+                //Chat.Print(Environment.TickCount);
+                CurrentEvadeResult = null;
+            }
 
             if (CurrentEvadeResult != null)
-                MoveTo(CurrentEvadeResult.WalkPoint, false);
+                args.Process = false;
         }
 
         private void SpellbookOnOnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -340,10 +334,10 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            //foreach (var evadePoint in GetEvadePoints())
-            //{
-            //    Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
-            //}
+            foreach (var evadePoint in GetEvadePoints())
+            {
+                Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
+            }
         }
 
         private void CacheSkillshots()
