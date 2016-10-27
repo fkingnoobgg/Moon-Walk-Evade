@@ -285,6 +285,21 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
+        private IEnumerable<Vector2> GetPathDots(Vector2 start, Vector2 end, int dotRadius = 30, int space = 100)
+        {
+            List<Vector2> vecList = new List<Vector2>();
+            //x*(dotRadius*2+space) = pathLength
+            int dotAmount = (int)Math.Floor((start - end).Length() / (dotRadius * 2 + space));
+
+            float currentDist = 0;
+            for (int i = 0; i < dotAmount; i++)
+            {
+                vecList.Add(start.Extend(end, currentDist));
+                currentDist += dotRadius + space;
+            }
+
+            return vecList;
+        }
         private void OnDraw(EventArgs args)
         {
             if (DisableDrawings)
@@ -296,7 +311,10 @@ namespace Moon_Walk_Evade.Evading
             {
                 if (CurrentEvadeResult.IsValid && CurrentEvadeResult.EnoughTime && !CurrentEvadeResult.Expired())
                 {
-                    Circle.Draw(new ColorBGRA(255, 0, 0, 255), Player.Instance.BoundingRadius, 25, CurrentEvadeResult.WalkPoint);
+                    foreach (var dot in GetPathDots(CurrentEvadeResult.WalkPoint.To2D(), Player.Instance.Position.To2D(), 20, 50))
+                    {
+                        new Circle(new ColorBGRA(255, 255, 255, 255), 20, 2, true).Draw(dot.To3D());
+                    }
                 }
             }
 
