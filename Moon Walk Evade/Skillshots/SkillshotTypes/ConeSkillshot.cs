@@ -311,7 +311,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return FixedEndPos.To2D();
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
             if (path.Length <= 1) //lastissue = playerpos
                 return IsSafe();

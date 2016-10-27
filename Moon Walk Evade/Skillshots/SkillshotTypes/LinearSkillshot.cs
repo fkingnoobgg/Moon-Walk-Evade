@@ -251,12 +251,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return CurrentPosition.Extend(EndPosition, dist);
         }
 
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null)
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
             if (path.Length <= 1) //lastissue = playerpos
                 return IsSafe();
 
-            timeOffset -= 40;
+            //timeOffset -= 40;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
@@ -307,10 +307,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         //Intersection with no exit point.
                         if (i == allIntersections.Count - 1)
                         {
-                            var missilePositionOnIntersection = GetMissilePosition(enterIntersection.Time - timeOffset);
-                            bool safe = EndPosition.Distance(missilePositionOnIntersection) + 50 <=
-                                        EndPosition.Distance(enterIntersectionProjection) &&
-                                        ObjectManager.Player.MoveSpeed < OwnSpellData.MissileSpeed;
+                            var missilePositionOnIntersection = GetMissilePosition(enterIntersection.Time + timeOffset);
+                            bool safe = EndPosition.Distance(missilePositionOnIntersection) <
+                                        EndPosition.Distance(enterIntersectionProjection);
                             return safe;
                         }
 
@@ -323,7 +322,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         //Missile didnt pass.
                         if (missilePosOnEnter.Distance(EndPosition) > enterIntersectionProjection.Distance(EndPosition))
                         {
-                            if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
+                            if (missilePosOnExit.Distance(EndPosition) < exitIntersectionProjection.Distance(EndPosition))
                             {
                                 return false;
                             }
@@ -346,7 +345,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, EndPosition.To2D()).SegmentPoint;
 
                     var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-                    return missilePosOnExit.Distance(EndPosition) > exitIntersectionProjection.Distance(EndPosition);
+                    bool safe = missilePosOnExit.Distance(EndPosition) >
+                                exitIntersectionProjection.Distance(EndPosition);
+                    return safe;
                 }
             }
 
@@ -355,19 +356,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 return IsSafe();
             }
-
             var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
 
-            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
 
-            if (!IsSafe(myPositionWhenExplodes))
-            {
-                return false;
-            }
-
-            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
-
-            return IsSafe(myPositionWhenExplodesWithOffset);
+            return IsSafe(myPositionWhenExplodes);
         }
     }
 }

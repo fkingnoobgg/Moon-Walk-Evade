@@ -108,10 +108,20 @@ namespace Moon_Walk_Evade.Evading
 
         private readonly Dictionary<EvadeSkillshot, Geometry.Polygon> _skillshotPolygonCache;
 
-        public EvadeResult CurrentEvadeResult { get; set; }
+        private int LastEvadeSetTick;
+        public EvadeResult CurrentEvadeResult
+        {
+            get { return _currentEvadeResult; }
+            set
+            {
+                _currentEvadeResult = value;
+                LastEvadeSetTick = Environment.TickCount;
+            }
+        }
 
         private Text StatusText, WarnText;
         private int EvadeIssurOrderTime;
+        private EvadeResult _currentEvadeResult;
 
         #endregion
 
@@ -205,7 +215,9 @@ namespace Moon_Walk_Evade.Evading
             CacheSkillshots();
 
             bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
-            if (!goodPath)
+            //dont change decision so fast
+            bool canReset = (CurrentEvadeResult != null && Environment.TickCount - LastEvadeSetTick >= 200) || CurrentEvadeResult == null;
+            if (!goodPath && canReset)
             {
                 bool oustside = !IsHeroInDanger();
                 var evade = CalculateEvade(LastIssueOrderPos, oustside);
@@ -352,7 +364,7 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            //if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
             foreach (var evadePoint in GetEvadePoints())
             {
                 Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
@@ -424,7 +436,8 @@ namespace Moon_Walk_Evade.Evading
         {
             return Skillshots.All(evadeSkillshot =>
             {
-                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
+                int timeNeededIfSafe;
+                bool safe = evadeSkillshot.IsSafePath(path, timeOffset: ServerTimeBuffer, speed: speed, delay: delay);
                 //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
                 //    if (!safe)
                 return safe;

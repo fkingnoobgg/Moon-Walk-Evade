@@ -107,7 +107,7 @@ namespace Moon_Walk_Evade.Skillshots
             return $"{OwnSpellData.ChampionName}_{OwnSpellData.Slot}_{OwnSpellData.DisplayName}";
         }
 
-        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0, [CallerMemberName] string caller = null);
+        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0);
 
         public abstract bool IsSafe(Vector2? p = null);
     }
