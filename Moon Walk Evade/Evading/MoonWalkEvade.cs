@@ -364,7 +364,7 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            //if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
+            if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
             foreach (var evadePoint in GetEvadePoints())
             {
                 Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
