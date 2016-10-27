@@ -216,7 +216,7 @@ namespace Moon_Walk_Evade.Evading
 
             bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
             //dont change decision so fast
-            bool canReset = (CurrentEvadeResult != null && Environment.TickCount - LastEvadeSetTick >= 200) || CurrentEvadeResult == null;
+            bool canReset = (CurrentEvadeResult != null && Environment.TickCount - LastEvadeSetTick >= 50) || CurrentEvadeResult == null;
             if (!goodPath && canReset)
             {
                 bool oustside = !IsHeroInDanger();
