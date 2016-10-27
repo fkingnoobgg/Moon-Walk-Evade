@@ -334,6 +334,7 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
+            if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
             foreach (var evadePoint in GetEvadePoints())
             {
                 Circle.Draw(new ColorBGRA(0, 255, 0, 255), Player.Instance.BoundingRadius, 2, evadePoint.To3D());
@@ -422,8 +423,8 @@ namespace Moon_Walk_Evade.Evading
             speed = speed == -1 ? Player.Instance.MoveSpeed : speed;
 
             int posChecked = 0;
-            int maxPosToCheck = 50;
-            int posRadius = 50;
+            const int maxPosToCheck = 150;
+            const int posRadius = 50;
             int radiusIndex = 0;
             var heroPoint = Player.Instance.Position;
 

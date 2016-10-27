@@ -498,7 +498,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
 
                         //Missile didnt pass.
-                        if (missilePosOnEnter.Distance(FixedEndPosition) + 50 > enterIntersectionProjection.Distance(FixedEndPosition))
+                        if (missilePosOnEnter.Distance(FixedEndPosition) > enterIntersectionProjection.Distance(FixedEndPosition))
                         {
                             if (missilePosOnExit.Distance(FixedEndPosition) <= exitIntersectionProjection.Distance(FixedEndPosition))
                             {
@@ -507,7 +507,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                         }
                     }
 
-                    return false;
+                    return true;
                 }
 
                 //Inside the skillshot.
@@ -524,19 +524,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
                     var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
                     return missilePosOnExit.Distance(FixedEndPosition) > exitIntersectionProjection.Distance(FixedEndPosition);
-                    //if (missilePosOnExit.Distance(EndPosition) <= exitIntersectionProjection.Distance(EndPosition))
-                    //{
-                    //missilePosOnExit.AddDrawVector();
-                    //exitIntersectionProjection.AddDrawVector();
-                    //missilePosOnExit.AddDrawLine();
-                    //exitIntersectionProjection.AddDrawLine();
-
-                    //float deltaX = missilePosOnExit.Distance(EndPosition) -
-                    //                exitIntersectionProjection.Distance(EndPosition);
-                    //float dt = deltaX/speed*1000;
-                    //Chat.Print("dt: " + dt);
-                    //return false;
-                    //}
                 }
             }
 
