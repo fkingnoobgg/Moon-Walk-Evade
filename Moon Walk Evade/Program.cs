@@ -20,8 +20,6 @@ namespace Moon_Walk_Evade
 
         private static void Main(string[] args)
         {
-            introImg = new Sprite(TextureLoader.BitmapToTexture(Resources.moonWalkTransparent));
-
             Loading.OnLoadingComplete += delegate
             {
                 _spellDetector = new SpellDetector(DeveloperMode ? DetectionTeam.AnyTeam : DetectionTeam.EnemyTeam);
@@ -34,6 +32,7 @@ namespace Moon_Walk_Evade
                 
                 Core.DelayAction(() =>
                 {
+                    introImg = new Sprite(TextureLoader.BitmapToTexture(Resources.moonWalkTransparent));
                     Chat.Print(
                         "<b><font size='20' color='#4B0082'>Moon Walk Evade</font><font size='20' color='#FFA07A'> Loaded</font></b>");
 
