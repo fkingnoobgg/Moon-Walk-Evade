@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
@@ -8,7 +7,6 @@ using Moon_Walk_Evade.Properties;
 using Moon_Walk_Evade.Skillshots;
 using SharpDX;
 using Collision = Moon_Walk_Evade.Evading.Collision;
-using Color = System.Drawing.Color;
 using Debug = Moon_Walk_Evade.Utils.Debug;
 
 namespace Moon_Walk_Evade

@@ -72,21 +72,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public override void OnDeleteObject(GameObject obj)
-        {
-            if (obj.Name.Contains("caitlyn_Base_yordleTrap_set.troy"))
-            {
-                Chat.Print(obj.Name);
-                IsValid = false;
-            }
-        }
-
         /// <summary>
         /// check if still valid
         /// </summary>
         public override void OnTick()
         {
-           if (Environment.TickCount >= TimeDetected + OwnSpellData.Delay + 90 * 1000)
+           if (Environment.TickCount >= TimeDetected + OwnSpellData.Delay + 2000)
                 IsValid = false;
         }
 
@@ -133,6 +124,15 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
+            if (path.Length <= 1) //lastissue = playerpos
+            {
+                if (!Player.Instance.IsRecalling())
+                    return IsSafe();
+
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
+                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
+
             var Distance = 0f;
             timeOffset += Game.Ping / 2;
 

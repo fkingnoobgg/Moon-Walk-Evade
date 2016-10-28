@@ -210,7 +210,7 @@ namespace Moon_Walk_Evade.Evading
         /// <returns></returns>
         private bool CheckEvade()
         {
-            if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing())
+            if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing() || Player.Instance.IsInFountainRange())
             {
                 CurrentEvadeResult = null;
                 return false;

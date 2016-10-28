@@ -1174,22 +1174,38 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "GragasR"
                     }
                 },
-                //new LinearSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Graves",
-                //        SpellName = "GravesClusterShot",
-                //        Slot = SpellSlot.Q,
-                //        Delay = 250,
-                //        Range = 1025,
-                //        Radius = 60,
-                //        MissileSpeed = 2000,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "GravesClusterShotAttack",
-                //        ExtraMissiles = 2
-                //    }
-                //},
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "End of the Line",
+                        ChampionName = "Graves",
+                        SpellName = "GravesQLineSpell",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 800,
+                        Radius = 70,
+                        MissileSpeed = 3000,
+                        DangerValue = 3,
+                        ObjectCreationName = "GravesQLineMis",
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "End of the Line (Return)",
+                        ChampionName = "Graves",
+                        SpellName = "GravesQLineSpell",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 900,
+                        Radius = 100,
+                        MissileSpeed = 1600,
+                        DangerValue = 3,
+                        ObjectCreationName = "GravesQReturn",
+                    }
+                },
                 new LinearSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -1205,6 +1221,22 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 5,
                         IsDangerous = true,
                         ObjectCreationName = "GravesChargeShotShot"
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Smoke Screen",
+                        ChampionName = "Graves",
+                        SpellName = "GravesSmokeGrenade",
+                        Slot = SpellSlot.W,
+                        Delay = 250,
+                        Range = 900,
+                        Radius = 250,
+                        MissileSpeed = 1500,
+                        DangerValue = 3,
+                        ObjectCreationName = "GravesSmokeGrenadeBoom",
                     }
                 },
                 new CircularSkillshot

@@ -132,7 +132,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (!OwnSpellData.IsPerpendicular)
             {
                 FixedStartPos = Caster.ServerPosition;
-                FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, OwnSpellData.Range);
+                FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, OwnSpellData.Range + 100);
             }
             else
             {
@@ -202,7 +202,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
         {
-            return ToPolygon().ToDetailedPolygon();
+            return ToPolygon();
         }
 
         public override int GetAvailableTime(Vector2 pos)
@@ -254,7 +254,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
             if (path.Length <= 1) //lastissue = playerpos
-                return IsSafe();
+            {
+                if (!Player.Instance.IsRecalling())
+                    return IsSafe();
+
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time)*1000;
+                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
 
             //timeOffset -= 40;
 
