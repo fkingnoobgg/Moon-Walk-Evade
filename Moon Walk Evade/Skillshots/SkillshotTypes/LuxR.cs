@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
+using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Menu.Values;
 using Moon_Walk_Evade.Utils;
+using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 {
@@ -57,6 +61,58 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 extrawidth += Player.Instance.HitBoxRadius();
             }
             return new Geometry.Polygon.Rectangle(Missile?.StartPosition ?? FixedStartPos, Missile?.EndPosition ?? FixedEndPos, OwnSpellData.Radius + extrawidth);
+        }
+
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        {
+            if (path.Length <= 1) //lastissue = playerpos
+            {
+                if (!Player.Instance.IsRecalling())
+                    return IsSafe();
+
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
+                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
+
+            //timeOffset -= 40;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+            var allIntersections = new List<FoundIntersection>();
+            var segmentIntersections = new List<FoundIntersection>();
+            var polygon = ToPolygon();
+
+            var from = path[0];
+            var to = path[1];
+
+            for (var j = 0; j <= polygon.Points.Count - 1; j++)
+            {
+                var sideStart = polygon.Points[j];
+                var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
+
+                var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                if (intersection.Intersects)
+                {
+                    segmentIntersections.Add(
+                        new FoundIntersection(intersection.Point.Distance(from), (int)(intersection.Point.Distance(from) * 1000 / speed) + delay,
+                            intersection.Point, from));
+                }
+            }
+
+            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+            allIntersections.AddRange(sortedList);
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return IsSafe();
+            }
+            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
+
+            return IsSafe(myPositionWhenExplodes);
         }
     }
 }
