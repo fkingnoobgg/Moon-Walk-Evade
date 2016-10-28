@@ -144,33 +144,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return poly;
         }
 
-        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
-        {
-            var endPolygon = new Geometry.Polygon();
-            List<Geometry.Polygon> circles = new List<Geometry.Polygon>();
-            for (int i = -30; i <= 30; i += 10)
-            {
-                var rotatedDirection = Direction.Rotated(i * (float)Math.PI / 180);
-                var c = ToExactCircle(OwnSpellData.Radius + extrawidth, StartPosition.To2D() + rotatedDirection * distance);
-                circles.Add(c);
-            }
-
-            //var circlePointsList = circles.Select(x => x.Points.Where(circlePoint =>
-            //     circles.Where(otherCircle => otherCircle != x).All(y => !y.IsInside(circlePoint))
-            //)).ToList();
-            var circlePointsList = circles.Select(x => x.Points);
-
-            foreach (var circlePoints in circlePointsList)
-            {
-                foreach (var p in circlePoints)
-                {
-                    endPolygon.Add(p);
-                }
-            }
-
-            return endPolygon;
-        }
-
         public override int GetAvailableTime(Vector2 pos)
         {
             return OwnSpellData.Delay - (Environment.TickCount - TimeDetected);

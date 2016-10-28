@@ -120,10 +120,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 Vector2 collision = this.GetCollisionPoint();
                 DoesCollide = !collision.IsZero;
-                LastCollisionPos = collision;
-
-                //if (DoesCollide && !LastCollisionPos.ProjectOn(CurrentPosition.To2D(), FixedEndPosition.To2D()).IsOnSegment)
-                //    DoesCollide = false;
+                LastCollisionPos = collision.ProjectOn(missile.StartPosition.To2D(), missile.EndPosition.To2D()).SegmentPoint;
             }
         }
 
@@ -198,11 +195,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
             return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
-        }
-
-        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
-        {
-            return ToPolygon();
         }
 
         public override int GetAvailableTime(Vector2 pos)

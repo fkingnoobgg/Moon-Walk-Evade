@@ -140,11 +140,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             ToPolygon().Draw(Color.White);
         }
 
-        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
-        {
-            return ToPolygon();//todo
-        }
-
         public override Geometry.Polygon ToInnerPolygon()
         {
             float extrawidth = -20;

@@ -78,8 +78,6 @@ namespace Moon_Walk_Evade.Skillshots
 
         public abstract Geometry.Polygon ToPolygon();
 
-        public abstract Geometry.Polygon ToExactPolygon(float extrawidth = 0);
-
         /// <summary>
         /// For Veigar E
         /// </summary>

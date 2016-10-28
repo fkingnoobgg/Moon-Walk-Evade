@@ -246,38 +246,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             return polygon;
         }
 
-        public override Geometry.Polygon ToExactPolygon(float extrawidth = 0)
-        {
-            var poly = ToPolygon();
-            var poly2 = new Geometry.Polygon();
-
-            for (int i = 0; i < poly.Points.Count; i++)
-            {
-                var p = poly.Points[i];
-                var nextP = poly.Points[i == poly.Points.Count - 1 ? 0 : i + 1];
-
-                if (p.Distance(nextP) > 50)
-                {
-                    int steps = (int)Math.Floor(p.Distance(nextP) / 50);
-
-                    float extendDist = 50;
-                    for (int step = 0; step < steps; step++)
-                    {
-                        poly2.Points.Add(p.Extend(nextP, extendDist));
-                        extendDist += 50;
-                    }
-
-                    if (p.Distance(nextP) % 50 != 0)
-                        poly2.Points.Add(nextP);
-                }
-                else
-                {
-                    poly2.Points.Add(nextP);
-                }
-            }
-            return poly2;
-        }
-
         public override int GetAvailableTime(Vector2 pos)
         {
             var dist1 =
@@ -328,7 +296,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             var allIntersections = new List<FoundIntersection>();
             var segmentIntersections = new List<FoundIntersection>();
-            var polygon = ToExactPolygon();
+            var polygon = ToPolygon();
 
             var from = path[0];
             var to = path[1];
