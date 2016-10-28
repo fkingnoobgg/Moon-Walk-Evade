@@ -116,7 +116,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 }
             }
 
-            if (missile != null && !DoesCollide) //missle
+            if (missile != null) //missle
             {
                 Vector2 collision = this.GetCollisionPoint();
                 DoesCollide = !collision.IsZero;
@@ -130,6 +130,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 FixedStartPos = Caster.ServerPosition;
                 FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, OwnSpellData.Range + 100);
+
+                if (OwnSpellData.MinionCollision)
+                {
+                    Vector2 collision = this.GetCollisionPoint();
+                    DoesCollide = !collision.IsZero;
+                    LastCollisionPos = collision.ProjectOn(FixedStartPos.To2D(), FixedEndPos.To2D()).SegmentPoint;
+                }
             }
             else
             {

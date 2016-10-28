@@ -1339,6 +1339,7 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 4,
                         IsDangerous = true,
                         ObjectCreationName = "IvernQ",
+                        MinionCollision = true
                     }
                 },
                 new LinearSkillshot

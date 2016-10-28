@@ -162,7 +162,7 @@ namespace Moon_Walk_Evade.Evading
 
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
-            if (CurrentEvadeResult != null)
+            if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
                 if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer + Game.Ping))
                 {
                     CurrentEvadeResult = null;
@@ -185,7 +185,7 @@ namespace Moon_Walk_Evade.Evading
         {
             CheckEvade();
 
-            if (CurrentEvadeResult != null)
+            if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
             {
                 if (CurrentEvadeResult.ShouldPreventStuttering)
                 {
@@ -205,15 +205,15 @@ namespace Moon_Walk_Evade.Evading
         }
 
         /// <summary>
-        /// block movement? | set evade
+        /// set evade
         /// </summary>
         /// <returns></returns>
-        private bool CheckEvade()
+        private void CheckEvade()
         {
             if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing() || Player.Instance.IsInFountainRange())
             {
                 CurrentEvadeResult = null;
-                return false;
+                return;
             }
 
             CacheSkillshots();
@@ -224,15 +224,12 @@ namespace Moon_Walk_Evade.Evading
                 bool oustside = !IsHeroInDanger();
                 var evade = CalculateEvade(LastIssueOrderPos, oustside);
 
-                if (evade.IsValid && evade.EnoughTime)
+                if (evade.IsValid)
                 {
                     evade.IsOutsideEvade = oustside;
                     CurrentEvadeResult = evade;
-                    return true;
                 }
             }
-
-            return true;
         }
 
         private void PlayerOnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
@@ -261,7 +258,7 @@ namespace Moon_Walk_Evade.Evading
                 CurrentEvadeResult = null;
             }
 
-            if (CurrentEvadeResult != null)
+            if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
                 args.Process = false;
         }
 
@@ -528,7 +525,9 @@ namespace Moon_Walk_Evade.Evading
             {
                 Vector2 evadeSpellEvadePoint;
                 if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
+                {
                     return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
+                }
                 else //can use evade spell
                     CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
 
