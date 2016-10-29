@@ -181,7 +181,6 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
-        
         private void OnUpdate(EventArgs args)
         {
             CheckEvade();
@@ -194,9 +193,6 @@ namespace Moon_Walk_Evade.Evading
                     var point = newPoints.FirstOrDefault();
                     if (point != default(Vector2))
                     {
-                        //Chat.Print(Environment.TickCount);
-                        //point.AddDrawVector();
-                        //CurrentEvadeResult.WalkPoint.AddDrawVector();
                         CurrentEvadeResult.EvadePoint = point;
                     }
                 }
@@ -357,7 +353,7 @@ namespace Moon_Walk_Evade.Evading
             }
 
             /*Danger Polygon*/
-            if (CurrentDrawingType == DrawingType.Fancy)
+            if (CurrentDrawingType == DrawingType.Fancy && EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
             {
                 foreach (var pol in Geometry.ClipPolygons(SkillshotDetector.ActiveSkillshots.Select(c => c.ToPolygon())).ToPolygons())
                 {
@@ -449,6 +445,38 @@ namespace Moon_Walk_Evade.Evading
             return IsPathSafeEx(Player.Instance.GetPath(end.To3D()).ToVector2(), (int)speed, (int)delay);
         }
 
+        public Vector2 GetClosestEvadePoint2(float speed = -1, float delay = 0)
+        {
+            speed = speed == -1 ? Player.Instance.MoveSpeed : speed;
+
+            int posChecked = 0;
+            const int maxPosToCheck = 150;
+            const int posRadius = 50;
+            int radiusIndex = 0;
+            var heroPoint = Player.Instance.Position;
+
+            var points = new List<Vector2>();
+
+            while (posChecked < maxPosToCheck)
+            {
+                radiusIndex++;
+
+                int curRadius = radiusIndex * 2 * posRadius;
+                int curCircleChecks = (int)Math.Ceiling(2 * Math.PI * curRadius / (2 * (double)posRadius));
+
+                for (int i = 1; i < curCircleChecks; i++)
+                {
+                    posChecked++;
+                    var cRadians = 2 * Math.PI / (curCircleChecks - 1) * i; //check decimals
+                    var pos = new Vector2((float)Math.Floor(heroPoint.X + curRadius * Math.Cos(cRadians)), (float)Math.Floor(heroPoint.Y + curRadius * Math.Sin(cRadians)));
+
+                    points.Add(pos);
+                }
+            }
+
+            return points.Where(IsPointSafe).OrderBy(x => x.Distance(Player.Instance)).First();
+        }
+
         public List<Vector2> GetEvadePoints(Vector2? awayFrom = null, float speed = -1, float delay = 0)
         {
             speed = speed == -1 ? Player.Instance.MoveSpeed : speed;
@@ -526,6 +554,9 @@ namespace Moon_Walk_Evade.Evading
             if (!points.Any())
             {
                 Vector2 evadeSpellEvadePoint;
+                //float needed = Player.Instance.Distance(GetClosestEvadePoint2())/Player.Instance.MoveSpeed*1000;
+                //if (time < 30000)
+                //    Chat.Print("<b><font size='30' color='#FFFFFF'>dt: " + (needed - time) + " for " + Skillshots[0] + "</font></b>");
                 if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
                 {
                     return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);

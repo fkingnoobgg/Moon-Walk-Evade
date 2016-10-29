@@ -73,7 +73,6 @@
     <Compile Include="Skillshots\EvadeSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotDatabase.cs" />
     <Compile Include="Skillshots\SkillshotTypes\AsheW.cs" />
-    <Compile Include="Skillshots\SkillshotTypes\CaitlynTrap.cs" />
     <Compile Include="Skillshots\SkillshotTypes\CircularSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\ConeSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\LinearSkillshot.cs" />

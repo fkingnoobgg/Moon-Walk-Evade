@@ -50,8 +50,8 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
-            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 0, 0, 200));
-            MainMenu.AddLabel("Evades X milliseconds earlier than excepected");
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 0, -400, 200));
+            MainMenu.AddLabel("Time is X ms shorter than expected");
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));

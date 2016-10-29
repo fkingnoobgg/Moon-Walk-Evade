@@ -224,7 +224,7 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "Volley",
                         Slot = SpellSlot.W,
                         Delay = 250,
-                        Range = 1400,
+                        Range = 1500,
                         Radius = 20,
                         MissileSpeed = 1500,
                         DangerValue = 1,
@@ -441,7 +441,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                new CaitlynTrap
+                new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
                     {

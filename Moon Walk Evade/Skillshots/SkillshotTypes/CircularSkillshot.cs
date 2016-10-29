@@ -68,11 +68,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override void OnCreateUnsafe(GameObject obj)
         {
-            if (Missile == null)
+            if (Missile == null && CastArgs != null)
             {
                 FixedEndPosition = CastArgs.End;
             }
-            else
+            else if (Missile != null)
             {
                 FixedEndPosition = Missile.EndPosition;
             }
