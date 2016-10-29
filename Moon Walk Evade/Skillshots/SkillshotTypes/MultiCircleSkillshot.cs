@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
+using Moon_Walk_Evade.Evading;
+using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 
@@ -35,6 +37,20 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override EvadeSkillshot NewInstance(bool debug = false)
         {
             var newInstance = new MultiCircleSkillshot { OwnSpellData = OwnSpellData };
+            if (debug)
+            {
+                var newDebugInst = new MultiCircleSkillshot
+                {
+                    OwnSpellData = OwnSpellData,
+                    StartPosition = Debug.GlobalStartPos,
+                    EndPosition = Debug.GlobalEndPos,
+                    IsValid = true,
+                    IsActive = true,
+                    TimeDetected = Environment.TickCount - Game.Ping,
+                    SpawnObject = null
+                };
+                return newDebugInst;
+            }
             return newInstance;
         }
 
@@ -95,8 +111,18 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            if (!EvadeMenu.DrawMenu["drawDangerPolygon"].Cast<CheckBox>().CurrentValue)
-                ToPolygon().Draw(Color.White);
+            if ((MoonWalkEvade.DrawingType) EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue == MoonWalkEvade.DrawingType.Fast)
+                DrawSimplePolygon();
+        }
+
+        public void DrawSimplePolygon()
+        {
+            for (int i = -30; i <= 30; i += 10)
+            {
+                var rotatedDirection = Direction.Rotated(i * (float)Math.PI / 180);
+                var c = new Geometry.Polygon.Circle(StartPosition + rotatedDirection.To3D() * distance, OwnSpellData.Radius);
+                c.Draw(Color.White);
+            }
         }
 
         public override Geometry.Polygon ToPolygon()

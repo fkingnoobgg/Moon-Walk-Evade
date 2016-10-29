@@ -166,7 +166,7 @@ namespace Moon_Walk_Evade
             DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point"));
             DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw Evade Status"));
             DrawMenu.Add("drawSkillshots", new CheckBox("Draw Skillshots"));
-            DrawMenu.Add("drawDangerPolygon", new CheckBox("Draw Danger Polygon"));
+            DrawMenu.AddStringList("drawType", "Drawing Type", new [] { "Fancy", "Fast" }, 0);
 
 
             HotkeysMenu = MainMenu.AddSubMenu("KeyBinds");

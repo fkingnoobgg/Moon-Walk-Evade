@@ -127,6 +127,14 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
+        public Geometry.Polygon ToSimplePolygon()
+        {
+            var poly = new Geometry.Polygon();
+            poly.Add(FixedStartPosition);
+            poly.Points.AddRange(GetEdgePoints());
+            return poly;
+        }
+
         public override void OnDraw()
         {
             if (!IsValid)
@@ -134,9 +142,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            if (!EvadeMenu.DrawMenu["drawDangerPolygon"].Cast<CheckBox>().CurrentValue)
+            if ((MoonWalkEvade.DrawingType)EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue == MoonWalkEvade.DrawingType.Fast)
             {
-                ToPolygon().Draw(Color.White);
+                ToSimplePolygon().Draw(Color.White);
             }
         }
 

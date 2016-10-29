@@ -12,6 +12,8 @@ namespace Moon_Walk_Evade.Skillshots
         public string ObjectCreationName { get; set; }
         public SpellSlot Slot { get; set; }
         public int Delay { get; set; }
+
+        public int ExtraExistingTime { get; set; }
         public int Range { get; set; }
 
         private int radiusBuffer => EvadeMenu.MainMenu["extraRadius"].Cast<Slider>().CurrentValue;

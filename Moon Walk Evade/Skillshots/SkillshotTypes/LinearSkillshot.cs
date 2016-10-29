@@ -52,7 +52,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     float traveledDist = speed * timeElapsed / 1000;
                     return Debug.GlobalStartPos.Extend(Debug.GlobalEndPos, traveledDist).To3D();
                 }
-
+                
                 if (DoesCollide && Missile.Position.Distance(Missile.StartPosition) >= LastCollisionPos.Distance(Missile.StartPosition))
                     return LastCollisionPos.To3D();
 
@@ -95,7 +95,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new LinearSkillshot
                 {
                     OwnSpellData = OwnSpellData, FixedStartPos = Debug.GlobalStartPos,
-                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping-45,
+                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping,
                     SpawnObject = isProjectile ? new MissileClient() : null
                 };
                 return newDebugInst;
@@ -190,7 +190,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White);
+            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.CornflowerBlue, 3);
         }
 
         public override Geometry.Polygon ToPolygon()

@@ -1893,7 +1893,7 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 2,
                         IsDangerous = false,
                         ObjectCreationName = "LucianQ",
-                        AddHitbox = false
+                        AddHitbox = true
                     }
                 },
                 new LinearSkillshot
@@ -1940,7 +1940,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Slot = SpellSlot.E,
                         Delay = 250,
                         Range = 1100,
-                        Radius = 340,
+                        Radius = 275,
                         MissileSpeed = 1400,
                         DangerValue = 2,
                         IsDangerous = false,
@@ -2050,6 +2050,39 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 3,
                         ObjectCreationName = "MalzaharQMissile",
                         IsPerpendicular = true
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Scattershot",
+                        ChampionName = "MissFortune",
+                        SpellName = "MissFortuneScattershot",
+                        Slot = SpellSlot.E,
+                        Delay = 500,
+                        ExtraExistingTime = 2300,
+                        Range = 800,
+                        Radius = 350,
+                        MissileSpeed = 0,
+                        DangerValue = 1,
+                        ObjectCreationName = "",
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Bullet Time",
+                        ChampionName = "MissFortune",
+                        SpellName = "MissFortuneBullets",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 1400,
+                        Radius = 30,
+                        MissileSpeed = 2000,
+                        DangerValue = 3,
+                        ObjectCreationName = "MissFortuneBullets",
                     }
                 },
                 //new CircularSkillshot
@@ -2328,7 +2361,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Riven",
                         SpellName = "RivenMartyr",
                         Slot = SpellSlot.W,
-                        Delay = 267,
+                        Delay = 150,
                         Range = 650,
                         Radius = 280,
                         MissileSpeed = 1500,
@@ -2351,8 +2384,24 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 2000,
                         DangerValue = 2,
                         IsDangerous = false,
-                        ObjectCreationName = "RumbleGrenade",
+                        ObjectCreationName = "RumbleGrenadeMissile",
                         MinionCollision = true
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Carpet Bomb",
+                        ChampionName = "Rumble",
+                        SpellName = "RumbleGrenade",
+                        Slot = SpellSlot.R,
+                        Delay = 400,
+                        Range = 1200,
+                        Radius = 200,
+                        MissileSpeed = 1600,
+                        DangerValue = 3,
+                        ObjectCreationName = "RumbleCarpetBombMissile",
                     }
                 },
                 new LinearSkillshot
@@ -3385,6 +3434,7 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "ZileanQ",
                         Slot = SpellSlot.Q,
                         Delay = 300,
+                        ExtraExistingTime = 3500,
                         Range = 900,
                         Radius = 250,
                         MissileSpeed = 2000,

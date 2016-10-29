@@ -70,9 +70,10 @@ namespace Moon_Walk_Evade.Evading
             get { return EvadeMenu.DrawMenu["drawEvadeStatus"].Cast<CheckBox>().CurrentValue; }
         }
 
-        public bool DrawDangerPolygon
+        public enum DrawingType { Fancy, Fast }
+        public DrawingType CurrentDrawingType
         {
-            get { return EvadeMenu.DrawMenu["drawDangerPolygon"].Cast<CheckBox>().CurrentValue; }
+            get { return (DrawingType)EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue; }
         }
 
         public int IssueOrderTickLimit
@@ -355,7 +356,8 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            if (DrawDangerPolygon)
+            /*Danger Polygon*/
+            if (CurrentDrawingType == DrawingType.Fancy)
             {
                 foreach (var pol in Geometry.ClipPolygons(SkillshotDetector.ActiveSkillshots.Select(c => c.ToPolygon())).ToPolygons())
                 {

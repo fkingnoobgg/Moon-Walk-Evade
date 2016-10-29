@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using Moon_Walk_Evade.Evading;
 using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
@@ -120,7 +122,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             if (Missile == null)
             {
-                if (Environment.TickCount > TimeDetected + OwnSpellData.Delay + 250)
+                if (Environment.TickCount > TimeDetected + OwnSpellData.Delay + 250 + OwnSpellData.ExtraExistingTime)
                     IsValid = false;
             }
             else if (Missile != null)
@@ -137,12 +139,22 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            if (Missile != null && !_missileDeleted)
-                new Geometry.Polygon.Circle(FixedEndPosition,
-                    FixedStartPosition.To2D().Distance(Missile.Position.To2D()) / (FixedStartPosition.To2D().Distance(FixedEndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
-                        Color.DodgerBlue);
+            //if (Missile != null && !_missileDeleted && OwnSpellData.ChampionName == "Lux")
+            //    new Geometry.Polygon.Circle(FixedEndPosition,
+            //        FixedStartPosition.To2D().Distance(Missile.Position.To2D()) / (FixedStartPosition.To2D().Distance(FixedEndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
+            //            Color.DodgerBlue);
 
-            ToPolygon().DrawPolygon(Color.White);
+            
+            float radius = OwnSpellData.Radius - Player.Instance.BoundingRadius;
+
+            new Circle(new ColorBGRA(), radius, 3) { Color = Color.White }.Draw(FixedEndPosition);
+            bool fancy = (MoonWalkEvade.DrawingType)EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue == MoonWalkEvade.DrawingType.Fancy;
+            if (Environment.TickCount < TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime && fancy)
+            {
+                float dt = Environment.TickCount - TimeDetected;
+                radius *= dt/(OwnSpellData.Delay + OwnSpellData.ExtraExistingTime);
+                new Circle(new ColorBGRA(), radius, 1) { Color = Color.CornflowerBlue }.Draw(FixedEndPosition);
+            }
         }
 
         public override Geometry.Polygon ToPolygon()

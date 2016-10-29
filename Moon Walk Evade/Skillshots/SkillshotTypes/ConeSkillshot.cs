@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
+using Moon_Walk_Evade.Evading;
 using Moon_Walk_Evade.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
@@ -161,15 +162,24 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
+        public Geometry.Polygon ToSimplePolygon()
+        {
+            var poly = new Geometry.Polygon();
+            poly.Add(RotateAroundPoint(FixedStartPos.To2D(), FixedEndPos.To2D(), -OwnSpellData.ConeAngle/2f * (float)Math.PI / 180));
+            poly.Add(RotateAroundPoint(FixedStartPos.To2D(), FixedEndPos.To2D(), +OwnSpellData.ConeAngle / 2f * (float)Math.PI / 180));
+            poly.Add(FixedStartPos);
+            return poly;
+        }
+
         public override void OnDraw()
         {
             if (!IsValid)
             {
                 return;
             }
-            if (!EvadeMenu.DrawMenu["drawDangerPolygon"].Cast<CheckBox>().CurrentValue)
+            if ((MoonWalkEvade.DrawingType)EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue == MoonWalkEvade.DrawingType.Fast)
             {
-                ToPolygon().Draw(Color.White);
+                ToSimplePolygon().Draw(Color.White);
             }
         }
 

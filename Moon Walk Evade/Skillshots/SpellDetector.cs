@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Menu.Values;
 using Moon_Walk_Evade.Utils;
 
@@ -132,7 +133,7 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            //if (sender is AIHeroClient && ((AIHeroClient)sender).ChampionName.Contains("Lux")
+            //if (sender is AIHeroClient && ((AIHeroClient)sender).ChampionName.Contains("tu")
             //     && !args.IsAutoAttack())
             //    Chat.Print(args.SData.Name);
 
@@ -166,9 +167,9 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void GameObjectOnCreate(GameObject sender, EventArgs args)
         {
-            bool isMis = sender.Type == GameObjectType.MissileClient &&
-                         !Utils.Utils.GetGameObjectName(sender).Contains("SRU");
-            if (!isMis)return;
+            //bool isMis = sender.Type == GameObjectType.MissileClient &&
+            //             !Utils.Utils.GetGameObjectName(sender).Contains("SRU") && !Utils.Utils.GetGameObjectName(sender).Contains("HA");
+            //if (isMis)
             //    Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))
