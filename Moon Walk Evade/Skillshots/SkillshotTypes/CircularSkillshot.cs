@@ -163,6 +163,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Geometry.Polygon ToPolygon()
         {
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius * 2);
+        }
+
+        private Geometry.Polygon ToDetailedPolygon()
+        {
             Geometry.Polygon poly = new Geometry.Polygon();
             for (int i = 0; i < 360; i += 10)
             {
@@ -230,12 +235,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
             var allIntersections = new List<FoundIntersection>();
+            var polygon = ToDetailedPolygon();
             for (var i = 0; i <= path.Length - 2; i++)
             {
                 var from = path[i];
                 var to = path[i + 1];
                 var segmentIntersections = new List<FoundIntersection>();
-                var polygon = ToPolygon();
 
                 for (var j = 0; j <= polygon.Points.Count - 1; j++)
                 {
