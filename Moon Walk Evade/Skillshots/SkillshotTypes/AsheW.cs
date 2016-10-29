@@ -203,7 +203,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public Vector2[] GetEdgePoints()
         {
-            float segmentAngleStep = 4.62f;
+            float segmentAngleStep = 4.8f;
             float sidewardsRotationAngle = segmentAngleStep * 5;
 
             Vector2 rightEdge = RotateAroundPoint(FixedStartPosition.To2D(), FixedEndPosition.To2D(), 

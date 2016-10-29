@@ -252,7 +252,7 @@ namespace Moon_Walk_Evade.Skillshots
         private void OnDraw(EventArgs args)
         {
             if (EvadeMenu.DrawMenu["disableAllDrawings"].Cast<CheckBox>().CurrentValue ||
-                !EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
+                EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
