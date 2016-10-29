@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using SharpDX;
@@ -58,7 +59,11 @@ namespace Moon_Walk_Evade.Skillshots
 
         public virtual bool OnDeleteMissile(GameObject obj)
         {
-            return true;
+            if (OwnSpellData.ExtraExistingTime == 0)
+                return true;
+            else Core.DelayAction(() => IsValid = false, TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime - Environment.TickCount);
+
+            return false;
         }
 
         public virtual void OnDispose() { }

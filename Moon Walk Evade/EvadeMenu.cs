@@ -37,6 +37,16 @@ namespace Moon_Walk_Evade
 
         public static Menu DebugMenu { get; private set; }
 
+        public static string bufferString
+        {
+            get
+            {
+                int val = MainMenu["serverTimeBuffer"].Cast<Slider>().CurrentValue;
+                string s = val < 0 ? "later" : "earlier";
+                return "Evade " + val.ToString().Replace("-", "").Replace("+", "") + " Milliseconds " + s + " than expected";
+            }
+        }
+
         public static readonly Dictionary<string, EvadeSkillshot> MenuSkillshots = new Dictionary<string, EvadeSkillshot>();
         public static readonly List<EvadeSpellData> MenuEvadeSpells = new List<EvadeSpellData>();
 
@@ -50,15 +60,14 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
-            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 0, -400, 200));
-            MainMenu.AddLabel("Time is X ms shorter than expected");
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", -295, -400, 200));
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
             MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
             MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
-            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 30, 0, 50));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 0, 0, 50));
             MainMenu.AddSeparator();
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));

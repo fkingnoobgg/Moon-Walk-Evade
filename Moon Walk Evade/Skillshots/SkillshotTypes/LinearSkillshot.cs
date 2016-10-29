@@ -95,7 +95,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new LinearSkillshot
                 {
                     OwnSpellData = OwnSpellData, FixedStartPos = Debug.GlobalStartPos,
-                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount-Game.Ping,
+                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount,
                     SpawnObject = isProjectile ? new MissileClient() : null
                 };
                 return newDebugInst;
@@ -120,7 +120,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 Vector2 collision = this.GetCollisionPoint();
                 DoesCollide = !collision.IsZero;
-                LastCollisionPos = collision.ProjectOn(missile.StartPosition.To2D(), missile.EndPosition.To2D()).SegmentPoint;
+                var projection = collision.ProjectOn(missile.StartPosition.To2D(), missile.EndPosition.To2D());
+                if (projection.IsOnSegment)
+                    LastCollisionPos = projection.SegmentPoint;
             }
         }
 
@@ -189,9 +191,10 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override Geometry.Polygon ToPolygon()
         {
             float extrawidth = 0;
+            OwnSpellData.AddHitbox = true;
             if (OwnSpellData.AddHitbox)
             {
-                extrawidth += Player.Instance.HitBoxRadius();
+                extrawidth += Player.Instance.BoundingRadius*1.3f;
             }
 
             return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);

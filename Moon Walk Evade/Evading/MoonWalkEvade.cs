@@ -5,6 +5,7 @@ using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
+using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Moon_Walk_Evade.EvadeSpells;
@@ -183,6 +184,8 @@ namespace Moon_Walk_Evade.Evading
 
         private void OnUpdate(EventArgs args)
         {
+            EvadeMenu.MainMenu["serverTimeBuffer"].Cast<Slider>().DisplayName = EvadeMenu.bufferString;
+
             CheckEvade();
 
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
@@ -319,9 +322,10 @@ namespace Moon_Walk_Evade.Evading
             {
                 if (CurrentEvadeResult.IsValid && CurrentEvadeResult.EnoughTime && !CurrentEvadeResult.Expired())
                 {
+                    var color = !CurrentEvadeResult.IsForced ? new ColorBGRA(255, 255, 255, 255) : new ColorBGRA(255, 0, 0, 255);
                     foreach (var dot in GetPathDots(CurrentEvadeResult.WalkPoint.To2D(), Player.Instance.Position.To2D(), 20, 50))
                     {
-                        new Circle(new ColorBGRA(255, 255, 255, 255), 20, 2, true).Draw(dot.To3D());
+                        new Circle(color, 20, 2, true).Draw(dot.To3D());
                     }
                 }
             }
@@ -554,12 +558,12 @@ namespace Moon_Walk_Evade.Evading
             if (!points.Any())
             {
                 Vector2 evadeSpellEvadePoint;
-                //float needed = Player.Instance.Distance(GetClosestEvadePoint2())/Player.Instance.MoveSpeed*1000;
+                //float needed = Player.Instance.Distance(GetClosestEvadePoint2()) / Player.Instance.MoveSpeed * 1000;
                 //if (time < 30000)
                 //    Chat.Print("<b><font size='30' color='#FFFFFF'>dt: " + (needed - time) + " for " + Skillshots[0] + "</font></b>");
                 if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
                 {
-                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade);
+                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade) {IsForced = ForceEvade};
                 }
                 else //can use evade spell
                     CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
@@ -612,6 +616,8 @@ namespace Moon_Walk_Evade.Evading
             public int TimeAvailable { get; set; }
             public int TotalTimeAvailable { get; set; }
             public bool EnoughTime { get; set; }
+
+            public bool IsForced { get; set; }
 
             public bool IsValid
             {

@@ -136,8 +136,7 @@ namespace Moon_Walk_Evade.Utils
                     if (skill == null || skill.CurrentPosition == default(Vector3))
                         return;
 
-                    if (skill.CurrentPosition.Distance(Player.Instance) <= Player.Instance.BoundingRadius &&
-                        Player.Instance.Position.To2D().ProjectOn(skill.CurrentPosition.To2D(), skill.EndPosition.To2D()).IsOnSegment && skill.Missile != null)
+                    if (skill.CurrentPosition.Distance(Player.Instance) <= skill.OwnSpellData.Radius + Player.Instance.BoundingRadius && skill.Missile != null)
                     {
                         Chat.Print(Game.Time + "  Hit");
                         lastKSkillshot = null;

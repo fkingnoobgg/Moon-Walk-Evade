@@ -100,7 +100,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return false;
             }
 
-            return true;
+            if (OwnSpellData.ExtraExistingTime == 0)
+                return true;
+            else Core.DelayAction(() => IsValid = false, TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime - Environment.TickCount);
+
+            return false;
         }
 
         public override void OnDeleteObject(GameObject obj)
@@ -145,7 +149,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             //            Color.DodgerBlue);
 
             
-            float radius = OwnSpellData.Radius - Player.Instance.BoundingRadius;
+            float radius = OwnSpellData.Radius;
 
             new Circle(new ColorBGRA(), radius, 3) { Color = Color.White }.Draw(FixedEndPosition);
             bool fancy = (MoonWalkEvade.DrawingType)EvadeMenu.DrawMenu["drawType"].Cast<Slider>().CurrentValue == MoonWalkEvade.DrawingType.Fancy;
@@ -153,16 +157,17 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 float dt = Environment.TickCount - TimeDetected;
                 radius *= dt/(OwnSpellData.Delay + OwnSpellData.ExtraExistingTime);
-                new Circle(new ColorBGRA(), radius, 1) { Color = Color.CornflowerBlue }.Draw(FixedEndPosition);
+                new Circle(new ColorBGRA(), radius, 2) { Color = Color.CornflowerBlue }.Draw(FixedEndPosition);
             }
         }
 
         public override Geometry.Polygon ToPolygon()
         {
             Geometry.Polygon poly = new Geometry.Polygon();
-            for (int i = 0; i < 360; i += 30)
+            for (int i = 0; i < 360; i += 10)
             {
-                poly.Points.Add(PointOnCircle(OwnSpellData.Radius, i, FixedEndPosition.To2D()));
+                /*bounding radius not included*/
+                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + Player.Instance.BoundingRadius*2, i, FixedEndPosition.To2D()));
             }
             return poly;
         }
@@ -207,6 +212,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
+            if (path.Any(p => !IsSafe(p)) && IsSafe(Player.Instance.Position.To2D()))
+                return false;
+
             if (path.Length <= 1) //lastissue = playerpos
             {
                 if (!Player.Instance.IsRecalling())
