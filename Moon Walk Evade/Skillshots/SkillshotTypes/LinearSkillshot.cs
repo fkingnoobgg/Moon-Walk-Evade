@@ -194,7 +194,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             OwnSpellData.AddHitbox = true;
             if (OwnSpellData.AddHitbox)
             {
-                extrawidth += Player.Instance.BoundingRadius*1.3f;
+                extrawidth += Player.Instance.BoundingRadius*1.5f;
             }
 
             return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
