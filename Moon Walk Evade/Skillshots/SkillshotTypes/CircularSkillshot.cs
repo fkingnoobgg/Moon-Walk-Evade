@@ -163,7 +163,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Geometry.Polygon ToPolygon()
         {
-            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius * 2);
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius*1.1f);
         }
 
         private Geometry.Polygon ToDetailedPolygon()
@@ -225,11 +225,14 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 if (!Player.Instance.IsRecalling())
                     return IsSafe();
 
+                if (IsSafe())
+                    return true;
+
                 float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 
-            timeOffset += Game.Ping / 2;
+            timeOffset += Game.Ping;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 

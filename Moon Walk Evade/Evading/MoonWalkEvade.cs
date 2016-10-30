@@ -597,7 +597,7 @@ namespace Moon_Walk_Evade.Evading
 
         public class EvadeResult
         {
-            private MoonWalkEvade _moonWalkEvade;
+            private MoonWalkEvade moonWalkEvadeInstance;
 
 
             public bool IsOutsideEvade { get; set; }
@@ -631,7 +631,7 @@ namespace Moon_Walk_Evade.Evading
                     var walkPoint = EvadePoint.Extend(PlayerPos, -80);
                     var newPoint = walkPoint.Extend(PlayerPos, -ExtraRange);
 
-                    if (_moonWalkEvade.IsPointSafe(newPoint))
+                    if (moonWalkEvadeInstance.IsPointSafe(newPoint))
                     {
                         return newPoint.To3DWorld();
                     }
@@ -640,11 +640,11 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            public EvadeResult(MoonWalkEvade moonWalkEvade, Vector2 evadePoint, Vector2 anchorPoint, int totalTimeAvailable,
+            public EvadeResult(MoonWalkEvade _moonWalkEvadeInstance, Vector2 evadePoint, Vector2 anchorPoint, int totalTimeAvailable,
                 int timeAvailable,
                 bool enoughTime)
             {
-                _moonWalkEvade = moonWalkEvade;
+                moonWalkEvadeInstance = _moonWalkEvadeInstance;
                 PlayerPos = Player.Instance.Position.To2D();
                 Time = Environment.TickCount;
 
@@ -654,12 +654,12 @@ namespace Moon_Walk_Evade.Evading
                 TimeAvailable = timeAvailable;
                 EnoughTime = enoughTime;
 
-                // extra moonWalkEvade range
-                if (_moonWalkEvade.ExtraEvadeRange > 0)
+                // extra moonWalkEvadeInstance range
+                if (moonWalkEvadeInstance.ExtraEvadeRange > 0)
                 {
-                    ExtraRange = (_moonWalkEvade.RandomizeExtraEvadeRange
-                        ? Utils.Utils.Random.Next(_moonWalkEvade.ExtraEvadeRange / 3, _moonWalkEvade.ExtraEvadeRange)
-                        : _moonWalkEvade.ExtraEvadeRange);
+                    ExtraRange = (moonWalkEvadeInstance.RandomizeExtraEvadeRange
+                        ? Utils.Utils.Random.Next(moonWalkEvadeInstance.ExtraEvadeRange / 3, moonWalkEvadeInstance.ExtraEvadeRange)
+                        : moonWalkEvadeInstance.ExtraEvadeRange);
                 }
             }
 

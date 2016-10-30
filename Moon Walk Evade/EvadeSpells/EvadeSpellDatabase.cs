@@ -855,6 +855,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 SpellName = "Deceive",
                 Range = 400,
                 Delay = 250,
+                Speed = int.MaxValue,
                 Slot = SpellSlot.Q,
                 EvadeType = EvadeType.Blink,
                 CastType = CastType.Position

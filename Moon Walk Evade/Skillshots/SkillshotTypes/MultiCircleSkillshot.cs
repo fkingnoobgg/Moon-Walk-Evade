@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -197,12 +196,15 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 if (!Player.Instance.IsRecalling())
                     return IsSafe();
 
+                if (IsSafe())
+                    return true;
+
                 float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 
             var Distance = 0f;
-            timeOffset += Game.Ping / 2;
+            timeOffset += Game.Ping;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
