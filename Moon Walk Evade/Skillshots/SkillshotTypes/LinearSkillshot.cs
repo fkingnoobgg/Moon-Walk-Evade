@@ -257,7 +257,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 
-            //timeOffset -= 40;
+            timeOffset += Game.Ping / 2;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 

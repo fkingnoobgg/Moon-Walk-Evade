@@ -229,41 +229,24 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 
-            var Distance = 0f;
             timeOffset += Game.Ping / 2;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
+            
             var allIntersections = new List<FoundIntersection>();
-            var polygon = ToDetailedPolygon();
-            for (var i = 0; i <= path.Length - 2; i++)
+            var segmentIntersections = new List<FoundIntersection>();
+
+            foreach (var intersection in Utils.Utils.GetLineCircleIntersectionPoints(FixedEndPosition.To2D(), OwnSpellData.Radius, path[0], path[1]))
             {
-                var from = path[i];
-                var to = path[i + 1];
-                var segmentIntersections = new List<FoundIntersection>();
-
-                for (var j = 0; j <= polygon.Points.Count - 1; j++)
-                {
-                    var sideStart = polygon.Points[j];
-                    var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
-
-                    var intersection = from.Intersection(to, sideStart, sideEnd);
-
-                    if (intersection.Intersects)
-                    {
-                        segmentIntersections.Add(
-                            new FoundIntersection(
-                                Distance + intersection.Point.Distance(from),
-                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed),
-                                intersection.Point, from));
-                    }
-                }
-
-                var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-                allIntersections.AddRange(sortedList);
-
-                Distance += from.Distance(to);
+                segmentIntersections.Add(new FoundIntersection(
+                        intersection.Distance(path[0]),
+                        (int)(intersection.Distance(path[0]) * 1000 / speed + delay),
+                        intersection, path[0]));
             }
+
+            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+            allIntersections.AddRange(sortedList);
 
             //No Missile
             if (allIntersections.Count == 0)
