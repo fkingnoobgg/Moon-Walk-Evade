@@ -252,7 +252,7 @@ namespace Moon_Walk_Evade.Evading
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
 
-            if (IsPathSafeEx(args.TargetPosition.To2D()))
+            if ((IsPathSafeEx(args.TargetPosition.To2D()) && !IsHeroInDanger()) || !IsHeroInDanger())
             {
                 //Chat.Print(Environment.TickCount);
                 CurrentEvadeResult = null;
@@ -357,13 +357,13 @@ namespace Moon_Walk_Evade.Evading
             }
 
             /*Danger Polygon*/
-            if (CurrentDrawingType == DrawingType.Fancy && EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
-            {
-                foreach (var pol in Geometry.ClipPolygons(SkillshotDetector.ActiveSkillshots.Select(c => c.ToPolygon())).ToPolygons())
-                {
-                    pol.DrawPolygon(Color.White, 3);
-                }
-            }
+            //if (CurrentDrawingType == DrawingType.Fancy && EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
+            //{
+            //    foreach (var pol in Geometry.ClipPolygons(SkillshotDetector.ActiveSkillshots.Select(c => c.ToPolygon())).ToPolygons())
+            //    {
+            //        pol.DrawPolygon(Color.White, 3);
+            //    }
+            //}
 
             //if (EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue)
             //foreach (var evadePoint in GetEvadePoints())
