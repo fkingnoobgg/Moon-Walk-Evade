@@ -146,6 +146,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 ToSimplePolygon().Draw(Color.White);
             }
+            else ToPolygon().Draw(Color.White, 3);
         }
 
         Vector2[] GetBeginEdgePoints(Vector2[] edges)

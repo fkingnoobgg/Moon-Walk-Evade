@@ -87,6 +87,20 @@ namespace Moon_Walk_Evade.Utils
             return obj1.Index == obj2.Index;
         }
 
+        public static bool IsWallBetweenPlayer(this Vector2 p)
+        {
+            AIHeroClient player = Player.Instance;
+            var v1 = p - player.Position.To2D();
+            for (float i = 0; i <= 1; i+=0.1f)
+            {
+                var v2 = player.Position.To2D() + i* v1;
+                if (v2.IsWall())
+                    return true;
+            }
+
+            return false;
+        }
+
         public static bool IsWalking(this Obj_AI_Base unit)
         {
             return unit.IsMoving;

@@ -514,8 +514,8 @@ namespace Moon_Walk_Evade.Evading
             points.AddRange(GetCloserEvadePoints(closestNormalPoint));
 
             return !awayFrom.HasValue ?
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall()).ToList() :
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
+                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer()).ToList() :
+                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer() && p.Distance(awayFrom.Value) >= 225).OrderBy(
                 p =>
                 {
                     if (AntiStutterSearchType == StutterSearchType.PlayerFaceDirection)
