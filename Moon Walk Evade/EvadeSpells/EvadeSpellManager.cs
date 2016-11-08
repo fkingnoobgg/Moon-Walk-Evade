@@ -143,7 +143,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                     float castTime = evadeSpell.Delay;
                     if (TimeAvailable > castTime && !evadePos.IsZero && evadeInstance.IsPointSafe(evadePos))
                     {
-                        if (IsDashSafe(evadeSpell.Slot, evadePos, evadeInstance) || evadeSpell.Speed >= short.MaxValue)
+                        if (IsDashSafe(evadeSpell, evadePos, evadeInstance))
                         {
                             evadePointOut = evadePos;
                             CastEvadeSpell(evadeSpell, evadePos);
@@ -225,15 +225,15 @@ namespace Moon_Walk_Evade.EvadeSpells
         /// <summary>
         /// returns if a dash with limited speed is safe
         /// </summary>
-        /// <param name="slot"></param>
-        /// <param name="endPos"></param>
-        /// <param name="evadeInstance"></param>
         /// <returns></returns>
-        public static bool IsDashSafe(SpellSlot slot, Vector2 endPos, MoonWalkEvade evadeInstance)
+        public static bool IsDashSafe(EvadeSpellData evadeSpellData, Vector2 endPos, MoonWalkEvade evadeInstance)
         {
+            if (evadeSpellData.Speed >= short.MaxValue && evadeInstance.IsPointSafe(endPos))
+                return true;
+
             var evadeSpell =
                 EvadeSpellDatabase.Spells.FirstOrDefault(
-                    x => x.ChampionName == Player.Instance.ChampionName && x.Slot == slot);
+                    x => x.ChampionName == Player.Instance.ChampionName && x.Slot == evadeSpellData.Slot);
             if (evadeSpell == null)
                 return false;
 
@@ -242,7 +242,8 @@ namespace Moon_Walk_Evade.EvadeSpells
         }
 
 
-        public static bool IsDashSpell(SpellSlot slot) => 
-            EvadeSpellDatabase.Spells.Any(x => x.ChampionName == Player.Instance.ChampionName && x.Slot == slot && x.EvadeType == EvadeType.Dash);
+        public static bool IsDashSpell(SpellSlot slot) =>
+            EvadeSpellDatabase.Spells.Any(x => x.ChampionName == Player.Instance.ChampionName && x.Slot == slot && 
+             (x.EvadeType == EvadeType.Dash || x.EvadeType == EvadeType.Blink));
     }
 }

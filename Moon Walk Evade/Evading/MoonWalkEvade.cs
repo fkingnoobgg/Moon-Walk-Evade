@@ -277,7 +277,7 @@ namespace Moon_Walk_Evade.Evading
 
             if (BlockDangerousDashes && EvadeSpellManager.IsDashSpell(args.Slot) && !IsHeroInDanger())
             {
-                if (!EvadeSpellManager.IsDashSafe(args.Slot, args.EndPosition.To2D(), this))
+                if (!EvadeSpellManager.IsDashSafe(EvadeSpellDatabase.Spells.First(x => x.Slot == args.Slot), args.EndPosition.To2D(), this))
                     args.Process = false;
             }
         }
