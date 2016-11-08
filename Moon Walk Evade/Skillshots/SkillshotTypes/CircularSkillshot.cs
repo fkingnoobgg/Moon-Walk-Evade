@@ -34,7 +34,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public MissileClient Missile => SpawnObject as MissileClient;
 
         private bool _missileDeleted;
-        
+
 
         public override Vector3 GetCurrentPosition()
         {
@@ -87,7 +87,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 if (missile.SData.Name == OwnSpellData.ObjectCreationName && missile.SpellCaster.Index == Caster.Index)
                 {
                     // Force skillshot to be removed
-                        IsValid = false;
+                    IsValid = false;
                 }
             }
         }
@@ -148,7 +148,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             //        FixedStartPosition.To2D().Distance(Missile.Position.To2D()) / (FixedStartPosition.To2D().Distance(FixedEndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
             //            Color.DodgerBlue);
 
-            
+
             float radius = OwnSpellData.Radius;
 
             new Circle(new ColorBGRA(), radius, 3) { Color = Color.White }.Draw(FixedEndPosition);
@@ -156,14 +156,14 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (Environment.TickCount < TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime && fancy)
             {
                 float dt = Environment.TickCount - TimeDetected;
-                radius *= dt/(OwnSpellData.Delay + OwnSpellData.ExtraExistingTime);
+                radius *= dt / (OwnSpellData.Delay + OwnSpellData.ExtraExistingTime);
                 new Circle(new ColorBGRA(), radius, 2) { Color = Color.CornflowerBlue }.Draw(FixedEndPosition);
             }
         }
 
         public override Geometry.Polygon ToPolygon()
         {
-            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius*1.1f);
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius * 2f);
         }
 
         private Geometry.Polygon ToDetailedPolygon()
@@ -172,7 +172,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             for (int i = 0; i < 360; i += 10)
             {
                 /*bounding radius not included*/
-                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + Player.Instance.BoundingRadius*2, i, FixedEndPosition.To2D()));
+                poly.Points.Add(PointOnCircle(OwnSpellData.Radius + Player.Instance.BoundingRadius * 2, i, FixedEndPosition.To2D()));
             }
             return poly;
         }
@@ -194,7 +194,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             if (!_missileDeleted)
             {
-                return (int) (Missile.Position.To2D().Distance(FixedEndPosition.To2D()) / OwnSpellData.MissileSpeed * 1000);
+                return (int)(Missile.Position.To2D().Distance(FixedEndPosition.To2D()) / OwnSpellData.MissileSpeed * 1000);
             }
 
             return -1;
@@ -236,7 +236,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
-            
+
             var allIntersections = new List<FoundIntersection>();
             var segmentIntersections = new List<FoundIntersection>();
 

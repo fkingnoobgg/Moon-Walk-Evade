@@ -60,7 +60,7 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
-            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", -180, -200, 200));
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 0, -100, 100));
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
@@ -190,7 +190,7 @@ namespace Moon_Walk_Evade
 
             DebugMenu = MainMenu.AddSubMenu("Debug");
             DebugMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
-            DebugMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 5000));
+            DebugMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 12000));
             DebugMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
             DebugMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
             DebugMenu.Add("manageMovementDelay", new CheckBox("Manage Orbwalker Movement Delay", false));

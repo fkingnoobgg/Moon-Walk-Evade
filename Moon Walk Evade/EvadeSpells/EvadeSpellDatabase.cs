@@ -855,7 +855,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 SpellName = "Deceive",
                 Range = 400,
                 Delay = 250,
-                Speed = int.MaxValue,
+                Speed = float.MaxValue,
                 Slot = SpellSlot.Q,
                 EvadeType = EvadeType.Blink,
                 CastType = CastType.Position
@@ -1136,6 +1136,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
                 SpellName = "SummonerFlash",
                 Range = 400,
+                Speed = float.MaxValue,
                 fixedRange = true, //test
                 Delay = 50,
                 isSummonerSpell = true,

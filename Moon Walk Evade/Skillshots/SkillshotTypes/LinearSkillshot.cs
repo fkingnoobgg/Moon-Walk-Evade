@@ -52,7 +52,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     float traveledDist = speed * timeElapsed / 1000;
                     return Debug.GlobalStartPos.Extend(Debug.GlobalEndPos, traveledDist).To3D();
                 }
-                
+
                 if (DoesCollide && Missile.Position.Distance(Missile.StartPosition) >= LastCollisionPos.Distance(Missile.StartPosition))
                     return LastCollisionPos.To3D();
 
@@ -94,8 +94,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 bool isProjectile = EvadeMenu.DebugMenu["isProjectile"].Cast<CheckBox>().CurrentValue;
                 var newDebugInst = new LinearSkillshot
                 {
-                    OwnSpellData = OwnSpellData, FixedStartPos = Debug.GlobalStartPos,
-                    FixedEndPos = Debug.GlobalEndPos, IsValid = true, IsActive = true, TimeDetected = Environment.TickCount,
+                    OwnSpellData = OwnSpellData,
+                    FixedStartPos = Debug.GlobalStartPos,
+                    FixedEndPos = Debug.GlobalEndPos,
+                    IsValid = true,
+                    IsActive = true,
+                    TimeDetected = Environment.TickCount,
                     SpawnObject = isProjectile ? new MissileClient() : null
                 };
                 return newDebugInst;
@@ -185,15 +189,15 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.CornflowerBlue, 3);
+            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White, 3);
         }
 
         public override Geometry.Polygon ToPolygon()
         {
             float extrawidth = 0;
-            if (OwnSpellData.AddHitbox)
+            if (OwnSpellData.AddHitbox || true)
             {
-                extrawidth += Player.Instance.BoundingRadius*1.1f;
+                extrawidth += Player.Instance.BoundingRadius * 1.7f;
             }
 
             return new Geometry.Polygon.Rectangle(CurrentPosition, EndPosition.ExtendVector3(CurrentPosition, -extrawidth), OwnSpellData.Radius + extrawidth);
@@ -218,7 +222,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return short.MaxValue;
 
             float skillDist = point.Distance(CurrentPosition);
-            return Math.Max(0, (int)(skillDist/OwnSpellData.MissileSpeed*1000));
+            return Math.Max(0, (int)(skillDist / OwnSpellData.MissileSpeed * 1000));
         }
 
         public override bool IsFromFow()
@@ -237,7 +241,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (Missile == null)
                 return FixedStartPos.To2D();//Missile not even created
 
-            float dist = OwnSpellData.MissileSpeed/1000f*extraTime;
+            float dist = OwnSpellData.MissileSpeed / 1000f * extraTime;
             if (dist > CurrentPosition.Distance(EndPosition))
                 dist = CurrentPosition.Distance(EndPosition);
 
@@ -255,7 +259,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 if (IsSafe())
                     return true;
 
-                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time)*1000;
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 

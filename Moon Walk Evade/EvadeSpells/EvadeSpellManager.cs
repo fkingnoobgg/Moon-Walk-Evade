@@ -125,8 +125,7 @@ namespace Moon_Walk_Evade.EvadeSpells
             });
             foreach (EvadeSpellData evadeSpell in evadeSpells)
             {
-                int dangerValue =
-                        EvadeMenu.MenuEvadeSpells.First(x => x.SpellName == evadeSpell.SpellName).DangerValue;
+                int dangerValue = EvadeMenu.MenuEvadeSpells.First(x => x.SpellName == evadeSpell.SpellName).DangerValue;
                 if (evadeInstance.GetDangerValue() < dangerValue)
                     continue;
 
@@ -137,14 +136,14 @@ namespace Moon_Walk_Evade.EvadeSpells
                 if (!isReady)
                     continue;
 
-                //dash
+                //dash or blink
                 if (evadeSpell.Range != 0)
                 {
                     var evadePos = GetBlinkCastPos(evadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
                     float castTime = evadeSpell.Delay;
                     if (TimeAvailable > castTime && !evadePos.IsZero && evadeInstance.IsPointSafe(evadePos))
                     {
-                        if (IsDashSafe(evadeSpell.Slot, evadePos, evadeInstance))
+                        if (IsDashSafe(evadeSpell.Slot, evadePos, evadeInstance) || evadeSpell.Speed >= short.MaxValue)
                         {
                             evadePointOut = evadePos;
                             CastEvadeSpell(evadeSpell, evadePos);
@@ -223,6 +222,13 @@ namespace Moon_Walk_Evade.EvadeSpells
             }
         }
 
+        /// <summary>
+        /// returns if a dash with limited speed is safe
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="endPos"></param>
+        /// <param name="evadeInstance"></param>
+        /// <returns></returns>
         public static bool IsDashSafe(SpellSlot slot, Vector2 endPos, MoonWalkEvade evadeInstance)
         {
             var evadeSpell =

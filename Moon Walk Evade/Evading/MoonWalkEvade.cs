@@ -84,7 +84,7 @@ namespace Moon_Walk_Evade.Evading
 
         public enum StutterSearchType
         {
-            MousePos, PlayerFaceDirection, FarestAway, 
+            MousePos, PlayerFaceDirection, FarestAway,
         }
         public StutterSearchType AntiStutterSearchType => (StutterSearchType)EvadeMenu.HumanizerMenu["stutterPointFindType"].Cast<Slider>().CurrentValue;
 
@@ -252,7 +252,7 @@ namespace Moon_Walk_Evade.Evading
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
 
-            if ((IsPathSafeEx(args.TargetPosition.To2D()) && !IsHeroInDanger()) || !IsHeroInDanger())
+            if (IsPathSafeEx(args.TargetPosition.To2D()))
             {
                 //Chat.Print(Environment.TickCount);
                 CurrentEvadeResult = null;
@@ -346,7 +346,7 @@ namespace Moon_Walk_Evade.Evading
                 var slot = (SpellSlot)i;
                 var evadeSpell = EvadeMenu.MenuEvadeSpells.FirstOrDefault(spell => spell.Slot == slot);
 
-                if (EvadeMenu.SpellBlockerMenu["block" + Player.Instance.ChampionName +"/" + slot].Cast<CheckBox>().CurrentValue
+                if (EvadeMenu.SpellBlockerMenu["block" + Player.Instance.ChampionName + "/" + slot].Cast<CheckBox>().CurrentValue
                     && EvadeMenu.IsEvadeSkillhotEnabled(evadeSpell))
                 {
                     WarnText.Color = Color.Red;
@@ -510,6 +510,9 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
+            var closestNormalPoint = points.Where(p => IsPathSafeEx(p, speed, delay)).OrderBy(x => x.Distance(Player.Instance)).FirstOrDefault();
+            points.AddRange(GetCloserEvadePoints(closestNormalPoint));
+
             return !awayFrom.HasValue ?
                 points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall()).ToList() :
                 points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWall() && p.Distance(awayFrom.Value) >= 225).OrderBy(
@@ -542,9 +545,23 @@ namespace Moon_Walk_Evade.Evading
             return !polPoints.Any() ? Vector2.Zero : polPoints.Last();
         }
 
+        public IOrderedEnumerable<Vector2> GetCloserEvadePoints(Vector2 closestNormalEvadePoint)
+        {
+            float closestNormalDistance = closestNormalEvadePoint.Distance(Player.Instance);
+            var polygons = ClippedPolygons.Where(p => p.IsInside(Player.Instance)).ToArray();
+
+            var polPoints =
+                polygons.Select(pol => pol.ToDetailedPolygon())
+                    .SelectMany(pol => pol.Points)
+                    .Where(p => p.Distance(Player.Instance) < closestNormalDistance)
+                    .OrderByDescending(p => p.Distance(Player.Instance));
+
+            return polPoints;
+        }
+
         public bool IsComfortPoint(Vector2 p) => !EntityManager.Heroes.Enemies.Any(x => x.IsValid && !x.IsDead && x.Distance(p) <= minComfortDistance);
         public bool DoesComfortPointExist(IEnumerable<Vector2> points) => points.Any(IsComfortPoint);
-        public bool HasToAttendComfort() => 
+        public bool HasToAttendComfort() =>
             EntityManager.Heroes.Enemies.Count(x => x.IsValid && !x.IsDead && x.Distance(Player.Instance) <= 1000) >= minEnemyComfortCount;
 
         public EvadeResult CalculateEvade(Vector2 anchor, bool outside = false)
@@ -563,7 +580,7 @@ namespace Moon_Walk_Evade.Evading
                 //    Chat.Print("<b><font size='30' color='#FFFFFF'>dt: " + (needed - time) + " for " + Skillshots[0] + "</font></b>");
                 if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
                 {
-                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade) {IsForced = ForceEvade};
+                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade) { IsForced = ForceEvade };
                 }
                 else //can use evade spell
                     CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
@@ -657,9 +674,9 @@ namespace Moon_Walk_Evade.Evading
                 // extra moonWalkEvadeInstance range
                 if (moonWalkEvadeInstance.ExtraEvadeRange > 0)
                 {
-                    ExtraRange = (moonWalkEvadeInstance.RandomizeExtraEvadeRange
+                    ExtraRange = moonWalkEvadeInstance.RandomizeExtraEvadeRange
                         ? Utils.Utils.Random.Next(moonWalkEvadeInstance.ExtraEvadeRange / 3, moonWalkEvadeInstance.ExtraEvadeRange)
-                        : moonWalkEvadeInstance.ExtraEvadeRange);
+                        : moonWalkEvadeInstance.ExtraEvadeRange;
                 }
             }
 

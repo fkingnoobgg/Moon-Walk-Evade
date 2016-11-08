@@ -316,7 +316,7 @@ namespace Moon_Walk_Evade.Utils
 
             if (drawStartLine)
             {
-                Line.DrawLine(Color.LawnGreen, lineWidth,
+                Line.DrawLine(Color.CornflowerBlue, 4,
                     (d1 + direction * (halfWidth + Player.Instance.BoundingRadius)).To3DPlayer(),
                     (d1 + direction * -(halfWidth + Player.Instance.BoundingRadius)).To3DPlayer());
             }
