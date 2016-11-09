@@ -53,7 +53,7 @@ namespace Moon_Walk_Evade.EvadeSpells
         public bool isItem = false;
         public ItemId itemID = 0;
         public CastType CastType = CastType.Position;
-        public SpellTargets[] spellTargets = { };
+        public SpellTargets[] SpellTargets = { };
         public UseSpellFunc useSpellFunc = null;
         public bool isSpecial = false;
         public bool untargetable = false;

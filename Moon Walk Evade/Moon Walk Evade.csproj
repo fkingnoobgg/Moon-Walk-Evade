@@ -78,8 +78,10 @@
     <Compile Include="Skillshots\SkillshotTypes\LinearSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\LuxR.cs" />
     <Compile Include="Skillshots\SkillshotTypes\MultiCircleSkillshot.cs" />
+    <Compile Include="Skillshots\SkillshotTypes\TwitchW.cs" />
     <Compile Include="Skillshots\SkillshotTypes\VeigarE.cs" />
     <Compile Include="Skillshots\SkillshotTypes\YasuoQ.cs" />
+    <Compile Include="Skillshots\SkillshotTypes\ZileanQ.cs" />
     <Compile Include="Skillshots\SpellData.cs" />
     <Compile Include="Skillshots\SpellDetector.cs" />
     <Compile Include="Utils\Debug.cs" />

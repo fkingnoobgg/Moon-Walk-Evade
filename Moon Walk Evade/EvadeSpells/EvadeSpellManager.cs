@@ -123,8 +123,9 @@ namespace Moon_Walk_Evade.EvadeSpells
                 // ReSharper disable once MergeConditionalExpression
                 return item != null ? item.Cast<CheckBox>().CurrentValue : false;
             });
-            foreach (EvadeSpellData evadeSpell in evadeSpells)
+            foreach (EvadeSpellData _evadeSpell in evadeSpells)
             {
+                var evadeSpell = _evadeSpell;
                 int dangerValue = EvadeMenu.MenuEvadeSpells.First(x => x.SpellName == evadeSpell.SpellName).DangerValue;
                 if (evadeInstance.GetDangerValue() < dangerValue)
                     continue;
@@ -136,9 +137,16 @@ namespace Moon_Walk_Evade.EvadeSpells
                 if (!isReady)
                     continue;
 
-                //dash or blink
-                if (evadeSpell.Range != 0)
+                if (evadeSpell.EvadeType == EvadeType.Dash || evadeSpell.EvadeType == EvadeType.Blink)
                 {
+                    /*check if ekko E2*/
+                    if (Player.Instance.ChampionName == "Ekko" &&
+                        Player.Instance.Spellbook.GetSpell(evadeSpell.Slot).Name.Contains("Two"))//todo: find out ekko E2 name
+                    {
+                        evadeSpell = EvadeSpellDatabase.Spells.First(spell => spell.SpellName == "EkkoEAttack");
+                        goto jump;
+                    }
+
                     var evadePos = GetBlinkCastPos(evadeInstance, Player.Instance.Position.To2D(), evadeSpell.Range);
                     float castTime = evadeSpell.Delay;
                     if (TimeAvailable > castTime && !evadePos.IsZero && evadeInstance.IsPointSafe(evadePos))
@@ -151,6 +159,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                         }
                     }
                 }
+                jump:
 
                 if (evadeSpell.Slot == SpellSlot.Unknown && evadeSpell.isItem)
                 {
@@ -189,6 +198,11 @@ namespace Moon_Walk_Evade.EvadeSpells
                     return true;
                 }
 
+                if (evadeSpell.CastType == CastType.Target)
+                {
+                    
+                }
+
             }
 
             return false;
@@ -223,7 +237,7 @@ namespace Moon_Walk_Evade.EvadeSpells
         }
 
         /// <summary>
-        /// returns if a dash with limited speed is safe
+        /// returns if a dash or a blink is safe
         /// </summary>
         /// <returns></returns>
         public static bool IsDashSafe(EvadeSpellData evadeSpellData, Vector2 endPos, MoonWalkEvade evadeInstance)

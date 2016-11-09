@@ -133,8 +133,7 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            //if (sender is AIHeroClient && ((AIHeroClient)sender).ChampionName.Contains("tu")
-            //     && !args.IsAutoAttack())
+            //if (sender is AIHeroClient)
             //    Chat.Print(args.SData.Name);
 
             if (!EnableSpellDetection)
@@ -170,8 +169,8 @@ namespace Moon_Walk_Evade.Skillshots
             //bool isMis = sender.Type == GameObjectType.MissileClient &&
             //             !Utils.Utils.GetGameObjectName(sender).Contains("SRU") && !Utils.Utils.GetGameObjectName(sender).Contains("HA");
             //if (isMis)
-            //if (!Utils.Utils.GetGameObjectName(sender).Contains("SRU"))
-            //    Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
+            //    if (!Utils.Utils.GetGameObjectName(sender).Contains("SRU"))
+            //        Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))
             {

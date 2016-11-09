@@ -154,7 +154,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.Recall,
                 EvadeType = EvadeType.Blink,
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions },
+                SpellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions },
                 isSpecial = true
             });
 
@@ -261,7 +261,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.Q,
                 EvadeType = EvadeType.Dash,
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.EnemyMinions, SpellTargets.EnemyChampions }
+                SpellTargets = new[] { SpellTargets.EnemyMinions, SpellTargets.EnemyChampions }
             });
 
             Spells.Add(
@@ -406,7 +406,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.E,
                 speedArray = new[] { 40f, 45f, 50f, 55f, 60f },
                 EvadeType = EvadeType.MovementSpeedBuff,
-                CastType = CastType.Target
+                CastType = CastType.Self
             });
 
             #endregion
@@ -443,7 +443,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.E,
                 EvadeType = EvadeType.Blink, //behind target
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.Targetables }
+                SpellTargets = new[] { SpellTargets.Targetables }
             });
 
             #endregion
@@ -461,7 +461,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.W,
                 speedArray = new[] { 18f, 21f, 24f, 27f, 30f },
                 EvadeType = EvadeType.MovementSpeedBuff,
-                CastType = CastType.Target
+                CastType = CastType.Self
             });
 
             Spells.Add(
@@ -474,8 +474,8 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Delay = 250,
                 Slot = SpellSlot.R,
                 EvadeType = EvadeType.SpellShield, //Invulnerability
-                CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.AllyChampions }
+                CastType = CastType.Self,
+                SpellTargets = new[] { SpellTargets.AllyChampions }
             });
 
             #endregion
@@ -568,7 +568,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.W,
                 EvadeType = EvadeType.Dash,
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.AllyChampions, SpellTargets.AllyMinions }
+                SpellTargets = new[] { SpellTargets.AllyChampions, SpellTargets.AllyMinions }
             });
 
             #endregion
@@ -605,7 +605,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.W,
                 speedArray = new[] { 30f, 30f, 30f, 35f, 40f },
                 EvadeType = EvadeType.MovementSpeedBuff,
-                CastType = CastType.Target
+                CastType = CastType.Self
             });
 
             #endregion
@@ -625,7 +625,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.Q,
                 EvadeType = EvadeType.Blink,
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions },
+                SpellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions },
                 untargetable = true
             });
 
@@ -643,8 +643,8 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Delay = 50,
                 Slot = SpellSlot.E,
                 EvadeType = EvadeType.SpellShield,
-                CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.AllyChampions }
+                CastType = CastType.Self,
+                SpellTargets = new[] { SpellTargets.AllyChampions }
             });
 
             #endregion
@@ -679,7 +679,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.W,
                 speedArray = new[] { 8f, 9f, 10f, 11f, 12f },
                 EvadeType = EvadeType.MovementSpeedBuff,
-                CastType = CastType.Target
+                CastType = CastType.Self
             });
 
             #endregion
@@ -910,7 +910,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.E,
                 EvadeType = EvadeType.Blink, //behind target
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions }
+                SpellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions }
             });
 
 
@@ -1057,7 +1057,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.E,
                 EvadeType = EvadeType.Dash,
                 CastType = CastType.Target,
-                spellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions }
+                SpellTargets = new[] { SpellTargets.EnemyChampions, SpellTargets.EnemyMinions }
             });
 
             //Spells.Add(
@@ -1076,7 +1076,7 @@ namespace Moon_Walk_Evade.EvadeSpells
 
             #endregion
 
-            #region Zillean
+            #region Zilean
 
             Spells.Add(
             new EvadeSpellData
@@ -1089,7 +1089,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                 Slot = SpellSlot.E,
                 speedArray = new[] { 40f, 55f, 70f, 85f, 99f },
                 EvadeType = EvadeType.MovementSpeedBuff,
-                CastType = CastType.Target
+                CastType = CastType.Self
             });
 
             #endregion

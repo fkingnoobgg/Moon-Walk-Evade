@@ -13,7 +13,7 @@ namespace Moon_Walk_Evade
 {
     internal static class Program
     {
-        public static bool DeveloperMode = false;
+        public static bool DeveloperMode = true;
 
         private static SpellDetector _spellDetector;
         private static Sprite introImg;
@@ -43,6 +43,7 @@ namespace Moon_Walk_Evade
                     }, 7000);
                 }, 2000);
             };
+            
         }
 
         private static int drawTick;

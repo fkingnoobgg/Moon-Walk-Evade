@@ -252,6 +252,23 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "Emperor's Divide",
+                        ChampionName = "Azir",
+                        //SpellName = "AzirR",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 500,
+                        Radius = 100,
+                        MissileSpeed = 2000,
+                        DangerValue = 4,
+                        ObjectCreationName = "AzirSoldierRMissile",
+                        IsDangerous = true,
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Cosmic Binding",
                         ChampionName = "Bard",
                         SpellName = "BardQ",
@@ -1936,6 +1953,23 @@ namespace Moon_Walk_Evade.Skillshots
                 {
                     OwnSpellData = new SpellData
                     {
+                        DisplayName = "Wild Growth",
+                        ChampionName = "Lulu",
+                        SpellName = "LuluR",
+                        Slot = SpellSlot.R,
+                        Delay = 150,
+                        Range = 900,
+                        Radius = 375,
+                        MissileSpeed = float.MaxValue,
+                        DangerValue = 4,
+                        IsDangerous = true,
+                        EnabledByDefault = false
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
                         DisplayName = "Lucent Singularity",
                         ChampionName = "Lux",
                         SpellName = "LuxLightStrikeKugel",
@@ -2767,7 +2801,7 @@ namespace Moon_Walk_Evade.Skillshots
                     {
                         DisplayName = "Wild Cards",
                         ChampionName = "TwistedFate",
-                        SpellName = "disabled/WildCards",
+                        SpellName = "WildCards",
                         Slot = SpellSlot.Q,
                         Delay = 250,
                         Range = 1450,
@@ -2776,6 +2810,39 @@ namespace Moon_Walk_Evade.Skillshots
                         DangerValue = 2,
                         IsDangerous = false,
                         ObjectCreationName = "SealFateMissile"
+                    }
+                },
+                new TwitchW
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Venom",
+                        ChampionName = "Twitch",
+                        SpellName = "TwitchVenom",
+                        Slot = SpellSlot.W,
+                        Delay = 250,
+                        Range = 900,
+                        Radius = 280,
+                        MissileSpeed = 2300,
+                        DangerValue = 2,
+                        ObjectCreationName = "TwitchVenomCaskMissile"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        DisplayName = "Spray Attack",
+                        ChampionName = "Twitch",
+                        SpellName = "TwitchSprayAndPrayAttack",
+                        Slot = SpellSlot.R,
+                        Delay = 250,
+                        Range = 1100,
+                        Radius = 65,
+                        MissileSpeed = 4000,
+                        DangerValue = 3,
+                        IsDangerous = false,
+                        ObjectCreationName = "TwitchSprayAndPrayAttack",
                     }
                 },
                 new LinearSkillshot
@@ -3427,7 +3494,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "ZiggsR"
                     }
                 },
-                new CircularSkillshot
+                new ZileanQ
                 {
                     OwnSpellData = new SpellData
                     {
@@ -3442,7 +3509,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 2000,
                         DangerValue = 2,
                         IsDangerous = false,
-                        ObjectCreationName = "ZileanQ"
+                        ObjectCreationName = "ZileanQMissile"
                     }
                 },
                 new LinearSkillshot

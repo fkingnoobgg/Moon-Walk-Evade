@@ -29,7 +29,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public Vector3 FixedStartPosition { get; set; }
 
-        public Vector3 FixedEndPosition { get; set; }
+        public virtual Vector3 FixedEndPosition { get; set; }
 
         public MissileClient Missile => SpawnObject as MissileClient;
 
