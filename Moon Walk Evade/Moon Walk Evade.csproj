@@ -75,6 +75,7 @@
     <Compile Include="Skillshots\SkillshotTypes\AsheW.cs" />
     <Compile Include="Skillshots\SkillshotTypes\CircularSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\ConeSkillshot.cs" />
+    <Compile Include="Skillshots\SkillshotTypes\GlobalUlt.cs" />
     <Compile Include="Skillshots\SkillshotTypes\LinearSkillshot.cs" />
     <Compile Include="Skillshots\SkillshotTypes\LuxR.cs" />
     <Compile Include="Skillshots\SkillshotTypes\MultiCircleSkillshot.cs" />

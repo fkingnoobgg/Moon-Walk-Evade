@@ -199,7 +199,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "InfernalGuardian"
                     }
                 },
-                new LinearSkillshot
+                new GlobalUlt
                 {
                     OwnSpellData = new SpellData
                     {
@@ -362,10 +362,9 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Brand",
                         SpellName = "BrandW",
                         Slot = SpellSlot.W,
-                        Delay = 400,
-                        ExtraExistingTime = 200,
+                        Delay = 850,
                         Range = 1100,
-                        Radius = 250,
+                        Radius = 260,
                         MissileSpeed = 0,
                         DangerValue = 2,
                         IsDangerous = false,
@@ -656,7 +655,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                new LinearSkillshot
+                new GlobalUlt
                 {
                     OwnSpellData = new SpellData
                     {
@@ -813,7 +812,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                new LinearSkillshot
+                new GlobalUlt
                 {
                     OwnSpellData = new SpellData
                     {
@@ -889,7 +888,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Ezreal",
                         SpellName = "EzrealEssenceFlux",
                         Slot = SpellSlot.W,
-                        Delay = 250,
+                        Delay = 300,
                         Range = 1050,
                         Radius = 80,
                         MissileSpeed = 1600,
@@ -1480,7 +1479,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                new LinearSkillshot
+                new GlobalUlt
                 {
                     OwnSpellData = new SpellData
                     {
@@ -1906,12 +1905,12 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "LucianQ",
                         Slot = SpellSlot.Q,
                         Delay = 250,
-                        Range = 1140,
+                        Range = 1300,
                         Radius = 65,
-                        MissileSpeed = 0,
+                        MissileSpeed = float.MaxValue,
                         DangerValue = 2,
                         IsDangerous = false,
-                        ObjectCreationName = "LucianQ",
+                        //ObjectCreationName = "LucianQ",
                         AddHitbox = true
                     }
                 },
@@ -1974,9 +1973,9 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Lux",
                         SpellName = "LuxLightStrikeKugel",
                         Slot = SpellSlot.E,
-                        Delay = 250,
+                        Delay = 850,
                         Range = 1100,
-                        Radius = 275,
+                        Radius = 320,
                         MissileSpeed = 1400,
                         DangerValue = 2,
                         IsDangerous = false,

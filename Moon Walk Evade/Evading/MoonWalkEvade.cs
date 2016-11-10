@@ -165,7 +165,7 @@ namespace Moon_Walk_Evade.Evading
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
-                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer + Game.Ping))
+                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer))
                 {
                     CurrentEvadeResult = null;
                 }
@@ -187,21 +187,6 @@ namespace Moon_Walk_Evade.Evading
             EvadeMenu.MainMenu["serverTimeBuffer"].Cast<Slider>().DisplayName = EvadeMenu.bufferString;
 
             CheckEvade();
-
-            if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
-            {
-                if (CurrentEvadeResult.ShouldPreventStuttering)
-                {
-                    var newPoints = GetEvadePoints(CurrentEvadeResult.WalkPoint.To2D());
-                    var point = newPoints.FirstOrDefault();
-                    if (point != default(Vector2))
-                    {
-                        CurrentEvadeResult.EvadePoint = point;
-                    }
-                }
-
-                MoveTo(CurrentEvadeResult.WalkPoint, false);
-            }
         }
 
         /// <summary>
@@ -229,6 +214,27 @@ namespace Moon_Walk_Evade.Evading
                     evade.IsOutsideEvade = oustside;
                     CurrentEvadeResult = evade;
                 }
+            }
+
+            if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
+            {
+                if (CurrentEvadeResult.ShouldPreventStuttering)
+                {
+                    var newPoints = GetEvadePoints(CurrentEvadeResult.WalkPoint.To2D());
+                    var point = newPoints.FirstOrDefault();
+                    if (point != default(Vector2))
+                    {
+                        CurrentEvadeResult.EvadePoint = point;
+                    }
+                }
+
+                //var evadePoints = GetEvadePoints();
+                //if (evadePoints.Any(p => p.Distance(Game.CursorPos) < CurrentEvadeResult.WalkPoint.Distance(Game.CursorPos) && p.Distance(Player.Instance) >= 225))
+                //{
+                //    CurrentEvadeResult.EvadePoint = evadePoints.OrderBy(p => p.Distance(Game.CursorPos)).First(p => p.Distance(Player.Instance) >= 225);
+                //}
+
+                MoveTo(CurrentEvadeResult.WalkPoint, false);
             }
         }
 
@@ -437,9 +443,11 @@ namespace Moon_Walk_Evade.Evading
         {
             return Skillshots.All(evadeSkillshot =>
             {
-                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer + Game.Ping, speed, delay);
+                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
                 //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
                 //    if (!safe)
+                //(Skillshots[0] as CircularSkillshot).IsSafePathTest(
+                //    new[] {Player.Instance.Position.To2D(), GetClosestEvadePoint(Player.Instance.Position.To2D())});
                 return safe;
             });
         }

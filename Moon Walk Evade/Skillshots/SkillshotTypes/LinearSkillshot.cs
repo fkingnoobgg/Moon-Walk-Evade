@@ -32,7 +32,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public MissileClient Missile => OwnSpellData.IsPerpendicular ? null : SpawnObject as MissileClient;
 
-        public Vector3 CurrentPosition
+        public virtual Vector3 CurrentPosition
         {
             get
             {
@@ -60,7 +60,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
         }
 
-        public Vector3 EndPosition
+        public virtual Vector3 EndPosition
         {
             get
             {
@@ -264,6 +264,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
             timeOffset += Game.Ping;
+            int earlierReachTime = 310;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
@@ -284,7 +285,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 if (intersection.Intersects)
                 {
                     segmentIntersections.Add(
-                        new FoundIntersection(intersection.Point.Distance(from), (int)(intersection.Point.Distance(from) * 1000 / speed) + delay,
+                        new FoundIntersection(intersection.Point.Distance(from), 
+                        (int)(intersection.Point.Distance(from) * 1000 / speed) + delay - earlierReachTime,
                             intersection.Point, from));
                 }
             }
@@ -363,7 +365,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             {
                 return IsSafe();
             }
-            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+            var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount + earlierReachTime;
 
             var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
 

@@ -218,7 +218,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
             if (path.Any(p => !IsSafe(p)) && IsSafe(Player.Instance.Position.To2D()))
+            {
                 return false;
+            }
 
             if (path.Length <= 1) //lastissue = playerpos
             {
@@ -233,42 +235,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
             timeOffset += Game.Ping;
+            int earlierReachTime = 310;
+            speed = speed == -1 ? (int)Player.Instance.MoveSpeed : speed;
 
-            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+            var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount + earlierReachTime;
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
 
-
-            var allIntersections = new List<FoundIntersection>();
-            var segmentIntersections = new List<FoundIntersection>();
-
-            foreach (var intersection in Utils.Utils.GetLineCircleIntersectionPoints(FixedEndPosition.To2D(), OwnSpellData.Radius, path[0], path[1]))
-            {
-                segmentIntersections.Add(new FoundIntersection(
-                        intersection.Distance(path[0]),
-                        (int)(intersection.Distance(path[0]) * 1000 / speed + delay),
-                        intersection, path[0]));
-            }
-
-            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-            allIntersections.AddRange(sortedList);
-
-            //No Missile
-            if (allIntersections.Count == 0)
-            {
-                return IsSafe();
-            }
-
-            var timeToExplode = Environment.TickCount - TimeDetected + OwnSpellData.Delay;
-
-            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
-
-            if (!IsSafe(myPositionWhenExplodes))
-            {
-                return false;
-            }
-
-            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
-
-            return IsSafe(myPositionWhenExplodesWithOffset);
+            return IsSafe(myPositionWhenExplodes);
         }
     }
 }
