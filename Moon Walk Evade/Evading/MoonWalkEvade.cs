@@ -564,9 +564,9 @@ namespace Moon_Walk_Evade.Evading
                     var missilePosOnExit = s.GetMissilePosition(exitIntersection.Time + timeOffset);
                     bool safe = missilePosOnExit.Distance(s.FixedEndPosition) >
                                 exitIntersectionProjection.Distance(s.FixedEndPosition);
-                    if (!safe)
-                        Chat.Print("<b><font size='20' color='#FFFFFF'TimeNeeded:" + missilePosOnExit.Distance(exitIntersectionProjection)/speed*1000 
-                            + "</font></b>");
+                    //if (!safe)
+                    //    Chat.Print("<b><font size='20' color='#FFFFFF'TimeNeeded:" + missilePosOnExit.Distance(exitIntersectionProjection)/speed*1000 
+                    //        + "</font></b>");
                     return safe;
                 }
             }
