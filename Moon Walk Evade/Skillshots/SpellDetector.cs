@@ -169,7 +169,7 @@ namespace Moon_Walk_Evade.Skillshots
             //bool isMis = sender.Type == GameObjectType.MissileClient &&
             //             !Utils.Utils.GetGameObjectName(sender).Contains("SRU") && !Utils.Utils.GetGameObjectName(sender).Contains("HA");
             //if (isMis)
-            //    if (!Utils.Utils.GetGameObjectName(sender).Contains("SRU"))
+            //    if (!Utils.Utils.GetGameObjectName(sender).Contains("SRU") && Utils.Utils.GetGameObjectName(sender).Contains("Zyra"))
             //        Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))

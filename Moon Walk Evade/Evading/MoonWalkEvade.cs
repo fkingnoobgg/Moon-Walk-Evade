@@ -90,8 +90,6 @@ namespace Moon_Walk_Evade.Evading
 
         public bool manageOrbwalker => EvadeMenu.DebugMenu["manageMovementDelay"].Cast<CheckBox>().CurrentValue;
 
-        public bool ForceEvade => EvadeMenu.MainMenu["forceEvade"].Cast<CheckBox>().CurrentValue;
-
         public int minComfortDistance => EvadeMenu.MainMenu["minComfortDistance"].Cast<Slider>().CurrentValue;
         public int minEnemyComfortCount => EvadeMenu.MainMenu["enemyComfortCount"].Cast<Slider>().CurrentValue;
 
@@ -565,7 +563,7 @@ namespace Moon_Walk_Evade.Evading
                     bool safe = missilePosOnExit.Distance(s.FixedEndPosition) >
                                 exitIntersectionProjection.Distance(s.FixedEndPosition);
                     //if (!safe)
-                    //    Chat.Print("<b><font size='20' color='#FFFFFF'TimeNeeded:" + missilePosOnExit.Distance(exitIntersectionProjection)/speed*1000 
+                    //    Chat.Print("<b><font size='20' color='#FFFFFF'TimeNeeded:" + missilePosOnExit.Distance(exitIntersectionProjection) / speed * 1000
                     //        + "</font></b>");
                     return safe;
                 }
@@ -687,7 +685,7 @@ namespace Moon_Walk_Evade.Evading
                 //    Chat.Print("<b><font size='30' color='#FFFFFF'>dt: " + (needed - time) + " for " + Skillshots[0] + "</font></b>");
                 if (!EvadeSpellManager.TryEvadeSpell(time, this, out evadeSpellEvadePoint))
                 {
-                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade) { IsForced = ForceEvade };
+                    return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, true) { IsForced = false };
                 }
                 else //can use evade spell
                     CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
@@ -722,6 +720,7 @@ namespace Moon_Walk_Evade.Evading
         public class EvadeResult
         {
             private MoonWalkEvade moonWalkEvadeInstance;
+            private bool _enoughTime;
 
 
             public bool IsOutsideEvade { get; set; }
@@ -739,7 +738,18 @@ namespace Moon_Walk_Evade.Evading
             public Vector2 AnchorPoint { get; set; }
             public int TimeAvailable { get; set; }
             public int TotalTimeAvailable { get; set; }
-            public bool EnoughTime { get; set; }
+
+            public bool EnoughTime
+            {
+                get
+                {
+                    if (IsOutsideEvade)
+                        return true;
+
+                    return _enoughTime;
+                }
+                set { _enoughTime = value; }
+            }
 
             public bool IsForced { get; set; }
 

@@ -3502,7 +3502,7 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "ZileanQ",
                         Slot = SpellSlot.Q,
                         Delay = 250 + 450,
-                        ExtraExistingTime = 3500,
+                        //ExtraExistingTime = 3500,
                         Range = 900,
                         Radius = 140,
                         MissileSpeed = 2000,
@@ -3525,7 +3525,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 1150,
                         DangerValue = 3,
                         IsDangerous = true,
-                        ObjectCreationName = "ZyraEMissile",
+                        ObjectCreationName = "ZyraE",
                     }
                 },
                 new LinearSkillshot
