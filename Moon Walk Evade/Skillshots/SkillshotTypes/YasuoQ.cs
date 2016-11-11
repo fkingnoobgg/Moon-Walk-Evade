@@ -13,8 +13,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override void OnSpellDetection(Obj_AI_Base sender)
         {
-            FixedStartPos = Caster.ServerPosition;
-            FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, -OwnSpellData.Range);
+            FixedStartPosition = Caster.ServerPosition;
+            FixedEndPosition = FixedStartPosition.ExtendVector3(CastArgs.End, -OwnSpellData.Range);
         }
     }
 }

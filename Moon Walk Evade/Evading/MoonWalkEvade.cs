@@ -165,7 +165,7 @@ namespace Moon_Walk_Evade.Evading
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
-                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer))
+                if (!IsSafePathForSkillshot(skillshot, Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer))
                 {
                     CurrentEvadeResult = null;
                 }
@@ -203,7 +203,7 @@ namespace Moon_Walk_Evade.Evading
 
             CacheSkillshots();
 
-            bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
+            bool goodPath = IsPathSafe(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
             if (!goodPath && CurrentEvadeResult == null)
             {
                 bool oustside = !IsHeroInDanger();
@@ -258,7 +258,7 @@ namespace Moon_Walk_Evade.Evading
                 LastIssueOrderPos = (args.Target?.Position ?? args.TargetPosition).To2D();
             }
 
-            if (IsPathSafeEx(args.TargetPosition.To2D()))
+            if (IsPathSafe(args.TargetPosition.To2D()))
             {
                 //Chat.Print(Environment.TickCount);
                 CurrentEvadeResult = null;
@@ -439,54 +439,153 @@ namespace Moon_Walk_Evade.Evading
             return values.Any() ? values.First() : 0;
         }
 
-        public bool IsPathSafeEx(Vector2[] path, int speed = -1, int delay = 0)
+        public struct FoundIntersection
         {
-            return Skillshots.All(evadeSkillshot =>
+            public float Distance;
+            public Vector2 Point;
+            public int Time;
+
+            public FoundIntersection(float distance, int time, Vector2 point, Vector2 comingFrom)
             {
-                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
-                //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
-                //    if (!safe)
-                //(Skillshots[0] as CircularSkillshot).IsSafePathTest(
-                //    new[] {Player.Instance.Position.To2D(), GetClosestEvadePoint(Player.Instance.Position.To2D())});
-                return safe;
-            });
+                Distance = distance;
+                Point = point;
+                Time = time;
+            }
         }
 
-        public bool IsPathSafeEx(Vector2 end, float speed = -1, float delay = 0)
+        public bool IsPathSafe(Vector2[] path, int speed = -1, int delay = 0)
         {
-            return IsPathSafeEx(Player.Instance.GetPath(end.To3D()).ToVector2(), (int)speed, (int)delay);
+            return Skillshots.All(s => IsSafePathForSkillshot(s, path, ServerTimeBuffer, speed, delay));
         }
 
-        public Vector2 GetClosestEvadePoint2(float speed = -1, float delay = 0)
+        public bool IsSafePathForSkillshot(EvadeSkillshot s, Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
-            speed = speed == -1 ? Player.Instance.MoveSpeed : speed;
-
-            int posChecked = 0;
-            const int maxPosToCheck = 150;
-            const int posRadius = 50;
-            int radiusIndex = 0;
-            var heroPoint = Player.Instance.Position;
-
-            var points = new List<Vector2>();
-
-            while (posChecked < maxPosToCheck)
+            if (path.Length <= 1) //lastissue = playerpos
             {
-                radiusIndex++;
+                if (!Player.Instance.IsRecalling())
+                    return s.IsSafe();
 
-                int curRadius = radiusIndex * 2 * posRadius;
-                int curCircleChecks = (int)Math.Ceiling(2 * Math.PI * curRadius / (2 * (double)posRadius));
+                if (s.IsSafe())
+                    return true;
 
-                for (int i = 1; i < curCircleChecks; i++)
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
+                return s.GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
+
+            timeOffset += Game.Ping / 2;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+            var allIntersections = new List<FoundIntersection>();
+            var segmentIntersections = new List<FoundIntersection>();
+            var polygon = s.ToPolygon();
+
+            var from = path[0];
+            var to = path[1];
+
+            for (var j = 0; j <= polygon.Points.Count - 1; j++)
+            {
+                var sideStart = polygon.Points[j];
+                var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
+
+                var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                if (intersection.Intersects)
                 {
-                    posChecked++;
-                    var cRadians = 2 * Math.PI / (curCircleChecks - 1) * i; //check decimals
-                    var pos = new Vector2((float)Math.Floor(heroPoint.X + curRadius * Math.Cos(cRadians)), (float)Math.Floor(heroPoint.Y + curRadius * Math.Sin(cRadians)));
-
-                    points.Add(pos);
+                    segmentIntersections.Add(
+                        new FoundIntersection(intersection.Point.Distance(from),
+                        (int)(intersection.Point.Distance(from) * 1000 / speed) + delay,
+                            intersection.Point, from));
                 }
             }
 
-            return points.Where(IsPointSafe).OrderBy(x => x.Distance(Player.Instance)).First();
+            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+            allIntersections.AddRange(sortedList);
+
+            //Skillshot with missile.
+            if (s.SpawnObject != null)
+            {
+                var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                var MissileStartPosition = debug ? Debug.GlobalStartPos.To2D() : s.FixedStartPosition.To2D();
+                //Outside the skillshot
+                if (s.IsSafe())
+                {
+                    //No intersections -> Safe
+                    if (allIntersections.Count == 0)
+                    {
+                        return true;
+                    }
+
+                    for (var i = 0; i <= allIntersections.Count - 1; i = i + 2)
+                    {
+                        var enterIntersection = allIntersections[i];
+                        var enterIntersectionProjection = enterIntersection.Point.ProjectOn(MissileStartPosition, s.FixedEndPosition.To2D()).SegmentPoint;
+
+                        //Intersection with no exit point.
+                        if (i == allIntersections.Count - 1)
+                        {
+                            var missilePositionOnIntersection = s.GetMissilePosition(enterIntersection.Time + timeOffset);
+                            bool safe = s.FixedEndPosition.Distance(missilePositionOnIntersection) <
+                                        s.FixedEndPosition.Distance(enterIntersectionProjection);
+                            return safe;
+                        }
+
+                        var exitIntersection = allIntersections[i + 1];
+                        var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, s.FixedEndPosition.To2D()).SegmentPoint;
+
+                        var missilePosOnEnter = s.GetMissilePosition(enterIntersection.Time - timeOffset);
+                        var missilePosOnExit = s.GetMissilePosition(exitIntersection.Time + timeOffset);
+
+                        //Missile didnt pass.
+                        if (missilePosOnEnter.Distance(s.FixedEndPosition) > enterIntersectionProjection.Distance(s.FixedEndPosition))
+                        {
+                            if (missilePosOnExit.Distance(s.FixedEndPosition) < exitIntersectionProjection.Distance(s.FixedEndPosition))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+
+                //Inside the skillshot.
+                if (allIntersections.Count == 0)
+                {
+                    return false;
+                }
+
+                if (allIntersections.Count > 0)
+                {
+                    //Check only for the exit point
+                    var exitIntersection = allIntersections[0];
+                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, s.FixedEndPosition.To2D()).SegmentPoint;
+
+                    var missilePosOnExit = s.GetMissilePosition(exitIntersection.Time + timeOffset);
+                    bool safe = missilePosOnExit.Distance(s.FixedEndPosition) >
+                                exitIntersectionProjection.Distance(s.FixedEndPosition);
+                    if (!safe)
+                        Chat.Print("<b><font size='20' color='#FFFFFF'TimeNeeded:" + missilePosOnExit.Distance(exitIntersectionProjection)/speed*1000 
+                            + "</font></b>");
+                    return safe;
+                }
+            }
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return s.IsSafe();
+            }
+            var timeToExplode = s.TimeDetected + s.OwnSpellData.Delay - Environment.TickCount;
+
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
+
+            return s.IsSafe(myPositionWhenExplodes);
+        }
+
+        public bool IsPathSafe(Vector2 end, float speed = -1, float delay = 0)
+        {
+            return IsPathSafe(Player.Instance.GetPath(end.To3D()).ToVector2(), (int)speed, (int)delay);
         }
 
         public List<Vector2> GetEvadePoints(Vector2? awayFrom = null, float speed = -1, float delay = 0)
@@ -518,12 +617,12 @@ namespace Moon_Walk_Evade.Evading
                 }
             }
 
-            var closestNormalPoint = points.Where(p => IsPathSafeEx(p, speed, delay)).OrderBy(x => x.Distance(Player.Instance)).FirstOrDefault();
+            var closestNormalPoint = points.Where(p => IsPathSafe(p, speed, delay)).OrderBy(x => x.Distance(Player.Instance)).FirstOrDefault();
             points.AddRange(GetCloserEvadePoints(closestNormalPoint));
 
             return !awayFrom.HasValue ?
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer()).ToList() :
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer() && p.Distance(awayFrom.Value) >= 225).OrderBy(
+                points.Where(p => IsPathSafe(p, speed, delay) && !p.IsWallBetweenPlayer()).ToList() :
+                points.Where(p => IsPathSafe(p, speed, delay) && !p.IsWallBetweenPlayer() && p.Distance(awayFrom.Value) >= 225).OrderBy(
                 p =>
                 {
                     if (AntiStutterSearchType == StutterSearchType.PlayerFaceDirection)

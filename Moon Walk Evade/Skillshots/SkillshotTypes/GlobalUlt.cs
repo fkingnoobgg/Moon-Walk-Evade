@@ -19,8 +19,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new GlobalUlt
                 {
                     OwnSpellData = OwnSpellData,
-                    FixedStartPos = Debug.GlobalStartPos,
-                    FixedEndPos = Debug.GlobalEndPos,
+                    FixedStartPosition = Debug.GlobalStartPos,
+                    FixedEndPosition = Debug.GlobalEndPos,
                     IsValid = true,
                     IsActive = true,
                     TimeDetected = Environment.TickCount,

@@ -57,7 +57,7 @@ namespace Moon_Walk_Evade.Utils
         }
 
         private static List<Vector2> DrawList = new List<Vector2>();
-        private static List<Vector2> DrawLineList = new List<Vector2>();
+        private static Dictionary<Vector2, Vector2> DrawLineList = new Dictionary<Vector2, Vector2>();
         public static void AddDrawVector(this Vector3 v)
         {
             if (!DrawList.Contains(v.To2D()))
@@ -72,15 +72,36 @@ namespace Moon_Walk_Evade.Utils
                 Core.DelayAction(() => DrawList.Remove(v), time);
         }
 
-        public static void AddDrawLine(this Vector2 v, int time = 10000)
+        public static void AddDrawPerpLine(this Vector2 v, Vector2 endPosition, int spellradius, int time = 10000)
         {
-            var wtc = Drawing.WorldToScreen(v.To3D());
+            if (DrawLineList.Count >= 2)
+                return;
 
-            if (!DrawLineList.Contains(wtc))
-                DrawLineList.Add(wtc);
+            var halfWidth = spellradius;
+            var d1 = v;
+            var d2 = endPosition;
+            var direction = (d1 - d2).Perpendicular().Normalized();
+
+            var fromDraw = d1 + direction*(halfWidth + Player.Instance.BoundingRadius);
+            var toDraw = d1 + direction*-(halfWidth + Player.Instance.BoundingRadius);
+
+            if (!DrawLineList.ContainsKey(fromDraw))
+                DrawLineList.Add(fromDraw, toDraw);
 
             if (time != short.MaxValue)
-                Core.DelayAction(() => DrawLineList.Remove(wtc), time);
+                Core.DelayAction(() => DrawLineList.Remove(fromDraw), time);
+        }
+
+        public static void AddDrawLine(this Vector2 v, Vector2 endPosition, int time = 10000)
+        {
+            var fromDraw = v;
+            var toDraw = endPosition;
+
+            if (!DrawLineList.ContainsKey(fromDraw))
+                DrawLineList.Add(fromDraw, toDraw);
+
+            if (time != short.MaxValue)
+                Core.DelayAction(() => DrawLineList.Remove(fromDraw), time);
         }
 
         public static void Init(ref SpellDetector detector)
@@ -101,10 +122,12 @@ namespace Moon_Walk_Evade.Utils
                     new Circle { Color = System.Drawing.Color.BlueViolet, Radius = 50, BorderWidth = 20}.Draw(vector2.To3D());
                 }
 
-                if (DrawLineList.Count >= 5) DrawLineList.Clear();
-                foreach (var vector2 in DrawLineList)
+                if (DrawLineList.Count >= 10) DrawLineList.Clear();
+                int i = 0;
+                foreach (var pair in DrawLineList)
                 {
-                    Drawing.DrawLine(Player.Instance.Position.WorldToScreen(), vector2, 5, Color.Aqua);
+                    Line.DrawLine(Color.Red, 7, Drawing.WorldToScreen(pair.Key.To3D()), Drawing.WorldToScreen(pair.Value.To3D()));
+                    i++;
                 }
             };
             Game.OnUpdate += GameOnOnUpdate;

@@ -25,24 +25,25 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public Vector3 FixedStartPos;
-        public Vector3 FixedEndPos;
+        public override Vector3 FixedStartPosition { get; set; }
+        public override Vector3 FixedEndPosition { get; set; }
         private bool DoesCollide;
         private Vector2 LastCollisionPos;
 
         public MissileClient Missile => OwnSpellData.IsPerpendicular ? null : SpawnObject as MissileClient;
 
+        bool debugMode => EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
         public virtual Vector3 CurrentPosition
         {
             get
             {
-                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
+                
                 if (Missile == null)
                 {
                     if (debugMode)
                         return Debug.GlobalStartPos;
 
-                    return FixedStartPos;
+                    return FixedStartPosition;
                 }
 
                 if (debugMode)//Simulate Position
@@ -64,14 +65,12 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-
-                bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
                 if (debugMode)
                     return Debug.GlobalEndPos;
 
                 if (Missile == null)
                 {
-                    return FixedEndPos;
+                    return FixedEndPosition;
                 }
 
                 if (DoesCollide)
@@ -95,8 +94,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new LinearSkillshot
                 {
                     OwnSpellData = OwnSpellData,
-                    FixedStartPos = Debug.GlobalStartPos,
-                    FixedEndPos = Debug.GlobalEndPos,
+                    FixedStartPosition = Debug.GlobalStartPos,
+                    FixedEndPosition = Debug.GlobalEndPos,
                     IsValid = true,
                     IsActive = true,
                     TimeDetected = Environment.TickCount,
@@ -111,7 +110,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             var missile = obj as MissileClient;
 
-            bool debugMode = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
             if (SpawnObject == null && missile != null && !debugMode)
             {
                 if (missile.SData.Name == OwnSpellData.ObjectCreationName && missile.SpellCaster.Index == Caster.Index)
@@ -122,6 +120,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             if (missile != null) //missle
             {
+                FixedEndPosition = missile.EndPosition;
+                FixedStartPosition = missile.StartPosition;
+
                 Vector2 collision = this.GetCollisionPoint();
                 DoesCollide = !collision.IsZero;
                 var projection = collision.ProjectOn(missile.StartPosition.To2D(), missile.EndPosition.To2D());
@@ -134,17 +135,17 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             if (!OwnSpellData.IsPerpendicular)
             {
-                FixedStartPos = Caster.ServerPosition;
-                FixedEndPos = FixedStartPos.ExtendVector3(CastArgs.End, OwnSpellData.Range + 100);
+                FixedStartPosition = Caster.ServerPosition;
+                FixedEndPosition = FixedStartPosition.ExtendVector3(CastArgs.End, OwnSpellData.Range + 100);
             }
             else
             {
                 OwnSpellData.Direction = (CastArgs.End - CastArgs.Start).To2D().Normalized();
 
                 var direction = OwnSpellData.Direction;
-                FixedStartPos = (CastArgs.End.To2D() - direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
+                FixedStartPosition = (CastArgs.End.To2D() - direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
 
-                FixedEndPos = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
+                FixedEndPosition = (CastArgs.End.To2D() + direction.Perpendicular() * OwnSpellData.SecondaryRadius).To3D();
             }
         }
 
@@ -239,7 +240,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override Vector2 GetMissilePosition(int extraTime)
         {
             if (Missile == null)
-                return FixedStartPos.To2D();//Missile not even created
+                return FixedStartPosition.To2D();//Missile not even created
 
             float dist = OwnSpellData.MissileSpeed / 1000f * extraTime;
             if (dist > CurrentPosition.Distance(EndPosition))
@@ -247,129 +248,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
 
             return CurrentPosition.Extend(EndPosition, dist);
-        }
-
-        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
-        {
-            if (path.Length <= 1) //lastissue = playerpos
-            {
-                if (!Player.Instance.IsRecalling())
-                    return IsSafe();
-
-                if (IsSafe())
-                    return true;
-
-                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
-                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
-            }
-
-            timeOffset += Game.Ping;
-            int earlierReachTime = 310;
-
-            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
-
-            var allIntersections = new List<FoundIntersection>();
-            var segmentIntersections = new List<FoundIntersection>();
-            var polygon = ToPolygon();
-
-            var from = path[0];
-            var to = path[1];
-
-            for (var j = 0; j <= polygon.Points.Count - 1; j++)
-            {
-                var sideStart = polygon.Points[j];
-                var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
-
-                var intersection = from.Intersection(to, sideStart, sideEnd);
-
-                if (intersection.Intersects)
-                {
-                    segmentIntersections.Add(
-                        new FoundIntersection(intersection.Point.Distance(from), 
-                        (int)(intersection.Point.Distance(from) * 1000 / speed) + delay - earlierReachTime,
-                            intersection.Point, from));
-                }
-            }
-
-            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-            allIntersections.AddRange(sortedList);
-
-            //Skillshot with missile.
-            if (SpawnObject != null)
-            {
-                var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
-                var MissileStartPosition = debug ? Debug.GlobalStartPos.To2D() : Missile.StartPosition.To2D();
-                //Outside the skillshot
-                if (IsSafe())
-                {
-                    //No intersections -> Safe
-                    if (allIntersections.Count == 0)
-                    {
-                        return true;
-                    }
-
-                    for (var i = 0; i <= allIntersections.Count - 1; i = i + 2)
-                    {
-                        var enterIntersection = allIntersections[i];
-                        var enterIntersectionProjection = enterIntersection.Point.ProjectOn(MissileStartPosition, EndPosition.To2D()).SegmentPoint;
-
-                        //Intersection with no exit point.
-                        if (i == allIntersections.Count - 1)
-                        {
-                            var missilePositionOnIntersection = GetMissilePosition(enterIntersection.Time + timeOffset);
-                            bool safe = EndPosition.Distance(missilePositionOnIntersection) <
-                                        EndPosition.Distance(enterIntersectionProjection);
-                            return safe;
-                        }
-
-                        var exitIntersection = allIntersections[i + 1];
-                        var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, EndPosition.To2D()).SegmentPoint;
-
-                        var missilePosOnEnter = GetMissilePosition(enterIntersection.Time - timeOffset);
-                        var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-
-                        //Missile didnt pass.
-                        if (missilePosOnEnter.Distance(EndPosition) > enterIntersectionProjection.Distance(EndPosition))
-                        {
-                            if (missilePosOnExit.Distance(EndPosition) < exitIntersectionProjection.Distance(EndPosition))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-
-                //Inside the skillshot.
-                if (allIntersections.Count == 0)
-                {
-                    return false;
-                }
-
-                if (allIntersections.Count > 0)
-                {
-                    //Check only for the exit point
-                    var exitIntersection = allIntersections[0];
-                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, EndPosition.To2D()).SegmentPoint;
-
-                    var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-                    bool safe = missilePosOnExit.Distance(EndPosition) >
-                                exitIntersectionProjection.Distance(EndPosition);
-                    return safe;
-                }
-            }
-
-            //No Missile
-            if (allIntersections.Count == 0)
-            {
-                return IsSafe();
-            }
-            var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount + earlierReachTime;
-
-            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
-
-            return IsSafe(myPositionWhenExplodes);
         }
     }
 }
