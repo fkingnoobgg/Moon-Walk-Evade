@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -24,9 +27,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public override Vector3 FixedStartPosition { get; set; }
+        public Vector3 FixedStartPosition { get; set; }
 
-        public override Vector3 FixedEndPosition { get; set; }
+        public virtual Vector3 FixedEndPosition { get; set; }
 
         public MissileClient Missile => SpawnObject as MissileClient;
 
@@ -210,6 +213,55 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override Vector2 GetMissilePosition(int extraTime)
         {
             return FixedEndPosition.To2D();
+        }
+
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        {
+            if (path.Any(p => !IsSafe(p)) && IsSafe(Player.Instance.Position.To2D()))
+                return false;
+
+            if (path.Length <= 1) //lastissue = playerpos
+            {
+                if (!Player.Instance.IsRecalling())
+                    return IsSafe();
+
+                if (IsSafe())
+                    return true;
+
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
+                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
+
+            timeOffset += Game.Ping;
+            timeOffset -= 270;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+
+            var allIntersections = new List<FoundIntersection>();
+            var segmentIntersections = new List<FoundIntersection>();
+
+            foreach (var intersection in Utils.Utils.GetLineCircleIntersectionPoints(FixedEndPosition.To2D(), OwnSpellData.Radius, path[0], path[1]))
+            {
+                segmentIntersections.Add(new FoundIntersection(
+                        intersection.Distance(path[0]),
+                        (int)(intersection.Distance(path[0]) * 1000 / speed + delay),
+                        intersection, path[0]));
+            }
+
+            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+            if (!ToPolygon().IsInside(Player.Instance) && sortedList.Any() && sortedList.Min(x => x.Distance) > 300)
+                return true;
+            allIntersections.AddRange(sortedList);
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return IsSafe();
+            }
+            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
+            return IsSafe(myPositionWhenExplodesWithOffset);
         }
     }
 }

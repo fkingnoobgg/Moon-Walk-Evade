@@ -60,12 +60,13 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
-            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 0, -200, 200));
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 50, -100, 100));
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
             MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
+            MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
             MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 0, 0, 50));
             MainMenu.AddSeparator();
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));

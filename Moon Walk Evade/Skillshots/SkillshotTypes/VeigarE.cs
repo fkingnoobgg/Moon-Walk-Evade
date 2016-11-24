@@ -25,9 +25,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             TimeDetected = Environment.TickCount;
         }
 
-        public override Vector3 FixedStartPosition { get; set; }
+        public Vector3 StartPosition { get; set; }
 
-        public override Vector3 FixedEndPosition { get; set; }
+        public Vector3 EndPosition { get; set; }
 
         public MissileClient Missile => SpawnObject as MissileClient;
 
@@ -36,7 +36,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector3 GetCurrentPosition()
         {
-            return FixedEndPosition;
+            return EndPosition;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 var newDebugInst = new VeigarE
                 {
                     OwnSpellData = OwnSpellData,
-                    FixedStartPosition = Debug.GlobalStartPos,
-                    FixedEndPosition = Debug.GlobalEndPos,
+                    StartPosition = Debug.GlobalStartPos,
+                    EndPosition = Debug.GlobalEndPos,
                     IsValid = true,
                     IsActive = true,
                     TimeDetected = Environment.TickCount,
@@ -66,7 +66,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override void OnCreateUnsafe(GameObject obj)
         {
-            FixedEndPosition = Missile?.EndPosition ?? CastArgs.End;
+            EndPosition = Missile?.EndPosition ?? CastArgs.End;
         }
 
         public override void OnCreateObject(GameObject obj)
@@ -99,7 +99,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             if (Missile != null && _missileDeleted && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
             {
                 var r = new Regex(OwnSpellData.ToggleParticleName);
-                if (r.Match(obj.Name).Success && obj.Distance(FixedEndPosition, true) <= 100 * 100)
+                if (r.Match(obj.Name).Success && obj.Distance(EndPosition, true) <= 100 * 100)
                 {
                     IsValid = false;
                 }
@@ -132,8 +132,8 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
             if (Missile != null && !_missileDeleted)
             {
-                new Geometry.Polygon.Circle(FixedEndPosition,
-                    FixedStartPosition.To2D().Distance(Missile.Position.To2D()) / (FixedStartPosition.To2D().Distance(FixedEndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
+                new Geometry.Polygon.Circle(EndPosition,
+                    StartPosition.To2D().Distance(Missile.Position.To2D()) / (StartPosition.To2D().Distance(EndPosition.To2D())) * OwnSpellData.Radius).DrawPolygon(
                         Color.DodgerBlue);
             }
 
@@ -143,13 +143,13 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         public override Geometry.Polygon ToInnerPolygon()
         {
             float extrawidth = -20;
-            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.RingRadius + extrawidth);
+            return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.RingRadius + extrawidth);
         }
 
         public override Geometry.Polygon ToOuterPolygon()
         {
             float extrawidth = 20;
-            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.RingRadius + OwnSpellData.Radius + extrawidth);
+            return new Geometry.Polygon.Circle(EndPosition, OwnSpellData.RingRadius + OwnSpellData.Radius + extrawidth);
         }
 
         Vector2 PointOnCircle(float radius, float angleInDegrees, Vector2 origin)
@@ -168,14 +168,14 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             int i = 0;
             for (; i <= 360; i += 20)
             {
-                points.Add(PointOnCircle(OwnSpellData.RingRadius + extrawidth, i, FixedEndPosition.To2D()));
+                points.Add(PointOnCircle(OwnSpellData.RingRadius + extrawidth, i, EndPosition.To2D()));
             }
 
             extrawidth = 20;
             i -= 20;
             for (; i >= 0; i -= 20)
             {
-                points.Add(PointOnCircle(OwnSpellData.RingRadius + OwnSpellData.Radius + extrawidth, i, FixedEndPosition.To2D()));
+                points.Add(PointOnCircle(OwnSpellData.RingRadius + OwnSpellData.Radius + extrawidth, i, EndPosition.To2D()));
             }
             var poly = new Geometry.Polygon();
             poly.Points.AddRange(points);
@@ -200,7 +200,74 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Vector2 GetMissilePosition(int extraTime)
         {
-            return FixedEndPosition.To2D();
+            return EndPosition.To2D();
+        }
+
+        public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
+        {
+            if (path.Length <= 1) //lastissue = playerpos
+            {
+                if (!Player.Instance.IsRecalling())
+                    return IsSafe();
+
+                float timeLeft = (Player.Instance.GetBuff("recall").EndTime - Game.Time) * 1000;
+                return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
+            }
+
+            var Distance = 0f;
+            timeOffset += Game.Ping / 2;
+
+            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
+
+            var allIntersections = new List<FoundIntersection>();
+            for (var i = 0; i <= path.Length - 2; i++)
+            {
+                var from = path[i];
+                var to = path[i + 1];
+                var segmentIntersections = new List<FoundIntersection>();
+                var polygon = ToPolygon();
+
+                for (var j = 0; j <= polygon.Points.Count - 1; j++)
+                {
+                    var sideStart = polygon.Points[j];
+                    var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
+
+                    var intersection = from.Intersection(to, sideStart, sideEnd);
+
+                    if (intersection.Intersects)
+                    {
+                        segmentIntersections.Add(
+                            new FoundIntersection(
+                                Distance + intersection.Point.Distance(from),
+                                (int)((Distance + intersection.Point.Distance(from)) * 1000 / speed),
+                                intersection.Point, from));
+                    }
+                }
+
+                var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
+                allIntersections.AddRange(sortedList);
+
+                Distance += from.Distance(to);
+            }
+
+            //No Missile
+            if (allIntersections.Count == 0)
+            {
+                return IsSafe();
+            }
+
+            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
+
+            if (!IsSafe(myPositionWhenExplodes))
+            {
+                return false;
+            }
+
+            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
+
+            return IsSafe(myPositionWhenExplodesWithOffset);
         }
     }
 }

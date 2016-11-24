@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using EloBuddy;
 using EloBuddy.SDK;
 using SharpDX;
@@ -7,6 +8,20 @@ namespace Moon_Walk_Evade.Skillshots
 {
     public abstract class EvadeSkillshot
     {
+        protected struct FoundIntersection
+        {
+            public float Distance;
+            public Vector2 Point;
+            public int Time;
+
+            public FoundIntersection(float distance, int time, Vector2 point, Vector2 comingFrom)
+            {
+                Distance = distance;
+                Point = point;
+                Time = time;
+            }
+        }
+
         public SpellDetector SpellDetector { get; set; }
         public GameObject SpawnObject { get; set; }
         public Obj_AI_Base Caster { get; set; }
@@ -22,10 +37,6 @@ namespace Moon_Walk_Evade.Skillshots
         public bool IsProcessSpellCast => Caster != null;
 
         public string DisplayText => $"{OwnSpellData.ChampionName} {OwnSpellData.Slot} - {OwnSpellData.DisplayName}";
-
-        public abstract Vector3 FixedStartPosition { get; set; }
-
-        public abstract Vector3 FixedEndPosition { get; set; }
 
         public abstract Vector3 GetCurrentPosition();
 
@@ -98,6 +109,8 @@ namespace Moon_Walk_Evade.Skillshots
         {
             return $"{OwnSpellData.ChampionName}_{OwnSpellData.Slot}_{OwnSpellData.DisplayName}";
         }
+
+        public abstract bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0);
 
         public abstract bool IsSafe(Vector2? p = null);
     }

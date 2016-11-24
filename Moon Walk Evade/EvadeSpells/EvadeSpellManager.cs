@@ -251,7 +251,7 @@ namespace Moon_Walk_Evade.EvadeSpells
             if (evadeSpell == null)
                 return false;
 
-            return evadeInstance.IsPathSafe(Player.Instance.GetPath(endPos.To3D()).ToVector2(), (int) evadeSpell.Speed,
+            return evadeInstance.IsPathSafeEx(Player.Instance.GetPath(endPos.To3D()).ToVector2(), (int) evadeSpell.Speed,
                 (int) evadeSpell.Delay);
         }
 

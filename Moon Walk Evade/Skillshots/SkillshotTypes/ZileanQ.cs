@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK.Menu.Values;
 using Moon_Walk_Evade.Utils;
@@ -45,11 +44,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             get
             {
-                if (Missile == null || Environment.TickCount - CreationTime <= 750 || true)
+                if (Missile == null || Environment.TickCount - CreationTime <= 750)
                     return base.FixedEndPosition;
 
                 /*Could be collected afterwards*/
-                return ObjectManager.Get<Obj_GeneralParticleEmitter>().First(x => x.Name.Equals("Zilean_Base_Q_Detonate_Audio.troy")).Position;
+                return Missile.Position;
             }
         }
     }
