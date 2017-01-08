@@ -36,6 +36,7 @@ namespace Moon_Walk_Evade.Utils
 
     static class Debug
     {
+        public static Vector2 LastIssueOrderPos;
         public static bool TempBool { get; set; }
         public static Vector3 GlobalEndPos = Vector3.Zero, GlobalStartPos = Vector3.Zero;
         private static SpellDetector spellDetector;
@@ -57,7 +58,7 @@ namespace Moon_Walk_Evade.Utils
         }
 
         private static List<Vector2> DrawList = new List<Vector2>();
-        private static List<Vector2> DrawLineList = new List<Vector2>();
+        private static List<Tuple<Vector2, Vector2>> DrawLineList = new List<Tuple<Vector2, Vector2>>();
         public static void AddDrawVector(this Vector3 v)
         {
             if (!DrawList.Contains(v.To2D()))
@@ -72,15 +73,17 @@ namespace Moon_Walk_Evade.Utils
                 Core.DelayAction(() => DrawList.Remove(v), time);
         }
 
-        public static void AddDrawLine(this Vector2 v, int time = 10000)
+        public static void AddDrawLine(this Vector2 v, Vector2? from = null, int time = 10000)
         {
             var wtc = Drawing.WorldToScreen(v.To3D());
+            var wtcFrom = Drawing.WorldToScreen(from?.To3D() ?? Player.Instance.Position);
+            var tuple = new Tuple<Vector2, Vector2>(wtcFrom, wtc);
 
-            if (!DrawLineList.Contains(wtc))
-                DrawLineList.Add(wtc);
+            if (!DrawLineList.Contains(tuple))
+                DrawLineList.Add(tuple);
 
             if (time != short.MaxValue)
-                Core.DelayAction(() => DrawLineList.Remove(wtc), time);
+                Core.DelayAction(() => DrawLineList.Remove(tuple), time);
         }
 
         public static void Init(ref SpellDetector detector)
@@ -102,9 +105,9 @@ namespace Moon_Walk_Evade.Utils
                 }
 
                 if (DrawLineList.Count >= 5) DrawLineList.Clear();
-                foreach (var vector2 in DrawLineList)
+                foreach (var tuple in DrawLineList)
                 {
-                    Drawing.DrawLine(Player.Instance.Position.WorldToScreen(), vector2, 5, Color.Aqua);
+                    Drawing.DrawLine(tuple.Item1, tuple.Item2, 5, Color.Aqua);
                 }
             };
             Game.OnUpdate += GameOnOnUpdate;
@@ -115,7 +118,7 @@ namespace Moon_Walk_Evade.Utils
         {
             CheckReportedHitSkillshots();
 
-            CheckDebugSkillshotHit();
+            //CheckDebugSkillshotHit();
             CreateDebugSkillshot();
         }
 

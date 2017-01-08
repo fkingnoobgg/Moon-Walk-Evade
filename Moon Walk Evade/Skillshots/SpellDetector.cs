@@ -5,6 +5,7 @@ using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Utils;
 using Moon_Walk_Evade.Utils;
 
 namespace Moon_Walk_Evade.Skillshots
@@ -251,6 +252,7 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void OnDraw(EventArgs args)
         {
+            
             if (EvadeMenu.DrawMenu["disableAllDrawings"].Cast<CheckBox>().CurrentValue ||
                 !EvadeMenu.DrawMenu["drawSkillshots"].Cast<CheckBox>().CurrentValue)
             {
@@ -259,7 +261,9 @@ namespace Moon_Walk_Evade.Skillshots
 
             foreach (var c in DetectedSkillshots)
                 if (EvadeMenu.IsSkillshotDrawingEnabled(c))
+                {
                     c.OnDraw();
+                }
         }
     }
 

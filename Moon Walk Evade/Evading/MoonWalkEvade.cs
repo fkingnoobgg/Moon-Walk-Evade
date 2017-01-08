@@ -106,7 +106,16 @@ namespace Moon_Walk_Evade.Evading
         public EvadeSkillshot[] Skillshots { get; private set; }
         public Geometry.Polygon[] Polygons { get; private set; }
         public List<Geometry.Polygon> ClippedPolygons { get; private set; }
-        public Vector2 LastIssueOrderPos;
+
+        public Vector2 LastIssueOrderPos
+        {
+            get { return _lastIssueOrderPos; }
+            set
+            {
+                _lastIssueOrderPos = value;
+                Debug.LastIssueOrderPos = value;
+            }
+        }
 
         private readonly Dictionary<EvadeSkillshot, Geometry.Polygon> _skillshotPolygonCache;
 
@@ -127,6 +136,7 @@ namespace Moon_Walk_Evade.Evading
         private Text StatusText, WarnText;
         private int EvadeIssurOrderTime;
         private EvadeResult _currentEvadeResult;
+        private Vector2 _lastIssueOrderPos;
 
         #endregion
 
@@ -165,7 +175,8 @@ namespace Moon_Walk_Evade.Evading
         private void OnSkillshotDetected(EvadeSkillshot skillshot, bool isProcessSpell)
         {
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
-                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(), ServerTimeBuffer + Game.Ping))
+                if (!skillshot.IsSafePath(Player.Instance.GetPath(CurrentEvadeResult.WalkPoint).ToVector2(),
+                     ServerTimeBuffer))
                 {
                     CurrentEvadeResult = null;
                 }
@@ -187,6 +198,12 @@ namespace Moon_Walk_Evade.Evading
             EvadeMenu.MainMenu["serverTimeBuffer"].Cast<Slider>().DisplayName = EvadeMenu.bufferString;
 
             CheckEvade();
+
+            bool shouldOrbwalk = Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None;
+            if (shouldOrbwalk)
+            {
+                Orbwalker.DisableMovement = !IsPathSafeEx(Game.CursorPos.To2D());
+            }
 
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
             {
@@ -218,9 +235,9 @@ namespace Moon_Walk_Evade.Evading
 
             CacheSkillshots();
 
-            bool goodPath = IsPathSafeEx(CurrentEvadeResult?.WalkPoint.To2D() ?? LastIssueOrderPos);
             bool inside = IsHeroInDanger();
-            if ((inside || !goodPath) && CurrentEvadeResult == null)
+            bool goodPath = IsPathSafeEx(LastIssueOrderPos);
+            if (!goodPath && CurrentEvadeResult == null)
             {
                 bool oustside = !inside;
                 var evade = CalculateEvade(LastIssueOrderPos, oustside);
@@ -407,7 +424,7 @@ namespace Moon_Walk_Evade.Evading
         public int GetTimeAvailable(AIHeroClient hero = null)
         {
             hero = hero ?? Player.Instance;
-            var skillshots = Skillshots.Where(c => _skillshotPolygonCache[c].IsInside(hero.Position)).ToArray();
+            var skillshots = Skillshots.Where(c => c.ToPolygon().IsInside(hero.Position)).ToArray();
 
             if (!skillshots.Any())
             {
@@ -438,7 +455,7 @@ namespace Moon_Walk_Evade.Evading
         {
             return Skillshots.All(evadeSkillshot =>
             {
-                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer + Game.Ping, speed, delay);
+                bool safe = evadeSkillshot.IsSafePath(path, ServerTimeBuffer, speed, delay);
                 //if (path.Length == 2 && path[1].Distance(LastIssueOrderPos) <= 50)
                 //    if (!safe)
                 return safe;
@@ -515,8 +532,8 @@ namespace Moon_Walk_Evade.Evading
             points.AddRange(GetCloserEvadePoints(closestNormalPoint));
 
             return !awayFrom.HasValue ?
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer()).ToList() :
-                points.Where(p => IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer() && p.Distance(awayFrom.Value) >= 225).OrderBy(
+                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer()).ToList() :
+                points.Where(p => IsPointSafe(p) && IsPathSafeEx(p, speed, delay) && !p.IsWallBetweenPlayer() && p.Distance(awayFrom.Value) >= 225).OrderBy(
                 p =>
                 {
                     if (AntiStutterSearchType == StutterSearchType.PlayerFaceDirection)
@@ -583,8 +600,8 @@ namespace Moon_Walk_Evade.Evading
                 {
                     return new EvadeResult(this, GetClosestEvadePoint(playerPos), anchor, maxTime, time, ForceEvade) { IsForced = ForceEvade };
                 }
-                else //can use evade spell
-                    CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
+                //can use evade spell
+                CurrentEvadeResult = new EvadeResult(this, evadeSpellEvadePoint, anchor, maxTime, time, true);
 
             }
 

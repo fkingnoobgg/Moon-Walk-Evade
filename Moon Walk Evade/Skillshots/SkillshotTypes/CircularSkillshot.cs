@@ -163,7 +163,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override Geometry.Polygon ToPolygon()
         {
-            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius + Player.Instance.BoundingRadius * 2f);
+            return new Geometry.Polygon.Circle(FixedEndPosition, OwnSpellData.Radius);
         }
 
         private Geometry.Polygon ToDetailedPolygon()
@@ -217,9 +217,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
-            if (path.Any(p => !IsSafe(p)) && IsSafe(Player.Instance.Position.To2D()))
-                return false;
-
             if (path.Length <= 1) //lastissue = playerpos
             {
                 if (!Player.Instance.IsRecalling())
@@ -233,33 +230,16 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
             timeOffset += Game.Ping;
-            timeOffset -= 270;
 
             speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
 
-
-            var allIntersections = new List<FoundIntersection>();
-            var segmentIntersections = new List<FoundIntersection>();
-
-            foreach (var intersection in Utils.Utils.GetLineCircleIntersectionPoints(FixedEndPosition.To2D(), OwnSpellData.Radius, path[0], path[1]))
+            var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount;
+            if (timeToExplode <= 0)
             {
-                segmentIntersections.Add(new FoundIntersection(
-                        intersection.Distance(path[0]),
-                        (int)(intersection.Distance(path[0]) * 1000 / speed + delay),
-                        intersection, path[0]));
-            }
-
-            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-            if (!ToPolygon().IsInside(Player.Instance) && sortedList.Any() && sortedList.Min(x => x.Distance) > 300)
-                return true;
-            allIntersections.AddRange(sortedList);
-
-            //No Missile
-            if (allIntersections.Count == 0)
-            {
+                //timeNeeded = -9;
                 return IsSafe();
             }
-            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+
             var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
             return IsSafe(myPositionWhenExplodesWithOffset);
         }

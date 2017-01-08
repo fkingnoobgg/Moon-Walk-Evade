@@ -407,8 +407,11 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override bool IsSafePath(Vector2[] path, int timeOffset = 0, int speed = -1, int delay = 0)
         {
+            timeOffset += Game.Ping;
+            speed = speed == -1 ? (int)Player.Instance.MoveSpeed : speed;
             if (path.Length <= 1) //lastissue = playerpos
             {
+                //timeNeeded = -11;
                 if (!Player.Instance.IsRecalling())
                     return IsSafe();
 
@@ -419,118 +422,95 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return GetAvailableTime(Player.Instance.Position.To2D()) > timeLeft;
             }
 
-            timeOffset += Game.Ping;
-
-            speed = speed == -1 ? (int)ObjectManager.Player.MoveSpeed : speed;
-
-            var allIntersections = new List<FoundIntersection>();
-            var segmentIntersections = new List<FoundIntersection>();
-            var polygon = ToPolygon();
-
-            var from = path[0];
-            var to = path[1];
-
-            for (var j = 0; j <= polygon.Points.Count - 1; j++)
-            {
-                var sideStart = polygon.Points[j];
-                var sideEnd = polygon.Points[j == polygon.Points.Count - 1 ? 0 : j + 1];
-
-                var intersection = from.Intersection(to, sideStart, sideEnd);
-
-                if (intersection.Intersects)
-                {
-                    segmentIntersections.Add(
-                        new FoundIntersection(intersection.Point.Distance(from), (int)(intersection.Point.Distance(from) * 1000 / speed) + delay,
-                            intersection.Point, from));
-                }
-            }
-
-            var sortedList = segmentIntersections.OrderBy(o => o.Distance).ToList();
-            allIntersections.AddRange(sortedList);
-
             //Skillshot with missile.
-            if (SpawnObject != null)
+            if (!string.IsNullOrEmpty(OwnSpellData.ObjectCreationName))
             {
-                var debug = EvadeMenu.DebugMenu["debugMode"].Cast<KeyBind>().CurrentValue;
-                var MissileStartPosition = debug ? Debug.GlobalStartPos.To2D() : Missile.StartPosition.To2D();
-                //Outside the skillshot
-                if (IsSafe())
+                float r = Missile == null ? TimeDetected + OwnSpellData.Delay - Environment.TickCount : 0;
+                r -= timeOffset;
+
+                Vector3 pathDir = path[1].To3D() - path[0].To3D();
+                Vector3 skillDir = FixedEndPosition - CurrentPosition;
+
+                float a = path[0].X;
+                float w = path[0].Y;
+                float m = path[0].To3D().Z;
+
+                float v = CurrentPosition.X;
+                float k = CurrentPosition.Y;
+                float o = CurrentPosition.Z;
+
+                float b = pathDir.X;
+                float j = pathDir.Y;
+                float n = pathDir.Z;
+
+                float f = skillDir.X;
+                float l = skillDir.Y;
+                float p = skillDir.Z;
+
+                float c = speed;
+                float d = pathDir.Length();
+
+                float g = OwnSpellData.MissileSpeed;
+                float h = skillDir.Length();
+
+                /*nullstelle d/dt - min distance*/
+                double t = ((1000 * Math.Pow(d, 2) * g * h * l - 1000 * c * d * Math.Pow(h, 2) * j) * w + (1000 * b * c * d *
+                            Math.Pow(h, 2) - 1000 * Math.Pow(d, 2) * f * g * h) * v + (c * d * g * h * n * p - Math.Pow(c, 2) *
+                            Math.Pow(h, 2) * Math.Pow(n, 2) + c * d * g * h * j * l - Math.Pow(c, 2) * Math.Pow(h, 2) * Math.Pow(j, 2) -
+                            Math.Pow(b, 2) * Math.Pow(c, 2) * Math.Pow(h, 2) + b * c * d * f * g * h) * r + (1000 * Math.Pow(d, 2) * g *
+                            h * m - 1000 * Math.Pow(d, 2) * g * h * o) * p + 1000 * c * d * Math.Pow(h, 2) * n * o - 1000 * c * d *
+                            Math.Pow(h, 2) * m * n - 1000 * Math.Pow(d, 2) * g * h * k * l + 1000 * c * d *
+                            Math.Pow(h, 2) * j * k - 1000 * a * b * c * d * Math.Pow(h, 2) + 1000 * a * Math.Pow(d, 2) * f * g * h) /
+                            (1000 * Math.Pow(d, 2) * Math.Pow(g, 2) * Math.Pow(p, 2) - 2000 * c * d * g * h * n * p +
+                            1000 * Math.Pow(c, 2) * Math.Pow(h, 2) * Math.Pow(n, 2) + 1000 * Math.Pow(d, 2) * Math.Pow(g, 2) * Math.Pow(l, 2) -
+                            2000 * c * d * g * h * j * l + 1000 * Math.Pow(c, 2) * Math.Pow(h, 2) * Math.Pow(j, 2) + 1000 * Math.Pow(b, 2) *
+                            Math.Pow(c, 2) * Math.Pow(h, 2) - 2000 * b * c * d * f * g * h + 1000 * Math.Pow(d, 2) * Math.Pow(f, 2) *
+                            Math.Pow(g, 2));
+
+                Vector3 myPosition = path[0].To3D() + (float)t * pathDir * c / pathDir.Length();
+                Vector3 misPosition = CurrentPosition + (float)t * skillDir * g / skillDir.Length();
+
+                bool valid = myPosition.Distance(Player.Instance) <= Player.Instance.Distance(path[1]) &&
+                    misPosition.Distance(CurrentPosition) <= CurrentPosition.Distance(FixedEndPosition) && t >= 0;
+
+                if (!valid && t >= 0)
                 {
-                    //No intersections -> Safe
-                    if (allIntersections.Count == 0)
+                    /*t out of skill range => set t to skillshot maxrange*/
+                    if (misPosition.Distance(CurrentPosition) > CurrentPosition.Distance(FixedEndPosition))
                     {
-                        return true;
+                        t = CurrentPosition.Distance(FixedEndPosition) / OwnSpellData.MissileSpeed + r / 1000;
+
+                        myPosition = path[0].To3D() + (float)t * pathDir * c / pathDir.Length();
+                        //misPosition = FixedEndPosition;
+
+                        return ToPolygon().IsOutside(myPosition.To2D());
                     }
 
-                    for (var i = 0; i <= allIntersections.Count - 1; i = i + 2)
+                    /*t out of path range*/
+                    if (myPosition.Distance(Player.Instance) > Player.Instance.Distance(path[1]))
                     {
-                        var enterIntersection = allIntersections[i];
-                        var enterIntersectionProjection = enterIntersection.Point.ProjectOn(MissileStartPosition, FixedEndPosition.To2D()).SegmentPoint;
-
-                        //Intersection with no exit point.
-                        if (i == allIntersections.Count - 1)
-                        {
-                            var missilePositionOnIntersection = GetMissilePosition(enterIntersection.Time - timeOffset);
-                            bool safe = FixedEndPosition.Distance(missilePositionOnIntersection) + 50 <=
-                                        FixedEndPosition.Distance(enterIntersectionProjection) &&
-                                        ObjectManager.Player.MoveSpeed < OwnSpellData.MissileSpeed;
-                            return safe;
-                        }
-
-                        var exitIntersection = allIntersections[i + 1];
-                        var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, FixedEndPosition.To2D()).SegmentPoint;
-
-                        var missilePosOnEnter = GetMissilePosition(enterIntersection.Time - timeOffset);
-                        var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-
-                        //Missile didnt pass.
-                        if (missilePosOnEnter.Distance(FixedEndPosition) > enterIntersectionProjection.Distance(FixedEndPosition))
-                        {
-                            if (missilePosOnExit.Distance(FixedEndPosition) <= exitIntersectionProjection.Distance(FixedEndPosition))
-                            {
-                                return false;
-                            }
-                        }
+                        return ToPolygon().IsOutside(path[1]);
                     }
-
-                    return true;
                 }
 
-                //Inside the skillshot.
-                if (allIntersections.Count == 0)
-                {
-                    return false;
-                }
-
-                if (allIntersections.Count > 0)
-                {
-                    //Check only for the exit point
-                    var exitIntersection = allIntersections[0];
-                    var exitIntersectionProjection = exitIntersection.Point.ProjectOn(MissileStartPosition, FixedEndPosition.To2D()).SegmentPoint;
-
-                    var missilePosOnExit = GetMissilePosition(exitIntersection.Time + timeOffset);
-                    return missilePosOnExit.Distance(FixedEndPosition) > exitIntersectionProjection.Distance(FixedEndPosition);
-                }
+                //timeNeeded = 1337;
+                return !valid || ToPolygon().IsOutside(myPosition.To2D());
             }
 
-            //No Missile
-            if (allIntersections.Count == 0)
+            var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount;
+            if (timeToExplode <= 0)
             {
+                //timeNeeded = -9;
                 return IsSafe();
             }
 
-            var timeToExplode = OwnSpellData.Delay + (Environment.TickCount - TimeDetected);
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
 
-            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
+            bool b1 = IsSafe(myPositionWhenExplodes);
+            //timeNeeded = b ? -103 : Player.Instance.WalkingTime(allIntersections[0].Point) + timeOffset + delay - timeToExplode;
+            //timeNeeded = -12345;
 
-            if (!IsSafe(myPositionWhenExplodes))
-            {
-                return false;
-            }
-
-            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
-
-            return IsSafe(myPositionWhenExplodesWithOffset);
+            return b1;
         }
     }
 }

@@ -99,6 +99,11 @@ namespace Moon_Walk_Evade.Skillshots
             return new Geometry.Polygon();
         }
 
+        /// <summary>
+        /// Doesnt include ping buffers
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         public abstract int GetAvailableTime(Vector2 pos);
 
         public abstract bool IsFromFow();

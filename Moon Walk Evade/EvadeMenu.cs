@@ -60,7 +60,7 @@ namespace Moon_Walk_Evade
             MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("MoonWalkEvade", "MoonWalkEvade");
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
-            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 50, -100, 100));
+            MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 70, -100, 100));
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
@@ -186,7 +186,6 @@ namespace Moon_Walk_Evade
             CollisionMenu = MainMenu.AddSubMenu("Collision");
             CollisionMenu.Add("minion", new CheckBox("Attend Minion Collision"));
             CollisionMenu.Add("yasuoWall", new CheckBox("Attend Yasuo Wall"));
-            CollisionMenu.Add("useProj", new CheckBox("Use Spell Projection", false));
 
             DebugMenu = MainMenu.AddSubMenu("Debug");
             DebugMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));

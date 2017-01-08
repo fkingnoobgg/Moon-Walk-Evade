@@ -362,7 +362,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ChampionName = "Brand",
                         SpellName = "BrandW",
                         Slot = SpellSlot.W,
-                        Delay = 400,
+                        Delay = 850,
                         ExtraExistingTime = 200,
                         Range = 1100,
                         Radius = 250,
