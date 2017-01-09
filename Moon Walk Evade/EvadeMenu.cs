@@ -70,7 +70,7 @@ namespace Moon_Walk_Evade
             MainMenu.AddSeparator();
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
             MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
-            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 10, 0, 50));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 15, 0, 50));
             MainMenu.AddSeparator();
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));
