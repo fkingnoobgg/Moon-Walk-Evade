@@ -64,10 +64,13 @@ namespace Moon_Walk_Evade
             MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
-            MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position", false));
+            MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position"));
+            MainMenu.Add("recalculationSpeed", new Slider("Recalculation Delay", 100, 0, 1000));
+            MainMenu.AddLabel("LOW DELAY IS CPU INTENSE");
+            MainMenu.AddSeparator();
             MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
             MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
-            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 0, 0, 50));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 10, 0, 50));
             MainMenu.AddSeparator();
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));
@@ -104,7 +107,7 @@ namespace Moon_Walk_Evade
             skillshots.AddRange(
                 SkillshotDatabase.Database.Where(
                     s =>
-                        s.OwnSpellData.ChampionName == "AllChampions" &&
+                        s.OwnSpellData.ChampionName == "AllChampions" ||
                         heroes.Any(obj => obj.Spellbook.Spells.Select(c => c.Name).Contains(s.OwnSpellData.SpellName))));
             var evadeSpells =
                 EvadeSpellDatabase.Spells.Where(s => Player.Instance.ChampionName.Contains(s.ChampionName)).ToList();

@@ -9,7 +9,7 @@ using Color = System.Drawing.Color;
 
 namespace Moon_Walk_Evade.Utils
 {
-    internal static class Utils
+    internal static class MyUtils
     {
         public static Vector2[] GetExactPath(this AIHeroClient me)
         {

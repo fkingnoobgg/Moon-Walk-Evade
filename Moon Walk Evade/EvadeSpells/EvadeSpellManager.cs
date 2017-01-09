@@ -43,7 +43,7 @@ namespace Moon_Walk_Evade.EvadeSpells
                     var end = i == pol.Points.Count - 1 ? pol.Points[0] : pol.Points[i + 1];
 
                     var intersections =
-                        Utils.Utils.GetLineCircleIntersectionPoints(center, maxRange, start, end)
+                        Utils.MyUtils.GetLineCircleIntersectionPoints(center, maxRange, start, end)
                             .Where(p => p.IsInLineSegment(start, end))
                             .ToList();
 

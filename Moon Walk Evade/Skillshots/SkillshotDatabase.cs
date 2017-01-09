@@ -12,6 +12,23 @@ namespace Moon_Walk_Evade.Skillshots
         {
             Database = new List<EvadeSkillshot>
             {
+                //new LinearSkillshot
+                //{
+                //    OwnSpellData = new SpellData
+                //    {
+                //        DisplayName = "Mark",
+                //        ChampionName = "AllChampions",
+                //        SpellName = "SummonerPoroThrow",
+                //        Slot = SpellSlot.Summoner1,
+                //        Delay = 0,
+                //        Range = 1600,
+                //        Radius = 60,
+                //        MissileSpeed = 1300,
+                //        DangerValue = 1,
+                //        IsDangerous = true,
+                //        ToggleParticleName = "Summoner_Snowball_Explosion_Sound.troy"
+                //    }
+                //},
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
@@ -1976,7 +1993,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Slot = SpellSlot.E,
                         Delay = 250,
                         Range = 1100,
-                        Radius = 325,
+                        Radius = 350,
                         MissileSpeed = 1400,
                         DangerValue = 2,
                         IsDangerous = false,
@@ -2099,7 +2116,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Delay = 500,
                         ExtraExistingTime = 2300,
                         Range = 800,
-                        Radius = 350,
+                        Radius = 375,
                         MissileSpeed = 0,
                         DangerValue = 1,
                         ObjectCreationName = "",
@@ -3088,81 +3105,67 @@ namespace Moon_Walk_Evade.Skillshots
                         MinionCollision = true
                     }
                 },
-                //new LinearSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Vi",
-                //        SpellName = "ViQMissile",
-                //        Slot = SpellSlot.Q,
-                //        Delay = 250,
-                //        Range = 725,
-                //        Radius = 90,
-                //        MissileSpeed = 1500,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "ViQMissile"
-                //    }
-                //},
-                //new LinearSkillshot //Unknown:
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Viktor",
-                //        SpellName = "ViktorDeathRay",
-                //        Slot = SpellSlot.E,
-                //        Delay = 0,
-                //        Range = 800,
-                //        Radius = 80,
-                //        MissileSpeed = 780,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "ViktorDeathRayMissile"
-                //    }
-                //},
-                //new LinearSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Viktor",
-                //        SpellName = "ViktorDeathRay3",
-                //        Slot = SpellSlot.E,
-                //        Delay = 500,
-                //        Range = 800,
-                //        Radius = 80,
-                //        MissileSpeed = 0,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "ViktorDeathRay3"
-                //    }
-                //},
-                //new LinearSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Viktor",
-                //        SpellName = "ViktorDeathRay2",
-                //        Slot = SpellSlot.E,
-                //        Delay = 0,
-                //        Range = 800,
-                //        Radius = 80,
-                //        MissileSpeed = 1500,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "ViktorDeathRayMissile2"
-                //    }
-                //},
-                //new CircularSkillshot
-                //{
-                //    OwnSpellData = new OwnSpellData
-                //    {
-                //        ChampionName = "Viktor",
-                //        SpellName = "ViktorGravitonField",
-                //        Slot = SpellSlot.W,
-                //        Delay = 1500,
-                //        Range = 625,
-                //        Radius = 300,
-                //        MissileSpeed = 0,
-                //        DangerValue = 3,
-                //        ObjectCreationName = "ViktorGravitonField"
-                //    }
-                //},
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        ChampionName = "Vi",
+                        SpellName = "ViQMissile",
+                        Slot = SpellSlot.Q,
+                        Delay = 250,
+                        Range = 725,
+                        Radius = 90,
+                        MissileSpeed = 1500,
+                        DangerValue = 3,
+                        ObjectCreationName = "ViQMissile"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        ChampionName = "Viktor",
+                        DisplayName = "ViktorDeathRay Secondary",
+                        SpellName = "ViktorDeathRay",
+                        Slot = SpellSlot.E,
+                        Delay = 0,
+                        Range = 800,
+                        Radius = 80,
+                        MissileSpeed = 780,
+                        DangerValue = 3,
+                        ObjectCreationName = "ViktorDeathRayMissile2"
+                    }
+                },
+                new LinearSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        ChampionName = "Viktor",
+                        SpellName = "ViktorDeathRay",
+                        Slot = SpellSlot.E,
+                        Delay = 500,
+                        Range = 800,
+                        Radius = 80,
+                        MissileSpeed = 0,
+                        DangerValue = 3,
+                        ObjectCreationName = "ViktorAugMissile"
+                    }
+                },
+                new CircularSkillshot
+                {
+                    OwnSpellData = new SpellData
+                    {
+                        ChampionName = "Viktor",
+                        SpellName = "ViktorGravitonField",
+                        Slot = SpellSlot.W,
+                        Delay = 1500,
+                        Range = 625,
+                        Radius = 300,
+                        MissileSpeed = 0,
+                        DangerValue = 3,
+                        ObjectCreationName = "ViktorGravitonField"
+                    }
+                },
                 new CircularSkillshot
                 {
                     OwnSpellData = new SpellData

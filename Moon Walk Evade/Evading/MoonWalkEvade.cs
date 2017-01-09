@@ -40,6 +40,7 @@ namespace Moon_Walk_Evade.Evading
         {
             get { return EvadeMenu.HumanizerMenu["extraEvadeRange"].Cast<Slider>().CurrentValue; }
         }
+        
 
         public bool RandomizeExtraEvadeRange
         {
@@ -49,6 +50,11 @@ namespace Moon_Walk_Evade.Evading
         public bool AllowRecalculateEvade
         {
             get { return EvadeMenu.MainMenu["recalculatePosition"].Cast<CheckBox>().CurrentValue; }
+        }
+
+        public int RecalculationDelay
+        {
+            get { return EvadeMenu.MainMenu["recalculationSpeed"].Cast<Slider>().CurrentValue; }
         }
 
         public bool RestorePosition
@@ -193,17 +199,27 @@ namespace Moon_Walk_Evade.Evading
             }
         }
 
+        private int LastRecalcTick;
         private void OnUpdate(EventArgs args)
         {
             EvadeMenu.MainMenu["serverTimeBuffer"].Cast<Slider>().DisplayName = EvadeMenu.bufferString;
 
+            if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing() || Player.Instance.IsInFountainRange())
+            {
+                CurrentEvadeResult = null;
+                Orbwalker.DisableMovement = false;
+                return;
+            }
+
             CheckEvade();
 
             bool shouldOrbwalk = Orbwalker.ActiveModesFlags != Orbwalker.ActiveModes.None;
-            if (shouldOrbwalk)
+            if (shouldOrbwalk && CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
             {
                 Orbwalker.DisableMovement = !IsPathSafeEx(Game.CursorPos.To2D());
             }
+            else if (shouldOrbwalk)
+                Orbwalker.DisableMovement = false;
 
             if (CurrentEvadeResult != null && CurrentEvadeResult.EnoughTime)
             {
@@ -214,6 +230,19 @@ namespace Moon_Walk_Evade.Evading
                     if (point != default(Vector2))
                     {
                         CurrentEvadeResult.EvadePoint = point;
+                    }
+                }
+                else if (AllowRecalculateEvade && Environment.TickCount - LastRecalcTick >= RecalculationDelay)
+                {
+                    LastRecalcTick = Environment.TickCount;
+                    var evade = CalculateEvade(LastIssueOrderPos, Player.Instance.Position.To2D());
+                    bool differentAngle =
+                        (evade.WalkPoint - Player.Instance.Position).To2D()
+                            .AngleBetween((CurrentEvadeResult.WalkPoint - Player.Instance.Position).To2D()) > 1;
+                    bool betterPos = evade.EvadePoint.Distance(Game.CursorPos) < CurrentEvadeResult.EvadePoint.Distance(Game.CursorPos);
+                    if (evade.IsValid && differentAngle && betterPos)
+                    {
+                        CurrentEvadeResult = evade;
                     }
                 }
 
@@ -227,12 +256,6 @@ namespace Moon_Walk_Evade.Evading
         /// <returns></returns>
         private void CheckEvade()
         {
-            if (!EvadeEnabled || Player.Instance.IsDead || Player.Instance.IsDashing() || Player.Instance.IsInFountainRange())
-            {
-                CurrentEvadeResult = null;
-                return;
-            }
-
             CacheSkillshots();
 
             bool inside = IsHeroInDanger();
@@ -240,7 +263,7 @@ namespace Moon_Walk_Evade.Evading
             if (!goodPath && CurrentEvadeResult == null)
             {
                 bool oustside = !inside;
-                var evade = CalculateEvade(LastIssueOrderPos, oustside);
+                var evade = CalculateEvade(LastIssueOrderPos);
 
                 if (evade.IsValid)
                 {
@@ -582,13 +605,13 @@ namespace Moon_Walk_Evade.Evading
         public bool HasToAttendComfort() =>
             EntityManager.Heroes.Enemies.Count(x => x.IsValid && !x.IsDead && x.Distance(Player.Instance) <= 1000) >= minEnemyComfortCount;
 
-        public EvadeResult CalculateEvade(Vector2 anchor, bool outside = false)
+        public EvadeResult CalculateEvade(Vector2 anchor, Vector2? awayFrom = null)
         {
             var playerPos = Player.Instance.ServerPosition.To2D();
             var maxTime = GetTimeAvailable();
             var time = Math.Max(0, maxTime - (Game.Ping + ServerTimeBuffer));
 
-            var points = GetEvadePoints();
+            var points = GetEvadePoints(awayFrom);
 
             if (!points.Any())
             {
@@ -693,7 +716,7 @@ namespace Moon_Walk_Evade.Evading
                 if (moonWalkEvadeInstance.ExtraEvadeRange > 0)
                 {
                     ExtraRange = moonWalkEvadeInstance.RandomizeExtraEvadeRange
-                        ? Utils.Utils.Random.Next(moonWalkEvadeInstance.ExtraEvadeRange / 3, moonWalkEvadeInstance.ExtraEvadeRange)
+                        ? Utils.MyUtils.Random.Next(moonWalkEvadeInstance.ExtraEvadeRange / 3, moonWalkEvadeInstance.ExtraEvadeRange)
                         : moonWalkEvadeInstance.ExtraEvadeRange;
                 }
             }

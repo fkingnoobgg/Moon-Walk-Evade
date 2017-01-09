@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using EloBuddy;
+using EloBuddy.Sandbox;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 using Moon_Walk_Evade.Evading;
@@ -192,7 +193,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             }
 
            
-            Utils.Utils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White, 3);
+            MyUtils.Draw3DRect(CurrentPosition, EndPosition, OwnSpellData.Radius * 2, Color.White, 3);
         }
 
         public override Geometry.Polygon ToPolygon()
@@ -216,13 +217,6 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             var proj = pos.ProjectOn(CurrentPosition.To2D(), EndPosition.To2D());
             if (!proj.IsOnSegment)
                 return short.MaxValue;
-
-            //var dest = proj.SegmentPoint;
-            //var InsidePath = Player.Instance.GetPath(dest.To3D(), true).Where(segment => ToPolygon().IsInside(segment));
-            //var point = InsidePath.OrderBy(x => x.Distance(CurrentPosition)).FirstOrDefault();
-
-            //if (point == default(Vector3))
-            //    return short.MaxValue;
 
             float skillDist = proj.SegmentPoint.Distance(CurrentPosition) - OwnSpellData.Radius - Player.Instance.BoundingRadius;
             return Math.Max(0, (int)(skillDist / OwnSpellData.MissileSpeed * 1000));
@@ -346,23 +340,20 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                     }
                 }
 
-                //timeNeeded = 1337;
                 return !valid || myPosition.Distance(misPosition) > OwnSpellData.Radius + Player.Instance.BoundingRadius;
             }
 
             var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount;
             if (timeToExplode <= 0)
             {
-                //timeNeeded = -9;
-                return IsSafe();
+                bool intersects;
+                MyUtils.GetLinesIntersectionPoint(CurrentPosition.To2D(), EndPosition.To2D(), path[0], path[1], out intersects);
+                return ToPolygon().IsOutside(Player.Instance.Position.To2D()) && !intersects;
             }
 
             var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay + timeOffset);
 
             bool b1 = IsSafe(myPositionWhenExplodes);
-            //timeNeeded = b ? -103 : Player.Instance.WalkingTime(allIntersections[0].Point) + timeOffset + delay - timeToExplode;
-            //timeNeeded = -12345;
-
             return b1;
         }
     }

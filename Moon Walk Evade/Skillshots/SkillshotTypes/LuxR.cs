@@ -50,7 +50,7 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
                 return;
             }
 
-            Utils.Utils.Draw3DRect(Missile?.StartPosition ?? FixedStartPos, Missile?.EndPosition ?? FixedEndPos, OwnSpellData.Radius * 2, Color.White);
+            Utils.MyUtils.Draw3DRect(Missile?.StartPosition ?? FixedStartPos, Missile?.EndPosition ?? FixedEndPos, OwnSpellData.Radius * 2, Color.White);
         }
 
         public override Geometry.Polygon ToPolygon()

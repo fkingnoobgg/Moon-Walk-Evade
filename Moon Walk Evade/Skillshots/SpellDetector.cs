@@ -168,22 +168,21 @@ namespace Moon_Walk_Evade.Skillshots
         private void GameObjectOnCreate(GameObject sender, EventArgs args)
         {
             //bool isMis = sender.Type == GameObjectType.MissileClient &&
-            //             !Utils.Utils.GetGameObjectName(sender).Contains("SRU") && !Utils.Utils.GetGameObjectName(sender).Contains("HA");
+            //             !MyUtils.MyUtils.GetGameObjectName(sender).Contains("SRU") && !MyUtils.MyUtils.GetGameObjectName(sender).Contains("HA");
             //if (isMis)
-            //    if (!Utils.Utils.GetGameObjectName(sender).Contains("SRU"))
-            //        Chat.Print("creating " + Utils.Utils.GetGameObjectName(sender));
+            //        Chat.Print("creating " + MyUtils.MyUtils.GetGameObjectName(sender));
 
             if (!(sender is Obj_GeneralParticleEmitter))
             {
                 var skillshot =
                     EvadeMenu.MenuSkillshots.Values.FirstOrDefault(
-                        evadeSkillshot => evadeSkillshot.OwnSpellData.ObjectCreationName == Utils.Utils.GetGameObjectName(sender));
+                        evadeSkillshot => evadeSkillshot.OwnSpellData.ObjectCreationName == Utils.MyUtils.GetGameObjectName(sender));
 
                 if (skillshot != null)
                 {
                     var nSkillshot = skillshot.NewInstance();
                     nSkillshot.SpawnObject = sender;
-                    nSkillshot.Team = Utils.Utils.GetGameObjectTeam(sender);
+                    nSkillshot.Team = Utils.MyUtils.GetGameObjectTeam(sender);
                     nSkillshot.OnCreateUnsafe(sender);
 
                     if (IsValidTeam(nSkillshot.Team) && (EnableFoWDetection || !nSkillshot.IsFromFow()))
@@ -218,8 +217,8 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void GameObjectOnDelete(GameObject sender, EventArgs args)
         {
-            //if (Utils.GetTeam(sender) == Utils.PlayerTeam())
-            //    Chat.Print("delete {0} {1} {2} {3}", sender.Team, sender.GetType().ToString(), Utils.GetGameObjectName(sender), sender.Index);
+            //if (MyUtils.GetTeam(sender) == MyUtils.PlayerTeam())
+            //    Chat.Print("delete {0} {1} {2} {3}", sender.Team, sender.GetType().ToString(), MyUtils.GetGameObjectName(sender), sender.Index);
 
             foreach (var c in DetectedSkillshots.Where(v => v.SpawnObject != null && v.SpawnObject.IndexEquals(sender)))
             {

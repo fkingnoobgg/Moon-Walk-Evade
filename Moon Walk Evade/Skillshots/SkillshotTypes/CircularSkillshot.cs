@@ -236,8 +236,9 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
             var timeToExplode = TimeDetected + OwnSpellData.Delay - Environment.TickCount;
             if (timeToExplode <= 0)
             {
-                //timeNeeded = -9;
-                return IsSafe();
+                bool noIntersections = MyUtils.GetLineCircleIntersectionPoints(FixedEndPosition.To2D(), OwnSpellData.Radius, path[0],
+                        path[1]).Length == 0;
+                return ToPolygon().IsOutside(Player.Instance.Position.To2D()) && noIntersections;
             }
 
             var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, delay + timeOffset);

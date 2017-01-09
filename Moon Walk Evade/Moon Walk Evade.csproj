@@ -36,6 +36,10 @@
     <Reference Include="EloBuddy">
       <HintPath>..\..\..\..\..\AppData\Roaming\EloBuddy\Addons\Libraries\EloBuddy.dll</HintPath>
     </Reference>
+    <Reference Include="EloBuddy.Sandbox, Version=1.0.6193.6141, Culture=neutral, PublicKeyToken=d671ef5d8e7e69a5, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\EloBuddy\System\EloBuddy.Sandbox.dll</HintPath>
+    </Reference>
     <Reference Include="EloBuddy.SDK">
       <HintPath>..\..\..\..\..\AppData\Roaming\EloBuddy\Addons\Libraries\EloBuddy.SDK.dll</HintPath>
     </Reference>
@@ -85,7 +89,7 @@
     <Compile Include="Skillshots\SpellData.cs" />
     <Compile Include="Skillshots\SpellDetector.cs" />
     <Compile Include="Utils\Debug.cs" />
-    <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Utils\MyUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
