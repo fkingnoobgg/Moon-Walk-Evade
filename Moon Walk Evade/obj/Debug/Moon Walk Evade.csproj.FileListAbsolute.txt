@@ -21,3 +21,4 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk 
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.csproj.GenerateResource.Cache
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\Moon-Walk-Evade\Moon Walk Evade\obj\Debug\Moon Walk Evade.csprojResolveAssemblyReference.cache

@@ -3498,7 +3498,7 @@ namespace Moon_Walk_Evade.Skillshots
                         ObjectCreationName = "ZiggsR"
                     }
                 },
-                new ZileanQ
+                new CircularSkillshot
                 {
                     OwnSpellData = new SpellData
                     {
@@ -3507,7 +3507,6 @@ namespace Moon_Walk_Evade.Skillshots
                         SpellName = "ZileanQ",
                         Slot = SpellSlot.Q,
                         Delay = 300,
-                        ExtraExistingTime = 3500,
                         Range = 900,
                         Radius = 250,
                         MissileSpeed = 2000,
