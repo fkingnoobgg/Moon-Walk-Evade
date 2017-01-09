@@ -56,6 +56,10 @@ namespace Moon_Walk_Evade.Evading
         {
             get { return EvadeMenu.MainMenu["recalculationSpeed"].Cast<Slider>().CurrentValue; }
         }
+        public int MinRecalculationAngle
+        {
+            get { return EvadeMenu.MainMenu["minRecalculationAngle"].Cast<Slider>().CurrentValue; }
+        }
 
         public bool RestorePosition
         {
@@ -240,7 +244,7 @@ namespace Moon_Walk_Evade.Evading
                         (evade.WalkPoint - Player.Instance.Position).To2D()
                             .AngleBetween((CurrentEvadeResult.WalkPoint - Player.Instance.Position).To2D());
                     bool betterPos = evade.EvadePoint.Distance(Game.CursorPos) < CurrentEvadeResult.EvadePoint.Distance(Game.CursorPos);
-                    if (evade.IsValid && angle > 5 && angle < 90 /*dont move forward back inside the skills*/ && betterPos)
+                    if (evade.IsValid && angle >= MinRecalculationAngle && angle < 90 /*dont move forward back inside the skills*/ && betterPos)
                     {
                         CurrentEvadeResult = evade;
                     }
