@@ -96,13 +96,15 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
         {
             if (Missile != null && obj.Index == Missile.Index && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
             {
-                _missileDeleted = true;
+                if (OwnSpellData.ExtraExistingTime == 0)
+                    _missileDeleted = true;
+                else Core.DelayAction(() => _missileDeleted = true, OwnSpellData.ExtraExistingTime);
                 return false;
             }
 
             if (OwnSpellData.ExtraExistingTime == 0)
                 return true;
-            else Core.DelayAction(() => IsValid = false, TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime - Environment.TickCount);
+            else Core.DelayAction(() => IsValid = false, OwnSpellData.ExtraExistingTime);
 
             return false;
         }

@@ -1994,6 +1994,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Delay = 250,
                         Range = 1100,
                         Radius = 350,
+                        ExtraExistingTime = 500,
                         MissileSpeed = 1400,
                         DangerValue = 2,
                         IsDangerous = false,
