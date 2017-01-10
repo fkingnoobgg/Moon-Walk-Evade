@@ -232,15 +232,15 @@ namespace Moon_Walk_Evade.Evading
                         CurrentEvadeResult.EvadePoint = point;
                     }
                 }
-                else if (AllowRecalculateEvade && Environment.TickCount - LastRecalcTick >= RecalculationDelay)
+                else if (AllowRecalculateEvade && !IsHeroInDanger() && Environment.TickCount - LastRecalcTick >= RecalculationDelay)
                 {
                     LastRecalcTick = Environment.TickCount;
                     var evade = CalculateEvade(LastIssueOrderPos, Player.Instance.Position.To2D());
-                    float angle =
+                    bool differentAngle =
                         (evade.WalkPoint - Player.Instance.Position).To2D()
-                            .AngleBetween((CurrentEvadeResult.WalkPoint - Player.Instance.Position).To2D());
+                            .AngleBetween((CurrentEvadeResult.WalkPoint - Player.Instance.Position).To2D()) > 1;
                     bool betterPos = evade.EvadePoint.Distance(Game.CursorPos) < CurrentEvadeResult.EvadePoint.Distance(Game.CursorPos);
-                    if (evade.IsValid && angle > 5 && angle < 90 /*dont move forward back inside the skills*/ && betterPos)
+                    if (evade.IsValid && differentAngle && betterPos)
                     {
                         CurrentEvadeResult = evade;
                     }
