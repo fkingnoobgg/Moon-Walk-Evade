@@ -1993,7 +1993,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Slot = SpellSlot.E,
                         Delay = 250,
                         Range = 1100,
-                        Radius = 350,
+                        Radius = 325,
                         ExtraExistingTime = 500,
                         MissileSpeed = 1400,
                         DangerValue = 2,
@@ -2117,7 +2117,7 @@ namespace Moon_Walk_Evade.Skillshots
                         Delay = 500,
                         ExtraExistingTime = 2300,
                         Range = 800,
-                        Radius = 375,
+                        Radius = 350,
                         MissileSpeed = 0,
                         DangerValue = 1,
                         ObjectCreationName = "",
@@ -3207,7 +3207,7 @@ namespace Moon_Walk_Evade.Skillshots
                     {
                         DisplayName = "Arcanopulse",
                         ChampionName = "Xerath",
-                        SpellName = "xeratharcanopulse2",
+                        SpellName = "XerathArcanopulse2",
                         Slot = SpellSlot.Q,
                         Delay = 500,
                         Range = 1525,
@@ -3215,7 +3215,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 0,
                         DangerValue = 2,
                         IsDangerous = false,
-                        ObjectCreationName = "xeratharcanopulse2"
+                        ObjectCreationName = "XerathArcanopulse2"
                     }
                 },
                 new CircularSkillshot
@@ -3224,7 +3224,7 @@ namespace Moon_Walk_Evade.Skillshots
                     {
                         DisplayName = "Rite of the Arcane",
                         ChampionName = "Xerath",
-                        SpellName = "xerathrmissilewrapper",
+                        SpellName = "XerathRMissileWrapper",
                         Slot = SpellSlot.R,
                         Delay = 700,
                         Range = 5600,
@@ -3232,7 +3232,7 @@ namespace Moon_Walk_Evade.Skillshots
                         MissileSpeed = 0,
                         DangerValue = 2,
                         IsDangerous = false,
-                        ObjectCreationName = "xerathrmissilewrapper"
+                        ObjectCreationName = "XerathRMissileWrapper"
                     }
                 },
                 new LinearSkillshot
@@ -3241,7 +3241,7 @@ namespace Moon_Walk_Evade.Skillshots
                     {
                         DisplayName = "Shocking Orb",
                         ChampionName = "Xerath",
-                        SpellName = "XerathMageSpear",
+                        SpellName = "XerathMageSpearMissile",
                         Slot = SpellSlot.E,
                         Delay = 200,
                         Range = 1125,
@@ -3258,12 +3258,12 @@ namespace Moon_Walk_Evade.Skillshots
                     {
                         DisplayName = "Steel Tempest (tornado)",
                         ChampionName = "Yasuo",
-                        SpellName = "YasuoQ3/disabled",
+                        SpellName = "YasuoQ3",
                         Slot = SpellSlot.Q,
                         Delay = 400,
                         Range = 1150,
                         Radius = 90,
-                        MissileSpeed = 1500,
+                        MissileSpeed = 1550,
                         DangerValue = 3,
                         ObjectCreationName = "YasuoQ3Mis"
                     }

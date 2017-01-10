@@ -134,7 +134,7 @@ namespace Moon_Walk_Evade.Skillshots
 
         private void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            //if (sender is AIHeroClient)
+            //if (sender is AIHeroClient && ((AIHeroClient)sender).ChampionName.Contains("Xerath"))
             //    Chat.Print(args.SData.Name);
 
             if (!EnableSpellDetection)

@@ -19,7 +19,7 @@ namespace Moon_Walk_Evade.Skillshots
         private int radiusBuffer => EvadeMenu.MainMenu["extraRadius"].Cast<Slider>().CurrentValue;
         public int Radius
         {
-            get { return _radius + radiusBuffer; }
+            get { return _radius + radiusBuffer + (int)Player.Instance.BoundingRadius; }
             set { _radius = value; }
         }
 
