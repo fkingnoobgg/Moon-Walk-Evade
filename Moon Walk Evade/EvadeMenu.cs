@@ -76,7 +76,7 @@ namespace Moon_Walk_Evade
             MainMenu.Add("minRecalculationAngle", new Slider("Minimum Change of Angle for Recalculation [in Degrees]", 2, 0, 50));
             MainMenu.AddSeparator(50);
             MainMenu.AddGroupLabel("Extra Distances");
-            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", (int)Player.Instance.BoundingRadius, 0, 50));
+            MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 15, 0, 50));
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));
 
@@ -180,10 +180,10 @@ namespace Moon_Walk_Evade
 
             DrawMenu = MainMenu.AddSubMenu("Drawings");
             DrawMenu.Add("disableAllDrawings", new CheckBox("Disable All Drawings", false));
-            DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point", false));
+            DrawMenu.Add("drawEvadePoint", new CheckBox("Draw Evade Point"));
             DrawMenu.Add("drawEvadeStatus", new CheckBox("Draw Evade Status"));
             DrawMenu.Add("drawSkillshots", new CheckBox("Draw Skillshots"));
-            DrawMenu.AddStringList("drawType", "Drawing Type", new [] { "Fancy", "Fast" }, 1);
+            DrawMenu.AddStringList("drawType", "Drawing Type", new [] { "Fancy", "Fast" }, 0);
 
 
             HotkeysMenu = MainMenu.AddSubMenu("KeyBinds");

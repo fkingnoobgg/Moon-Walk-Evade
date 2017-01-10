@@ -244,8 +244,7 @@ namespace Moon_Walk_Evade.Evading
                         (evade.WalkPoint - Player.Instance.Position).To2D()
                             .AngleBetween((CurrentEvadeResult.WalkPoint - Player.Instance.Position).To2D());
                     bool betterPos = evade.EvadePoint.Distance(Game.CursorPos) < CurrentEvadeResult.EvadePoint.Distance(Game.CursorPos);
-                    if (evade.IsValid && evade.EnoughTime && !evade.IsForced && 
-                        angle >= MinRecalculationAngle && betterPos)
+                    if (evade.IsValid && angle >= MinRecalculationAngle && angle < 90 /*dont move forward back inside the skills*/ && betterPos)
                     {
                         CurrentEvadeResult = evade;
                     }
@@ -359,7 +358,6 @@ namespace Moon_Walk_Evade.Evading
         }
         private void OnDraw(EventArgs args)
         {
-
             if (DisableDrawings)
             {
                 return;
@@ -370,9 +368,9 @@ namespace Moon_Walk_Evade.Evading
                 if (CurrentEvadeResult.IsValid && CurrentEvadeResult.EnoughTime && !CurrentEvadeResult.Expired())
                 {
                     var color = !CurrentEvadeResult.IsForced ? new ColorBGRA(255, 255, 255, 255) : new ColorBGRA(255, 165, 0, 255);
-                    foreach (var dot in GetPathDots(CurrentEvadeResult.WalkPoint.To2D(), Player.Instance.Position.To2D(), 10, 25))
+                    foreach (var dot in GetPathDots(CurrentEvadeResult.WalkPoint.To2D(), Player.Instance.Position.To2D(), 20, 50))
                     {
-                        new Circle(color, 10, 2, true).Draw(dot.To3D());
+                        new Circle(color, 20, 2, true).Draw(dot.To3D());
                     }
                 }
             }
