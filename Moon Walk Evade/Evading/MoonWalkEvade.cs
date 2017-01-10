@@ -232,7 +232,7 @@ namespace Moon_Walk_Evade.Evading
                         CurrentEvadeResult.EvadePoint = point;
                     }
                 }
-                else if (AllowRecalculateEvade && !IsHeroInDanger() && Environment.TickCount - LastRecalcTick >= RecalculationDelay)
+                else if (AllowRecalculateEvade && Environment.TickCount - LastRecalcTick >= RecalculationDelay)
                 {
                     LastRecalcTick = Environment.TickCount;
                     var evade = CalculateEvade(LastIssueOrderPos, Player.Instance.Position.To2D());
