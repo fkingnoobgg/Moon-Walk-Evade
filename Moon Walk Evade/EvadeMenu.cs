@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
-using EloBuddy.Sandbox;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
@@ -62,21 +61,17 @@ namespace Moon_Walk_Evade
 
             MainMenu.Add("fowDetection", new CheckBox("Enable FOW Detection"));
             MainMenu.Add("serverTimeBuffer", new Slider("Server Time Buffer", 70, -100, 100));
-            MainMenu.AddSeparator(50);
-            MainMenu.AddGroupLabel("Misc");
+            MainMenu.AddSeparator();
             MainMenu.Add("processSpellDetection", new CheckBox("Enable Fast Spell Detection"));
             MainMenu.Add("limitDetectionRange", new CheckBox("Limit Spell Detection Range"));
-            MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
-            MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
-            MainMenu.AddSeparator(50);
-            MainMenu.AddGroupLabel("Recalculation");
             MainMenu.Add("recalculatePosition", new CheckBox("Allow Recalculation Of Evade Position"));
             MainMenu.Add("recalculationSpeed", new Slider("Recalculation Delay", 100, 0, 1000));
-            MainMenu.AddLabel("Low Delay is Cpu Intense");
-            MainMenu.Add("minRecalculationAngle", new Slider("Minimum Change of Angle for Recalculation [in Degrees]", 2, 0, 50));
-            MainMenu.AddSeparator(50);
-            MainMenu.AddGroupLabel("Extra Distances");
+            MainMenu.AddLabel("LOW DELAY IS CPU INTENSE");
+            MainMenu.AddSeparator();
+            MainMenu.Add("moveToInitialPosition", new CheckBox("Move To Desired Position After Evade", false));
+            MainMenu.Add("forceEvade", new CheckBox("Try To Evade If Impossible"));
             MainMenu.Add("extraRadius", new Slider("Extra Skillshot Radius", 15, 0, 50));
+            MainMenu.AddSeparator();
             MainMenu.Add("minComfortDistance", new Slider("Minimum Comfort Distance To Enemies", 550, 0, 1000));
             MainMenu.Add("enemyComfortCount", new Slider("Minimum Amount of Enemies To Attend Comfort Distance", 3, 1, 5));
 
@@ -195,16 +190,12 @@ namespace Moon_Walk_Evade
             CollisionMenu.Add("minion", new CheckBox("Attend Minion Collision"));
             CollisionMenu.Add("yasuoWall", new CheckBox("Attend Yasuo Wall"));
 
-            if (SandboxConfig.Username == "DanThePman")
-            {
-                DebugMenu = MainMenu.AddSubMenu("Testings");
-                DebugMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
-                DebugMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 12000));
-                DebugMenu.AddStringList("debugMissile", "Selected Skillshot",
-                    SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
-                DebugMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
-                DebugMenu.Add("manageMovementDelay", new CheckBox("Manage Orbwalker Movement Delay", false));
-            }
+            DebugMenu = MainMenu.AddSubMenu("Debug");
+            DebugMenu.Add("debugMode", new KeyBind("Debug Mode", false, KeyBind.BindTypes.PressToggle));
+            DebugMenu.Add("debugModeIntervall", new Slider("Debug Skillshot Creation Intervall", 1000, 0, 12000));
+            DebugMenu.AddStringList("debugMissile", "Selected Skillshot", SkillshotDatabase.Database.Select(x => x.OwnSpellData.SpellName).ToArray(), 0);
+            DebugMenu.Add("isProjectile", new CheckBox("Is Projectile?"));
+            DebugMenu.Add("manageMovementDelay", new CheckBox("Manage Orbwalker Movement Delay", false));
         }
 
         private static EvadeSkillshot GetSkillshot(string s)
