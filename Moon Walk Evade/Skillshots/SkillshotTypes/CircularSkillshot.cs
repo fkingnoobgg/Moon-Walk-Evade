@@ -94,18 +94,17 @@ namespace Moon_Walk_Evade.Skillshots.SkillshotTypes
 
         public override bool OnDeleteMissile(GameObject obj)
         {
-            int delaytime = TimeDetected + OwnSpellData.Delay + OwnSpellData.ExtraExistingTime - Environment.TickCount;
             if (Missile != null && obj.Index == Missile.Index && !string.IsNullOrEmpty(OwnSpellData.ToggleParticleName))
             {
                 if (OwnSpellData.ExtraExistingTime == 0)
                     _missileDeleted = true;
-                else Core.DelayAction(() => _missileDeleted = true, delaytime);
+                else Core.DelayAction(() => _missileDeleted = true, OwnSpellData.ExtraExistingTime);
                 return false;
             }
 
             if (OwnSpellData.ExtraExistingTime == 0)
                 return true;
-            else Core.DelayAction(() => IsValid = false, delaytime);
+            else Core.DelayAction(() => IsValid = false, OwnSpellData.ExtraExistingTime);
 
             return false;
         }
